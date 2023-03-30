@@ -40,8 +40,10 @@ body {
     display: none;
 }
 
-.actions {
-    padding: 0px 300px;
+.new {
+    padding: 20px;
+    height: 60px;
+    display: inline-table;
 }
 
 textarea {
@@ -74,7 +76,6 @@ h1{
     color: #3c84f8;
     background-color: rgb(224, 224, 224, 0.5);
     border: 1px solid rgb(224, 224, 224, 1);
-    margin-top: 85px;
 }
 .list{
     padding: 0px 187px;

@@ -6,12 +6,13 @@ window.onload = () => {
 var CLIENT_ID = '129246923501-4lk4rkmhin21kcaoul91k300s9ar9n1t.apps.googleusercontent.com';
 var API_KEY = 'AIzaSyCfXON-94Onk-fLyihh8buKZcFIjynGRTc';
 var DISCOVERY_DOCS = ["https://www.googleapis.com/discovery/v1/apis/drive/v3/rest"];
-var SCOPES = 'https://www.googleapis.com/auth/drive';
+var SCOPES = 'https://www.googleapis.com/auth/drive.file'; // access to files created by the application
 var signinButton = document.getElementsByClassName('signin')[0];
 var signoutButton = document.getElementsByClassName('signout')[0];
 let tokenClient;
 let gapiInited = false;
 let gisInited = false;
+let gameNumber = 0;
 
 function gapiLoaded() {
     gapi.load('client', initializeGapiClient);
@@ -23,6 +24,7 @@ async function initializeGapiClient() {
         discoveryDocs: DISCOVERY_DOCS,
     });
     gapiInited = true;
+    console.log()
     maybeEnableButtons();
 }
 
@@ -42,12 +44,13 @@ function maybeEnableButtons() {
     }
 }
 
-signinButton.onclick = () => handleAuthClick()
+signinButton.onclick = () => handleAuthClick() // Sign in
 function handleAuthClick() {
     tokenClient.callback = async (resp) => {
         if (resp.error !== undefined) {
             throw (resp);
         }
+        console.log(resp);
         signinButton.style.display = 'none'
         signoutButton.style.display = 'block'
         checkFolder()
@@ -58,9 +61,10 @@ function handleAuthClick() {
     } else {
         tokenClient.requestAccessToken({ prompt: '' });
     }
+
 }
 
-signoutButton.onclick = () => handleSignoutClick()
+signoutButton.onclick = () => handleSignoutClick() // Sign out
 function handleSignoutClick() {
     const token = gapi.client.getToken();
     if (token !== null) {
@@ -77,17 +81,17 @@ function checkFolder() {
         'q': 'name = "Loop Games"',
     }).then(function (response) {
         var files = response.result.files;
-        console.log(files);
         if (files && files.length > 0) {
-            for (var i = 0; i < files.length; i++) {
-                var file = files[i];
-                localStorage.setItem('parent_folder', file.id);
-                console.log('Folder Available');
+            //for (var i = 0; i < files.length; i++) {
+            //    var file = files[0];
+                localStorage.setItem('games_folder', files[0].id);
+                console.log('Folder available');
                 // get files if folder available
                 showList();
-            }
+           // }
         } else {
             // if folder not available then create
+            console.log('Folder will be created');
             createFolder();
         }
     })
@@ -95,34 +99,31 @@ function checkFolder() {
 
 // now create a function to upload file
 function save() {
-    var text = document.querySelector('textarea');
-    if (text.value != "") {
-        const blob = new Blob([text.value], { type: 'plain/text' });
-        // get parent folder id from localstorage
-        const parentFolder = localStorage.getItem('parent_folder');
-        var gameName = text.value.split(' ')[0];
-        // set file metadata
-        var metadata = {
-            name:  gameName + '.json',
-            mimeType: 'plain/text',
-            parents: [parentFolder]
-        };
-        var formData = new FormData();
-        formData.append("metadata", new Blob([JSON.stringify(metadata)], { type: 'application/json' }));
-        formData.append("file", blob);
+    //const blob = new Blob([text.value], { type: 'plain/text' });
+    // get parent folder id from localstorage
+    const gamesFolder = localStorage.getItem('games_folder');
+    // set file metadata
+    var metadata = {
+        name:  "game" + gameNumber.toString(),
+        //mimeType: 'plain/text',
+        mimeType: 'application/vnd.google-apps.folder',
+        parents: [gamesFolder]
+    };
+    var formData = new FormData();
+    formData.append("metadata", new Blob([JSON.stringify(metadata)], { type: 'application/json' }));
+   // formData.append("file", blob);
 
-        fetch("https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart", {
-            method: 'POST',
-            headers: new Headers({ "Authorization": "Bearer " + gapi.auth.getToken().access_token }),
-            body: formData
-        }).then(function (response) {
-            return response.json();
-        }).then(function (value) {
-            console.log(value);
-            // also update list on file upload
-            showList();
-        });
-    }
+    fetch("https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart", {
+        method: 'POST',
+        headers: new Headers({ "Authorization": "Bearer " + gapi.auth.getToken().access_token }),
+        body: formData
+    }).then(function (response) {
+        return response.json();
+    }).then(function (value) {
+        console.log(value);
+        // also update list on file upload
+        showList();
+    });
 }
 
 function createFolder() {
@@ -140,7 +141,7 @@ function createFolder() {
         }
     });
     request.execute(function (response) {
-        localStorage.setItem('parent_folder', response.id);
+        localStorage.setItem('games_folder', response.id);
     })
 }
 
@@ -167,21 +168,18 @@ function expand(v) {
 // function for files list
 function showList() {
     gapi.client.drive.files.list({
-        // get parent folder id from localstorage
-        'q': `parents in "${localStorage.getItem('parent_folder')}"`
+        'q': `parents in "${localStorage.getItem('games_folder')}"`// get parent folder id from localstorage
     }).then(function (response) {
-        var files = response.result.files;
+        var files = response.result.files; console.log("Loop Gaems Folder", files);
         if (files && files.length > 0) {
             listcontainer.innerHTML = '';
+            gameNumber = files.length;
             for (var i = 0; i < files.length; i++) {
                 listcontainer.innerHTML += `
-                
                 <li data-id="${files[i].id}" data-name="${files[i].name}">
                 <span>${files[i].name}</span>
                 <svg onclick="expand(this)" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M24 24H0V0h24v24z" fill="none" opacity=".87"/><path d="M16.59 8.59L12 13.17 7.41 8.59 6 10l6 6 6-6-1.41-1.41z"/></svg>
-                </li>
-                
-                `;
+                </li>`;
             }
         } else {
             listcontainer.innerHTML = '<div style="text-align: center;">No Files</div>'

@@ -15,7 +15,8 @@ class DisplayActor extends PIXI.Container {
         this.flipY = actor.flipY;
 
         var texture = null;
-        var existsImage = Boolean(app.file.loader.resources[actor.image]);
+      //  var existsImage = Boolean(app.file.loader.resources[actor.image]);
+        var existsImage = false;
         if (actor.image && existsImage) texture = app.file.loader.resources[actor.image].texture;
         else texture = PIXI.Texture.WHITE;
 

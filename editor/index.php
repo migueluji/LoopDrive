@@ -111,6 +111,8 @@
 </head>
 <body>
 	<script src="https://unpkg.com/material-components-web@latest/dist/material-components-web.min.js"></script>
+	<script async defer src="https://apis.google.com/js/api.js"></script>
+    <script async defer src="https://accounts.google.com/gsi/client"></script>
 	<script>
 
 		window.onbeforeunload = () => "";
@@ -127,24 +129,55 @@
 	//	userName="Editor";
 		var gameId=Utils.id();
 		var serverGamesFolder="http://localhost/games";
-		var gameFolder;
+		var gameName = localStorage.getItem("gameName");
+		var gameId = localStorage.getItem("gameId");
+		var token = localStorage.getItem("token");
 
 	//  gameFolder="ludumdare46-carlos";
 
-	//	gameFolder="move";
-	//	gameFolder="box-doger"
-		gameFolder="alien-invasion";
-	//	gameFolder="pirate-bomb";
-	//	gameFolder ="move";
-	//	gameFolder="box-doger";
-	//	gameFolder="bird";
-	//	gameFolder="prehistoric";
-	//  gameFolder="babe-plataformer";
-	//  gameFolder="arkanoid";
-	//  gameFolder="asteroids";
-	//  gameFolder="flying-plane";
-	//	gameFolder="empty";
-		var app = new App();
+	window.onload = () => {
+		gapiLoaded();
+		gisLoaded()
+	}
+
+	var CLIENT_ID = '129246923501-4lk4rkmhin21kcaoul91k300s9ar9n1t.apps.googleusercontent.com';
+	var API_KEY = 'AIzaSyCfXON-94Onk-fLyihh8buKZcFIjynGRTc';
+	var DISCOVERY_DOCS = ["https://www.googleapis.com/discovery/v1/apis/drive/v3/rest"];
+	var SCOPES = 'https://www.googleapis.com/auth/drive.file'; // access to files created by the application
+	let tokenClient;
+	let gapiInited = false;
+	let gisInited = false;
+
+
+	function gapiLoaded() {
+		gapi.load('client', initializeGapiClient);
+	}
+
+	async function initializeGapiClient() {
+		await gapi.client.init({
+			apiKey: API_KEY,
+			discoveryDocs: DISCOVERY_DOCS,
+		});
+		gapiInited = true;
+		maybeEnable();
+	}
+
+	function gisLoaded() {
+		tokenClient = google.accounts.oauth2.initTokenClient({
+			client_id: CLIENT_ID,
+			scope: SCOPES,
+			callback: ''
+		});
+		gisInited = true;
+		maybeEnable();
+	}
+
+	function maybeEnable() {
+		if (gapiInited && gisInited) {
+			gapi.client.setToken(JSON.parse(token));
+			var app = new App();
+		}
+	}
 		
 	</script>
 </body>

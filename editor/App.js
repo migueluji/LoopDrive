@@ -3,12 +3,16 @@ class App {
         this.file = new File();
         this.load = new LoadingView("var(--mdc-theme-primary)");
         document.body.appendChild(this.load.html);
-        this.file.loadJson(serverGamesFolder+"/loadJson.php?gameFolder="+gameFolder,this);
+       // this.file.loadJson(serverGamesFolder+"/loadJson.php?gameFolder="+gameFolder,this);
+       console.log("loading...", gameName);
+       this.file.loadJson(gameId,this)
     }
     
     onJsonLoaded(json){
         this.json=json;
-        this.file.loadImages(serverGamesFolder+"/"+gameFolder,json,this);
+      //  console.log(json);
+     //  this.file.loadImages(gameId,json,this);
+        this.onAssetLoaded();
     }
 
     onImagesLoaded(){

@@ -1,15 +1,16 @@
 class File {
 
-    loadJson(URL, app) {
-        var xhr = new XMLHttpRequest();
-        xhr.onreadystatechange = function () {
-            if (this.readyState == this.DONE && this.status == 200) {
-                var json = JSON.parse(this.responseText);
-                app.onJsonLoaded(json);
-            }
-        }
-        xhr.open("GET", URL, true);
-        xhr.send();
+    loadJson(gameId, app) {
+        gapi.client.drive.files.list({
+            'q': `parents in "${gameId}" and name="game.json"`
+        }).then(function (res) {
+            gapi.client.drive.files.get({
+                fileId: res.result.files[0].id,
+                alt: 'media'
+            }).then(function (res) {
+                app.onJsonLoaded(JSON.parse(res.body));
+            })
+        })
     }
 
     loadImages(URL, json, app) {

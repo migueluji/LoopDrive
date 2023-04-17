@@ -1,0 +1,122 @@
+<!DOCTYPE HTML>
+<html>
+
+<head>
+	<style type="text/css">
+		body {
+			background: #222222;
+		}
+
+		canvas {
+			display: block;
+			position: absolute;
+			top: 50%;
+			left: 50%;
+			transform: translateX(-50%) translateY(-50%);
+		}
+	</style>
+	<title>Loop Engine</title>
+</head>
+
+<body>
+	<script src="libraries/math.js"></script>
+	<script src="https://pixijs.download/v6.1.3/pixi.min.js"></script>
+	<script src="libraries/Planck.js"></script>
+	<script src="libraries/howler.min.js"></script>
+
+	<script src="Player.js"></script>
+
+	<script src="../core/Game.js"></script>
+	<script src="../core/Scene.js"></script>
+	<script src="../core/Actor.js"></script>
+	<script src="../core/Script.js"></script>
+	<script src="../core/Node.js"></script>
+	<script src="../core/File.js"></script>
+	<script src="../core/Utils.js"></script>
+
+	<script src="Physics.js"></script>
+	<script src="Input.js"></script>
+	<script src="Logic.js"></script>
+	<script src="Render.js"></script>
+	<script src="Engine.js"></script>
+
+	<script src="GameState.js"></script>
+	<script src="GameObject.js"></script>
+	<script src="Container.js"></script>
+	<script src="Rigidbody.js"></script>
+	<script src="Rule.js"></script>
+	<script src="Sound.js"></script>
+
+	<script async defer src="https://apis.google.com/js/api.js"></script>
+	<script async defer src="https://accounts.google.com/gsi/client"></script>
+
+	<script>
+
+		window.onload = () => { gapiLoaded(); gisLoaded() }
+		// requestAnimationFrame Polyfill
+		var lastTime = 0, vendors = ['ms', 'moz', 'webkit', 'o'], x, length, currTime, timeToCall;
+
+		for (x = 0, length = vendors.length; x < length && !window.requestAnimationFrame; ++x) {
+			window.requestAnimationFrame = window[vendors[x] + 'RequestAnimationFrame'];
+			window.cancelAnimationFrame = window[vendors[x] + 'CancelAnimationFrame'] || window[vendors[x] + 'CancelRequestAnimationFrame'];
+		}
+
+		if (!window.requestAnimationFrame)
+			window.requestAnimationFrame = function (callback, element) {
+				currTime = new Date().getTime();
+				timeToCall = Math.max(0, 16.67 - (currTime - lastTime));
+				lastTime = currTime + timeToCall;
+				return window.setTimeout(function () { callback(currTime + timeToCall); }, timeToCall);
+			};
+
+		if (!window.cancelAnimationFrame) window.cancelAnimationFrame = function (id) { clearTimeout(id); };
+
+		// Game info 
+		var gameName = localStorage.getItem("gameName");
+		var gameId = localStorage.getItem("gameId");
+		var token = localStorage.getItem("token");
+
+		var CLIENT_ID = '129246923501-4lk4rkmhin21kcaoul91k300s9ar9n1t.apps.googleusercontent.com';
+		var API_KEY = 'AIzaSyCfXON-94Onk-fLyihh8buKZcFIjynGRTc';
+		var DISCOVERY_DOCS = ["https://www.googleapis.com/discovery/v1/apis/drive/v3/rest"];
+		var SCOPES = 'https://www.googleapis.com/auth/drive'; // access to files created by the application
+		let tokenClient;
+		let gapiInited = false;
+		let gisInited = false;
+		let player;
+
+		var editor = true; /* to kown if the engine has been launched from the editor */
+
+		function gapiLoaded() { gapi.load('client', initializeGapiClient); }
+
+		async function initializeGapiClient() {
+			await gapi.client.init({
+				apiKey: API_KEY,
+				discoveryDocs: DISCOVERY_DOCS,
+			});
+			gapiInited = true;
+			maybeEnable();
+		}
+
+		function gisLoaded() {
+			tokenClient = google.accounts.oauth2.initTokenClient({
+				client_id: CLIENT_ID,
+				scope: SCOPES,
+				callback: ''
+			});
+			gisInited = true;
+			maybeEnable();
+		}
+
+		function maybeEnable() {
+			if (gapiInited && gisInited) {
+				gapi.client.setToken(JSON.parse(token));
+				player = new Player();
+			}
+		}
+
+	</script>
+	<canvas id="main"></canvas>
+</body>
+
+</html>

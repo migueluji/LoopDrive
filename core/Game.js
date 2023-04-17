@@ -1,7 +1,6 @@
 class Game {
 
     constructor(game) {
-        console.log("********************",game.sceneList,this);
         this.fontList = []; this.imageList = []; this.soundList = [];
         this.tagList = []; this.sceneList = [];
 

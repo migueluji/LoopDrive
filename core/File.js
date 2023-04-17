@@ -1,33 +1,65 @@
 class File {
 
+    constructor() {
+        this.imageList = {}; this.soundList = {}; this.loader = new PIXI.Loader();
+    }
+
     loadJson(gameId, app) {
-        gapi.client.drive.files.list({
+        gapi.client.drive.files.list({ // find game.json id from the game folder
             'q': `parents in "${gameId}" and name="game.json"`
         }).then(function (res) {
             gapi.client.drive.files.get({
-                fileId: res.result.files[0].id,
+                fileId: res.result.files[0].id, // get the game.json file
                 alt: 'media'
             }).then(function (res) {
-                app.onJsonLoaded(JSON.parse(res.body));
+                var json = JSON.parse(res.body);
+                gapi.client.drive.files.list({ // find the image folder in the game folder
+                    'q': `parents in "${gameId}" and name="images" and mimeType = "application/vnd.google-apps.folder"`
+                }).then(function (res) {
+                    gapi.client.drive.files.list({ // list the images in the image folder
+                        'q': `parents in "${res.result.files[0].id}"`,
+                    }).then(function (res) {
+                        var files = res.result.files;
+                        if (files && files.length > 0) {
+                            files.forEach((file) => {
+                                app.file.imageList[file.name] = file.id;
+                            })
+                            json.imageList = Object.keys(app.file.imageList);
+                            app.onJsonLoaded(json);
+                        }
+                    })
+                })
             })
         })
     }
-
-    loadImages(URL, json, app) {
-        this.loader = new PIXI.Loader(URL + "/images");
-        if (json.imageList) this.loader.add(json.imageList);
-        else this.loader.add("Loader", "../../../editor/images/loop.png");// trick to initialize the loader when there is not /image folder
-        this.loader.onLoad.add((loader, resource) => {
-            console.log(resource.name, " loaded");
-        });
-        this.loader.load(() => {
-            console.log("Loaded images!");
-            if (app.file.loader.resources.hasOwnProperty("Loader")) {
-                app.file.loader.resources["Loader"].texture.destroy(true);
-                delete app.file.loader.resources["Loader"];
-            }
-            app.onImagesLoaded();
-        });
+    loadImages(app) {
+        Object.keys(app.file.imageList).forEach((image, i) => {
+            var imageId = app.file.imageList[image];
+            gapi.client.drive.files.get({
+                fileId: imageId,
+                alt: 'media'
+            }).then(function (response) {
+                var blob = new Blob([new Uint8Array(response.body.length).map((_, i) => response.body.charCodeAt(i))]);
+                const objectUrl = URL.createObjectURL(blob, { type: response.headers["Content-Type"] });
+                const texture = PIXI.Texture.from(objectUrl);
+                app.file.loader.resources[image] = { "texture": texture };
+                console.log("loading... ", image);
+                if (Object.keys(app.file.loader.resources).length == Object.keys(app.file.imageList).length &&
+                    async function f() { return texture.baseTexture.hasLoaded }) {
+                    app.file.loader.onComplete.add(() => {
+                        console.log('All textures loaded!');
+                        for (var name in app.file.loader.resources) {
+                            var texture = app.file.loader.resources[name].texture;
+                            if (texture.baseTexture.hasLoaded && texture.baseTexture.imageUrl) {
+                                URL.revokeObjectURL(texture.baseTexture.imageUrl);
+                            }
+                        }
+                        app.onImagesLoaded();
+                    });
+                    app.file.loader.load();
+                };
+            });
+        })
     }
 
     loadSounds(URL, json, app) {

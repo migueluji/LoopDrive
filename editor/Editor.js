@@ -87,27 +87,27 @@ class Editor {
         Object.assign(gameData, this.model);
         gameData = JSON.stringify(gameData, (key, value) => { if (key != "id") return value }, '\t');
         localStorage.setItem("localStorage_GameData", gameData);
+        window.open("../engine/", "_blank");
+        // var form = document.createElement("form");
+        // form.setAttribute("method", "post");
+        // form.setAttribute("action", "../engine/");
+        // form.setAttribute("target", "play");
 
-        var form = document.createElement("form");
-        form.setAttribute("method", "post");
-        form.setAttribute("action", "../engine/");
-        form.setAttribute("target", "play");
+        // var inputFolder = document.createElement('input');
+        // inputFolder.type = 'text';
+        // inputFolder.name = "gameFolder";
+        // inputFolder.value = gameFolder;
+        // form.appendChild(inputFolder);
 
-        var inputFolder = document.createElement('input');
-        inputFolder.type = 'text';
-        inputFolder.name = "gameFolder";
-        inputFolder.value = gameFolder;
-        form.appendChild(inputFolder);
+        // var inputUrl = document.createElement('input');
+        // inputUrl.type = 'text';
+        // inputUrl.name = "serverGamesFolder";
+        // inputUrl.value = serverGamesFolder;
+        // form.appendChild(inputUrl);
+        // document.body.appendChild(form);
 
-        var inputUrl = document.createElement('input');
-        inputUrl.type = 'text';
-        inputUrl.name = "serverGamesFolder";
-        inputUrl.value = serverGamesFolder;
-        form.appendChild(inputUrl);
-        document.body.appendChild(form);
-
-        form.submit();
-        document.body.removeChild(form);
+        // form.submit();
+        // document.body.removeChild(form);
     }
 
     //SCENES

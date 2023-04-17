@@ -137,7 +137,6 @@ class CanvasView {
     }
 
     initApp() {
-
         this.appRenderer.view.style.position = "absolute";
         this.appRenderer.view.style.display = "block";
         this.html.appendChild(this.appRenderer.view);

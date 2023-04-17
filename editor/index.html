@@ -1,13 +1,18 @@
 <!DOCTYPE HTML>
 <html lang="en-US">
+
 <head>
 	<meta charset="UTF-8">
 	<title>Gamesonomy Editor</title>
-	
-	<link rel="stylesheet" type="text/css" href="https://unpkg.com/material-components-web@10.0.0/dist/material-components-web.min.css"></link>
+
+	<link rel="stylesheet" type="text/css"
+		href="https://unpkg.com/material-components-web@10.0.0/dist/material-components-web.min.css">
+	</link>
 	<link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
-	<link rel="stylesheet" href="editor.css"></link>
-	<link rel="stylesheet" href="scripts.css"></link>
+	<link rel="stylesheet" href="editor.css">
+	</link>
+	<link rel="stylesheet" href="scripts.css">
+	</link>
 
 	<script src="https://pixijs.download/v6.1.3/pixi.min.js"></script>
 	<script src="../engine/libraries/howler.min.js"></script>
@@ -107,78 +112,60 @@
 	<script src="./commands/MoveNodeCmd.js"></script>
 	<script src="./commands/ChangeNodeCmd.js"></script>
 	<script src="./commands/RemoveTagCmd.js"></script>
-	
+
 </head>
+
 <body>
 	<script src="https://unpkg.com/material-components-web@latest/dist/material-components-web.min.js"></script>
 	<script async defer src="https://apis.google.com/js/api.js"></script>
-    <script async defer src="https://accounts.google.com/gsi/client"></script>
+	<script async defer src="https://accounts.google.com/gsi/client"></script>
+	
 	<script>
 
-		window.onbeforeunload = () => "";
-	/*    
-		var userId="<?php echo $_POST['iduser'];?>";
-		var userName="<?php echo $_POST['nameuser'];?>";
-		var gameId="<?php echo $_POST['idgame'];?>";
-		var gameName="<?php echo $_POST['gamename'];?>";
-		var gameFolder="<?php echo $_POST['gamefolder'];?>";
-		var serverGamesFolder="https://<?php echo $_SERVER['SERVER_NAME'];?>/games-js";
-	*/
+		window.onload = () => { gapiLoaded(); gisLoaded() }
+		window.onbeforeunload = () => ""; // This event enables the web page to trigger a confirmation dialog asking the user if they really want to leave the page
 
-	//	userId=1455;
-	//	userName="Editor";
-		var gameId=Utils.id();
-		var serverGamesFolder="http://localhost/games";
 		var gameName = localStorage.getItem("gameName");
 		var gameId = localStorage.getItem("gameId");
 		var token = localStorage.getItem("token");
 
-	//  gameFolder="ludumdare46-carlos";
+		var CLIENT_ID = '129246923501-4lk4rkmhin21kcaoul91k300s9ar9n1t.apps.googleusercontent.com';
+		var API_KEY = 'AIzaSyCfXON-94Onk-fLyihh8buKZcFIjynGRTc';
+		var DISCOVERY_DOCS = ["https://www.googleapis.com/discovery/v1/apis/drive/v3/rest"];
+		var SCOPES = 'https://www.googleapis.com/auth/drive'; // access to files created by the application
+		let tokenClient;
+		let gapiInited = false;
+		let gisInited = false;
+		let app;
 
-	window.onload = () => {
-		gapiLoaded();
-		gisLoaded()
-	}
+		function gapiLoaded() { gapi.load('client', initializeGapiClient);}
 
-	var CLIENT_ID = '129246923501-4lk4rkmhin21kcaoul91k300s9ar9n1t.apps.googleusercontent.com';
-	var API_KEY = 'AIzaSyCfXON-94Onk-fLyihh8buKZcFIjynGRTc';
-	var DISCOVERY_DOCS = ["https://www.googleapis.com/discovery/v1/apis/drive/v3/rest"];
-	var SCOPES = 'https://www.googleapis.com/auth/drive.file'; // access to files created by the application
-	let tokenClient;
-	let gapiInited = false;
-	let gisInited = false;
-
-
-	function gapiLoaded() {
-		gapi.load('client', initializeGapiClient);
-	}
-
-	async function initializeGapiClient() {
-		await gapi.client.init({
-			apiKey: API_KEY,
-			discoveryDocs: DISCOVERY_DOCS,
-		});
-		gapiInited = true;
-		maybeEnable();
-	}
-
-	function gisLoaded() {
-		tokenClient = google.accounts.oauth2.initTokenClient({
-			client_id: CLIENT_ID,
-			scope: SCOPES,
-			callback: ''
-		});
-		gisInited = true;
-		maybeEnable();
-	}
-
-	function maybeEnable() {
-		if (gapiInited && gisInited) {
-			gapi.client.setToken(JSON.parse(token));
-			var app = new App();
+		async function initializeGapiClient() {
+			await gapi.client.init({
+				apiKey: API_KEY,
+				discoveryDocs: DISCOVERY_DOCS,
+			});
+			gapiInited = true;
+			maybeEnable();
 		}
-	}
-		
+
+		function gisLoaded() {
+			tokenClient = google.accounts.oauth2.initTokenClient({
+				client_id: CLIENT_ID,
+				scope: SCOPES,
+				callback: ''
+			});
+			gisInited = true;
+			maybeEnable();
+		}
+
+		function maybeEnable() {
+			if (gapiInited && gisInited) {
+				gapi.client.setToken(JSON.parse(token));
+				app = new App();
+			}
+		}
+
 	</script>
 </body>
 </html>

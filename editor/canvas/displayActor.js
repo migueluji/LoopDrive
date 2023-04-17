@@ -15,11 +15,10 @@ class DisplayActor extends PIXI.Container {
         this.flipY = actor.flipY;
 
         var texture = null;
-      //  var existsImage = Boolean(app.file.loader.resources[actor.image]);
-        var existsImage = false;
+        var existsImage = Boolean(app.file.loader.resources[actor.image]);
+        if (existsImage) console.log(actor.name,actor.image,app.file.loader.resources[actor.image].texture.width,app.file.loader.resources[actor.image].texture.height);
         if (actor.image && existsImage) texture = app.file.loader.resources[actor.image].texture;
         else texture = PIXI.Texture.WHITE;
-
         this.createSprite(actor, texture);
 
         if ((!actor.spriteOn && !actor.textOn) || actor.image == "" || !existsImage) {

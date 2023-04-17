@@ -6,7 +6,7 @@ window.onload = () => {
 var CLIENT_ID = '129246923501-4lk4rkmhin21kcaoul91k300s9ar9n1t.apps.googleusercontent.com';
 var API_KEY = 'AIzaSyCfXON-94Onk-fLyihh8buKZcFIjynGRTc';
 var DISCOVERY_DOCS = ["https://www.googleapis.com/discovery/v1/apis/drive/v3/rest"];
-var SCOPES = 'https://www.googleapis.com/auth/drive'; // access only to files created by the application
+var SCOPES = 'https://www.googleapis.com/auth/drive.file https://www.googleapis.com/auth/drive'; // access only to files created by the application
 var signinButton = document.getElementsByClassName('signin')[0];
 var signoutButton = document.getElementsByClassName('signout')[0];
 let tokenClient;

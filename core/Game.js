@@ -4,6 +4,7 @@ class Game {
         this.fontList = []; this.imageList = []; this.soundList = [];
         this.tagList = []; this.sceneList = [];
 
+        console.log("GAME",game);
         if (!game.sceneList) { // if the game is empty
             this.name = "Untitled Game";
             Object.assign(this, this.properties); // add basic game properties
@@ -11,10 +12,14 @@ class Game {
         }
         else {
             Object.assign(this, game);
+            console.log(this,game);
             this.sceneList.forEach((scene, i) => this.sceneList[i] = new Scene(scene));
         }
 
-        if (this.imageList) this.imageList.forEach((image, i) => this.imageList[i] = new Object({ "id": Utils.id(), "name": image.name }));
+         if (this.imageList) this.imageList.forEach((image, i) => {
+            console.log(image);
+            this.imageList[i] = new Object({ "id": Utils.id(), "name": image })}
+            );
         if (this.soundList) this.soundList.forEach((sound, i) => this.soundList[i] = new Object({ "id": Utils.id(), "name": sound.name }));
         // add fixed fonts
         var fontList = ["Arial", "Arial Black", "Courier New", "Georgia", "Helvetica", "Impact", "Tahoma", "Times New Roman", "Verdana"];

@@ -125,8 +125,7 @@
 		window.onload = () => { gapiLoaded(); gisLoaded() }
 		window.onbeforeunload = () => ""; // This event enables the web page to trigger a confirmation dialog asking the user if they really want to leave the page
 
-		var gameName = localStorage.getItem("gameName");
-		var gameId = localStorage.getItem("gameId");
+		var game= JSON.parse(localStorage.getItem("game"));
 		var token = localStorage.getItem("token");
 
 		var CLIENT_ID = '129246923501-4lk4rkmhin21kcaoul91k300s9ar9n1t.apps.googleusercontent.com';
@@ -162,7 +161,7 @@
 		function maybeEnable() {
 			if (gapiInited && gisInited) {
 				gapi.client.setToken(JSON.parse(token));
-				app = new App();
+				app = new App(game);
 			}
 		}
 

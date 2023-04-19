@@ -7,7 +7,6 @@ class Player {
     }
 
     onJsonLoaded(json) { // when json is loaded then load assets
-        console.log(json);
         this.json = json;
         this.file.loadImages(this);
     }

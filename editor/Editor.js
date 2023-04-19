@@ -87,6 +87,7 @@ class Editor {
         Object.assign(gameData, this.model);
         gameData = JSON.stringify(gameData, (key, value) => { if (key != "id") return value }, '\t');
         localStorage.setItem("localStorage_GameData", gameData);
+        console.log(this.model);
         window.open("../engine/", "_blank");
         // var form = document.createElement("form");
         // form.setAttribute("method", "post");

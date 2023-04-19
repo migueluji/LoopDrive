@@ -92,10 +92,7 @@ function checkFolder() {
 }
 
 function editGame(game) {
-    var id = game.getAttribute('data-id');
-    var name = game.getAttribute('data-name');
-    localStorage.setItem("gameId", id);
-    localStorage.setItem("gameName", name);
+    localStorage.setItem("game", JSON.stringify({ id: game.getAttribute('data-id'), name: game.getAttribute('data-name') }));
     localStorage.setItem("token", JSON.stringify(gapi.client.getToken()));
     window.open("editor/", "_blank");
 }

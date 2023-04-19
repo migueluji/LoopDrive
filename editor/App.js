@@ -1,14 +1,15 @@
 class App {
-    constructor() {
+    constructor(game) {
+        this.gameId = game.id;
         this.file = new File();
         this.load = new LoadingView("var(--mdc-theme-primary)");
         document.body.appendChild(this.load.html);
-        this.file.loadJson(gameId, this)
+        this.file.loadJson(this.gameId, this);
     }
 
     onJsonLoaded(json) {
         this.json = json;
-        this.file.loadImages(this);
+        this.file.loadImages(this.gameId,this);
     }
 
     onImagesLoaded() {

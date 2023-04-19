@@ -20,51 +20,34 @@ class File {
     }
 
     loadImages(gameId, app) {
-        gapi.client.drive.files.list({ // find game.json id from the game folder
+        gapi.client.drive.files.list({
             'q': `parents in "${gameId}" and name="images" and mimeType = "application/vnd.google-apps.folder"`
         }).then(function (res) {
-            gapi.client.drive.files.list({ // list the images in the image folder
+            gapi.client.drive.files.list({
                 'q': `parents in "${res.result.files[0].id}"`,
             }).then(function (res) {
                 var files = res.result.files;
-                app.file.loader.add("Loader", "http://localhost/editor/images/loop.png")
+                var images = [];
                 files.forEach((image) => {
-                    console.log(image);
                     gapi.client.drive.files.get({
                         fileId: image.id,
                         alt: 'media'
                     }).then(function (res) {
                         var blob = new Blob([new Uint8Array(res.body.length).map((_, i) => res.body.charCodeAt(i))]);
                         const objectUrl = URL.createObjectURL(blob, { type: res.headers["Content-Type"] });
-                        app.file.url = objectUrl;
+                        images.push({ [image.name]: objectUrl });
                         const texture = PIXI.Texture.from(objectUrl);
+                        app.file.loader.add(image.name, objectUrl);
                         app.file.loader.resources[image.name] = { "texture": texture };
-                        console.log("loading... ", image.name);
-                        if (Object.keys(app.file.loader.resources).length == 12) {
-                            console.log(":::::::::::::::::::::::::::");
-                            app.file.loader.onComplete.add(() => {
-                                console.log('All textures loaded!');
-                                for (var name in app.file.loader.resources) {
-                                    var texture = app.file.loader.resources[name].texture;
-                                    if (texture.baseTexture.hasLoaded && texture.baseTexture.imageUrl) {
-                                        URL.revokeObjectURL(texture.baseTexture.imageUrl);
-                                    }
-                                }
-                                if (app.file.loader.resources.hasOwnProperty("Loader")) {
-                                    app.file.loader.resources["Loader"].texture.destroy(true);
-                                    delete app.file.loader.resources["Loader"];
-                                }
-                                app.onImagesLoaded();
-                            });
+                        if (images.length === files.length) {
+                            app.file.loader.onLoad.add((loader, resource) => { console.log("loaded :", resource.name); });
+                            app.file.loader.onComplete.add(() => { app.onImagesLoaded(images) });
                             app.file.loader.load();
-                        };
-
+                        }
                     })
                 })
             })
-
         });
-
     }
 
     loadSounds(URL, json, app) {

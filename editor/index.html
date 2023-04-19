@@ -119,13 +119,13 @@
 	<script src="https://unpkg.com/material-components-web@latest/dist/material-components-web.min.js"></script>
 	<script async defer src="https://apis.google.com/js/api.js"></script>
 	<script async defer src="https://accounts.google.com/gsi/client"></script>
-	
+
 	<script>
 
 		window.onload = () => { gapiLoaded(); gisLoaded() }
 		window.onbeforeunload = () => ""; // This event enables the web page to trigger a confirmation dialog asking the user if they really want to leave the page
 
-		var game= JSON.parse(localStorage.getItem("game"));
+		var game = JSON.parse(localStorage.getItem("game"));
 		var token = localStorage.getItem("token");
 
 		var CLIENT_ID = '129246923501-4lk4rkmhin21kcaoul91k300s9ar9n1t.apps.googleusercontent.com';
@@ -137,7 +137,7 @@
 		let gisInited = false;
 		let app;
 
-		function gapiLoaded() { gapi.load('client', initializeGapiClient);}
+		function gapiLoaded() { gapi.load('client', initializeGapiClient); }
 
 		async function initializeGapiClient() {
 			await gapi.client.init({
@@ -167,4 +167,5 @@
 
 	</script>
 </body>
+
 </html>

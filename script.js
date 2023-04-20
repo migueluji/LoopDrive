@@ -94,7 +94,8 @@ function checkFolder() {
 function editGame(game) {
     localStorage.setItem("game", JSON.stringify({ id: game.getAttribute('data-id'), name: game.getAttribute('data-name') }));
     localStorage.setItem("token", JSON.stringify(gapi.client.getToken()));
-    window.open("editor/", "_blank");
+    console.log(localStorage.getItem("token"));
+    window.open("engine/", "_blank");
 }
 // now create a function to upload file
 function save() {

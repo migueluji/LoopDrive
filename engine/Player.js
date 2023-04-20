@@ -1,22 +1,23 @@
 class Player {
 
-    constructor() {
+    constructor(game) {
+        this.gameId = game.id;
         this.file = new File();
-        (editor) ? this.onJsonLoaded(JSON.parse(localStorage.getItem("localStorage_GameData")) ): 
-             this.file.loadJson(gameId, this) ;
+        //     (editor) ? this.onJsonLoaded(JSON.parse(localStorage.getItem("localStorage_GameData"))) :
+        this.file.loadJson(this.gameId, this);
     }
 
     onJsonLoaded(json) { // when json is loaded then load assets
         this.json = json;
-        this.file.loadImages(this);
+        this.file.loadImages(this.gameId,this);
     }
 
-    onImagesLoaded(){
-      //  this.file.loadSounds(this);
+    onImagesLoaded() {
+       // this.file.loadSounds(this);
         this.onAssetLoaded();
     }
 
-    onSoundsLoaded(){
+    onSoundsLoaded() {
         this.onAssetLoaded();
     }
 

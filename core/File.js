@@ -3,6 +3,7 @@ class File {
     constructor() {
         //   this.imageList = {}; this.soundList = {};
         this.loader = new PIXI.Loader();
+        this.json;
         //this.json, this.url;
     }
 
@@ -14,7 +15,22 @@ class File {
                 fileId: res.result.files[0].id, // get the game.json file
                 alt: 'media'
             }).then(function (res) {
-                app.onJsonLoaded(JSON.parse(res.body));
+                app.file.json = JSON.parse(res.body);
+                gapi.client.drive.files.list({ // find the image folder in the game folder
+                    'q': `parents in "${gameId}" and name="images" and mimeType = "application/vnd.google-apps.folder"`
+                }).then(function (res) {
+                    gapi.client.drive.files.list({ // list the images in the image folder
+                        'q': `parents in "${res.result.files[0].id}"`,
+                    }).then(function (res) {
+                        var files = res.result.files;
+                        app.file.json.imageList =[];
+                        files.forEach((file) => {
+                            app.file.json.imageList.push(file.name);
+                        })
+                        console.log("loadJson ",app.file.json)
+                        app.onJsonLoaded(app.file.json);
+                    })
+                })
             })
         })
     }
@@ -27,7 +43,7 @@ class File {
                 'q': `parents in "${res.result.files[0].id}"`,
             }).then(function (res) {
                 var files = res.result.files;
-                var images = [];
+                app.file.images = {};
                 files.forEach((image) => {
                     gapi.client.drive.files.get({
                         fileId: image.id,
@@ -35,13 +51,13 @@ class File {
                     }).then(function (res) {
                         var blob = new Blob([new Uint8Array(res.body.length).map((_, i) => res.body.charCodeAt(i))]);
                         const objectUrl = URL.createObjectURL(blob, { type: res.headers["Content-Type"] });
-                        images.push({ [image.name]: objectUrl });
+                        app.file.images[image.name] = objectUrl;
                         const texture = PIXI.Texture.from(objectUrl);
                         app.file.loader.add(image.name, objectUrl);
                         app.file.loader.resources[image.name] = { "texture": texture };
-                        if (images.length === files.length) {
+                        if (Object.keys(app.file.images).length === files.length) {
                             app.file.loader.onLoad.add((loader, resource) => { console.log("loaded :", resource.name); });
-                            app.file.loader.onComplete.add(() => { app.onImagesLoaded(images) });
+                            app.file.loader.onComplete.add(() => { app.onImagesLoaded() });
                             app.file.loader.load();
                         }
                     })

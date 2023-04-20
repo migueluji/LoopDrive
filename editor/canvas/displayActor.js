@@ -16,7 +16,6 @@ class DisplayActor extends PIXI.Container {
 
         var texture = null;
         var existsImage = Boolean(app.file.loader.resources[actor.image]);
-        if (existsImage) console.log(actor.name,actor.image,app.file.loader.resources[actor.image].texture.width,app.file.loader.resources[actor.image].texture.height);
         if (actor.image && existsImage) texture = app.file.loader.resources[actor.image].texture;
         else texture = PIXI.Texture.WHITE;
         this.createSprite(actor, texture);
@@ -54,7 +53,7 @@ class DisplayActor extends PIXI.Container {
         var pivot = { x: 0, y: 0 };
         switch (actor.align) {
             case "Left": pivot.x = - actor.width / 2 + text.width / 2; break;
-            case "Right": pivot.x =  actor.width / 2 - text.width / 2; break;
+            case "Right": pivot.x = actor.width / 2 - text.width / 2; break;
         }
         text.position = { x: pivot.x + actor.offsetX, y: pivot.y + actor.offsetY };
         text.scale.y = -1;

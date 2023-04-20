@@ -9,7 +9,7 @@ class App {
 
     onJsonLoaded(json) {
         this.json = json;
-        this.file.loadImages(this.gameId,this);
+        this.file.loadImages(this.gameId, this);
     }
 
     onImagesLoaded() {

@@ -1,6 +1,7 @@
 class Game {
 
     constructor(game) {
+
         this.fontList = []; this.imageList = []; this.soundList = [];
         this.tagList = []; this.sceneList = [];
 
@@ -14,12 +15,13 @@ class Game {
             this.sceneList.forEach((scene, i) => this.sceneList[i] = new Scene(scene));
         }
 
-        if (this.imageList) this.imageList.forEach((image, i) => this.imageList[i] = new Object({ "id": Utils.id(), "name": image.name }));
-        if (this.soundList) this.soundList.forEach((sound, i) => this.soundList[i] = new Object({ "id": Utils.id(), "name": sound.name }));
+        if (this.imageList) this.imageList.forEach((image, i) => this.imageList[i] = new Object({ "id": Utils.id(), "name": image }));
+      //  if (this.soundList) this.soundList.forEach((sound, i) => this.soundList[i] = new Object({ "id": Utils.id(), "name": sound }));
+
         // add fixed fonts
         var fontList = ["Arial", "Arial Black", "Courier New", "Georgia", "Helvetica", "Impact", "Tahoma", "Times New Roman", "Verdana"];
-        fontList.forEach((font, i) => this.fontList[i] = new Object({ "name": font }));
-        if (this.fontList) this.fontList.forEach((font, i) => this.fontList[i] = new Object({ "id": Utils.id(), "name": font.name }));
+        fontList.forEach((font, i) => this.fontList[i] = new Object({ "id": Utils.id(), "name": font }));
+        console.log("game", this);
     }
 
     get properties() {
@@ -51,9 +53,9 @@ class Game {
             deltaTime: 0.01,
             mouseX: 0, mouseY: 0,
             currentScene: this.sceneList[0].name, currentSceneNumber: 0,
-          //  accelerationX: 0, accelerationY: 0, accelerationZ: 0,
-          //  latitude: 0, longitude: 0
-         //  exit: false,
+            //  accelerationX: 0, accelerationY: 0, accelerationZ: 0,
+            //  latitude: 0, longitude: 0
+            //  exit: false,
         }
         return (obj);
     }

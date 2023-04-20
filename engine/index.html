@@ -72,8 +72,7 @@
 		if (!window.cancelAnimationFrame) window.cancelAnimationFrame = function (id) { clearTimeout(id); };
 
 		// Game info 
-		var gameName = localStorage.getItem("gameName");
-		var gameId = localStorage.getItem("gameId");
+		var game = JSON.parse(localStorage.getItem("game"));
 		var token = localStorage.getItem("token");
 
 		var CLIENT_ID = '129246923501-4lk4rkmhin21kcaoul91k300s9ar9n1t.apps.googleusercontent.com';
@@ -85,14 +84,14 @@
 		let gisInited = false;
 		let player;
 
-		var editor = true; /* to kown if the engine has been launched from the editor */
+		var editor = false; /* to kown if the engine has been launched from the editor */
 
 		function gapiLoaded() { gapi.load('client', initializeGapiClient); }
 
 		async function initializeGapiClient() {
 			await gapi.client.init({
 				apiKey: API_KEY,
-				discoveryDocs: DISCOVERY_DOCS,
+			   discoveryDocs: DISCOVERY_DOCS,
 			});
 			gapiInited = true;
 			maybeEnable();
@@ -111,7 +110,8 @@
 		function maybeEnable() {
 			if (gapiInited && gisInited) {
 				gapi.client.setToken(JSON.parse(token));
-				player = new Player();
+				console.log(token);
+			    player = new Player(game);
 			}
 		}
 

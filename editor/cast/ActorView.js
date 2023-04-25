@@ -32,7 +32,7 @@ class ActorView {
 			span.innerHTML = "";
 			var image = new Image();
 			image.style = "width:40px;height:40px;object-fit:contain";
-			image.src = app.file.images[actor.image];
+			image.src = app.loader.resources[actor.image].texture.baseTexture.cacheId;
 			span.appendChild(image);
 		}
 	}

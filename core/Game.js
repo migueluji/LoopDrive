@@ -16,12 +16,11 @@ class Game {
         }
 
         if (this.imageList) this.imageList.forEach((image, i) => this.imageList[i] = new Object({ "id": Utils.id(), "name": image }));
-      //  if (this.soundList) this.soundList.forEach((sound, i) => this.soundList[i] = new Object({ "id": Utils.id(), "name": sound }));
+        if (this.soundList) this.soundList.forEach((sound, i) => this.soundList[i] = new Object({ "id": Utils.id(), "name": sound }));
 
         // add fixed fonts
         var fontList = ["Arial", "Arial Black", "Courier New", "Georgia", "Helvetica", "Impact", "Tahoma", "Times New Roman", "Verdana"];
         fontList.forEach((font, i) => this.fontList[i] = new Object({ "id": Utils.id(), "name": font }));
-        console.log("game", this);
     }
 
     get properties() {

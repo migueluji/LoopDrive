@@ -23,8 +23,8 @@ class Container {
     }
 
     static updateSpriteTexture(container, image, tileX, tileY, flipX, flipY) {
-        const existsImage = Boolean(player.file.loader.resources[image]);
-        if (existsImage) container.sprite.texture = player.file.loader.resources[image].texture;
+        const existsImage = Boolean(player.loader.resources[image]);
+        if (existsImage) container.sprite.texture = player.loader.resources[image].texture;
         else {
             container.sprite.texture = PIXI.Texture.WHITE;
             container.sprite.texture.orig = new PIXI.Rectangle(0, 0, 50, 50);

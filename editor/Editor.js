@@ -1,6 +1,7 @@
 class Editor {
 
     constructor(editorView, gameModel) {
+        this.openWindows = {};
         this.view = editorView;
         this.model = gameModel;
         this.selectedSceneIndex = 0;
@@ -75,7 +76,7 @@ class Editor {
         delete saveToFile.fontList;
         delete saveToFile.imageList;
         delete saveToFile.soundList;
-        File.save(JSON.stringify(saveToFile, (key, value) => { if (key != "id") return value }, '\t'));
+        File.save(JSON.parse(localStorage.getItem("game")).id, JSON.stringify(saveToFile, (key, value) => { if (key != "id") return value }, '\t'));
     }
 
     takeScreenshot() {
@@ -87,28 +88,13 @@ class Editor {
         Object.assign(gameData, this.model);
         gameData = JSON.stringify(gameData, (key, value) => { if (key != "id") return value }, '\t');
         localStorage.setItem("localStorage_GameData", gameData);
-        console.log(this.model);
-        window.open("../engine/", "_blank");
-        // var form = document.createElement("form");
-        // form.setAttribute("method", "post");
-        // form.setAttribute("action", "../engine/");
-        // form.setAttribute("target", "play");
 
-        // var inputFolder = document.createElement('input');
-        // inputFolder.type = 'text';
-        // inputFolder.name = "gameFolder";
-        // inputFolder.value = gameFolder;
-        // form.appendChild(inputFolder);
-
-        // var inputUrl = document.createElement('input');
-        // inputUrl.type = 'text';
-        // inputUrl.name = "serverGamesFolder";
-        // inputUrl.value = serverGamesFolder;
-        // form.appendChild(inputUrl);
-        // document.body.appendChild(form);
-
-        // form.submit();
-        // document.body.removeChild(form);
+        var url = "../engine/?id" + JSON.parse(localStorage.getItem("game")).id;
+        if (this.openWindows[url] && !this.openWindows[url].closed) {
+            this.openWindows[url].location.reload();
+            this.openWindows[url].focus();
+        }
+        else this.openWindows[url] = window.open(url, "_blank");
     }
 
     //SCENES
@@ -215,9 +201,9 @@ class Editor {
 
         var originalWidth = 50;
         var originalHeight = 50;
-        if (app.file.loader.resources.hasOwnProperty(actor.image)) {
-            originalWidth = app.file.loader.resources[actor.image].texture.width;
-            originalHeight = app.file.loader.resources[actor.image].texture.height;
+        if (app.loader.resources.hasOwnProperty(actor.image)) {
+            originalWidth = app.loader.resources[actor.image].texture.width;
+            originalHeight = app.loader.resources[actor.image].texture.height;
         }
 
         switch (true) {

@@ -1,112 +1,127 @@
 class File {
 
-    constructor() {
-        //   this.imageList = {}; this.soundList = {};
-        this.loader = new PIXI.Loader();
-        this.json;
-        //this.json, this.url;
-    }
-
-    loadJson(gameId, app) {
+    loadJson(gameId, callback) {
         gapi.client.drive.files.list({ // find game.json id from the game folder
             'q': `parents in "${gameId}" and name="game.json"`
         }).then(function (res) {
+            console.log('Game.json ID:', res.result.files[0].id);
+            console.log(res);
             gapi.client.drive.files.get({
                 fileId: res.result.files[0].id, // get the game.json file
                 alt: 'media'
             }).then(function (res) {
-                app.file.json = JSON.parse(res.body);
-                gapi.client.drive.files.list({ // find the image folder in the game folder
-                    'q': `parents in "${gameId}" and name="images" and mimeType = "application/vnd.google-apps.folder"`
-                }).then(function (res) {
-                    gapi.client.drive.files.list({ // list the images in the image folder
-                        'q': `parents in "${res.result.files[0].id}"`,
-                    }).then(function (res) {
-                        var files = res.result.files;
-                        app.file.json.imageList =[];
-                        files.forEach((file) => {
-                            app.file.json.imageList.push(file.name);
-                        })
-                        console.log("loadJson ",app.file.json)
-                        app.onJsonLoaded(app.file.json);
-                    })
-                })
+                var json = JSON.parse(res.body);
+                callback(json);
             })
         })
     }
 
-    loadImages(gameId, app) {
-        gapi.client.drive.files.list({
+    loadImages(gameId, callback) {
+        var loader = new PIXI.Loader();
+        var counter = 0;
+        gapi.client.drive.files.list({ // find the images folder in the game folder
             'q': `parents in "${gameId}" and name="images" and mimeType = "application/vnd.google-apps.folder"`
         }).then(function (res) {
-            gapi.client.drive.files.list({
+            if (res.result.files.length === 0) {
+                console.log("No images folder found.");
+                callback(loader);
+                return;
+            }
+            gapi.client.drive.files.list({ // list the images in the image folder
                 'q': `parents in "${res.result.files[0].id}"`,
-            }).then(function (res) {
-                var files = res.result.files;
-                app.file.images = {};
-                files.forEach((image) => {
+            }).then(function (response) {
+                Object.entries(response.result.files).forEach(([key, value]) => { // key is the image name and value.id their id in google drive
                     gapi.client.drive.files.get({
-                        fileId: image.id,
+                        fileId: value.id,
                         alt: 'media'
                     }).then(function (res) {
+                        var type = res.headers["Content-Type"];
                         var blob = new Blob([new Uint8Array(res.body.length).map((_, i) => res.body.charCodeAt(i))]);
-                        const objectUrl = URL.createObjectURL(blob, { type: res.headers["Content-Type"] });
-                        app.file.images[image.name] = objectUrl;
+                        const objectUrl = URL.createObjectURL(blob, type);
                         const texture = PIXI.Texture.from(objectUrl);
-                        app.file.loader.add(image.name, objectUrl);
-                        app.file.loader.resources[image.name] = { "texture": texture };
-                        if (Object.keys(app.file.images).length === files.length) {
-                            app.file.loader.onLoad.add((loader, resource) => { console.log("loaded :", resource.name); });
-                            app.file.loader.onComplete.add(() => { app.onImagesLoaded() });
-                            app.file.loader.load();
+                        loader.add(value.name, objectUrl);
+                        loader.resources[value.name] = { "texture": texture };
+                        counter++;
+                        if (counter === response.result.files.length) {
+                            loader.onLoad.add((loader, resource) => { console.log("Loaded :", resource.name); });
+                            loader.onComplete.add(() => { callback(loader) });
+                            loader.load();
                         }
                     })
                 })
             })
-        });
+        })
     }
 
-    loadSounds(URL, json, app) {
-        this.playList = {};
-        this.soundCount = json.soundList.length;
-        if (this.soundCount == 0) app.onSoundsLoaded(); // no sounds return to app
-        else json.soundList.forEach(sound => {
-            this.playList[sound.name] = new Howl({
-                src: [URL + "/sounds/" + sound.name],
-                format: sound.name.split(".")[1],
-                onload: this.onLoadSound.bind(this, sound, app), // wait to load a sound
+
+    loadSounds(gameId, callback) {
+        var playList = {};
+        var counter = 0;
+        gapi.client.drive.files.list({ // find the images folder in the game folder
+            'q': `parents in "${gameId}" and name="sounds" and mimeType = "application/vnd.google-apps.folder"`
+        }).then(function (res) {
+            if (res.result.files.length === 0) {
+                console.log("No sounds folder found.");
+                callback(playList);
+                return;
+            }
+            gapi.client.drive.files.list({ // list the images in the image folder
+                'q': `parents in "${res.result.files[0].id}"`,
+            }).then(function (response) {
+                Object.entries(response.result.files).forEach(([key, value]) => {
+                    gapi.client.drive.files.get({
+                        fileId: value.id,
+                        alt: 'media'
+                    }).then(function (res) {
+                        var type = res.headers["Content-Type"];
+                        var blob = new Blob([new Uint8Array(res.body.length).map((_, i) => res.body.charCodeAt(i))]);
+                        var objectUrl = URL.createObjectURL(blob, type);
+                        playList[value.name] = new Howl({
+                            src: [objectUrl],
+                            format: type.split("/")[1],
+                            onload: function () {
+                                counter++;
+                                console.log("Loaded : " + value.name);
+                                if (counter == response.result.files.length) {
+                                    callback(playList);
+                                }
+                            }
+                        });
+                    });
+                });
             })
         })
     }
 
-    onLoadSound(sound, app) {
-        this.soundCount--;
-        console.log(sound.name, " loaded");
-        if (!this.soundCount) {
-            console.log("Loaded sounds!");
-            app.onSoundsLoaded(); // after load sounds return to app
-        }
+    static save(gameId, json) {
+        gapi.client.drive.files.list({
+            'q': `parents in "${gameId}" and name="game.json"`
+        }).then(function (response) {
+            if (response.result.files.length > 0) {
+                var fileId = response.result.files[0].id;
+                gapi.client.request({
+                    path: `/upload/drive/v3/files/${fileId}`,
+                    method: 'PATCH',
+                    params: {
+                        uploadType: 'media'
+                    },
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: json
+                }).then(function (response) {
+                    console.log('File updated: ' + response.result.name);
+                }).catch(function (error) {
+                    console.error('Error updating file: ' + error.message);
+                });
+            } else {
+                console.log('No files found.');
+            }
+        }).catch(function (error) {
+            console.error('Error listing files: ' + error.message);
+        });
     }
 
-    static save(json) {
-        var url = serverGamesFolder + "/saveJson.php?gameId=" + gameId + "&gameFolder=" + gameFolder;
-        var xhr = new XMLHttpRequest();
-        xhr.open("POST", url, true);
-        xhr.setRequestHeader("Content-type", "application/json");
-        var upload = false;
-        xhr.onreadystatechange = function () {
-            if (xhr.readyState == 4) {
-                if (xhr.status == 200) {
-                    alert(xhr.responseText);
-                    Command.takeScreenshot();
-                }
-                else if (xhr.status == 404) alert("DEMO VERSION - The Game cannot be saved")
-                else alert("Server Error! " + xhr.responseText);
-                return upload;
-            }
-        }
-        xhr.send(json);
-    }
 
     static uploadFile(file, formData, type) {
         var destination;

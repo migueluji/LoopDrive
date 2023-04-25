@@ -84,14 +84,14 @@
 		let gisInited = false;
 		let player;
 
-		var editor = false; /* to kown if the engine has been launched from the editor */
+		var editor = true; /* to kown if the engine has been launched from the editor */
 
 		function gapiLoaded() { gapi.load('client', initializeGapiClient); }
 
 		async function initializeGapiClient() {
 			await gapi.client.init({
 				apiKey: API_KEY,
-			   discoveryDocs: DISCOVERY_DOCS,
+				discoveryDocs: DISCOVERY_DOCS,
 			});
 			gapiInited = true;
 			maybeEnable();
@@ -110,8 +110,7 @@
 		function maybeEnable() {
 			if (gapiInited && gisInited) {
 				gapi.client.setToken(JSON.parse(token));
-				console.log(token);
-			    player = new Player(game);
+				player = new Player(game);
 			}
 		}
 

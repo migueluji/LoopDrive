@@ -13,6 +13,7 @@ let tokenClient;
 let gapiInited = false;
 let gisInited = false;
 let gameNumber = 0;
+var openWindows = {};
 
 function gapiLoaded() {
     gapi.load('client', initializeGapiClient);
@@ -91,12 +92,15 @@ function checkFolder() {
     })
 }
 
-function editGame(game) {
-    localStorage.setItem("game", JSON.stringify({ id: game.getAttribute('data-id'), name: game.getAttribute('data-name') }));
+function editGame(gameHTML) {
+    var game = { id: gameHTML.getAttribute('data-id'), name: gameHTML.getAttribute('data-name') }
+    localStorage.setItem("game", JSON.stringify(game));
     localStorage.setItem("token", JSON.stringify(gapi.client.getToken()));
-    console.log(localStorage.getItem("token"));
-    window.open("engine/", "_blank");
+    var url = "editor/?id=" + game.id;
+    if (openWindows[url] && !openWindows[url].closed) openWindows[url].focus();
+    else openWindows[url] = window.open(url, "_blank");
 }
+
 // now create a function to upload file
 function save() {
     // get parent folder id from localstorage

@@ -125,16 +125,15 @@ class CanvasView {
         }, 'image/png');
     }
 
-    loadImage(image) {
-        while (app.file.loader.loading);
-        app.file.loader.add(image);
-    }
+    // loadImage(image) {
+    //     // while (app.loader.loading);
+    //     // app.loader.add(image);
+    // }
 
-    deleteImage(image) {
-        while (app.file.loader.loading);
-        app.file.loader.resources[image].texture.destroy(true);
-        delete app.file.loader.resources[image];
-    }
+    // deleteImage(image) {
+    //     app.loader.resources[image].texture.destroy(true);
+    //     delete app.loader.resources[image];
+    // }
 
     initApp() {
         this.appRenderer.view.style.position = "absolute";

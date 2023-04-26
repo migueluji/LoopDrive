@@ -508,28 +508,27 @@ class Editor {
     }
 
     uploadFile(file, type) {
-        var formData = new FormData();
-        formData.append('file', file, file.name);
-        File.uploadFile(file, formData, type);
+        File.upload(JSON.parse(localStorage.getItem("game")).id, file, type);
     }
 
     addAsset(name, type) {
         var asset = new Object({ "id": Utils.id(), "name": name });
         this.model.addAsset(asset, type);
-        if (type == "Image" || type == "Animation") this.canvasView.loadImage(asset.name);
+        console.log(this.model.imageList, name, type);
+      //  if (type == "Image" || type == "Animation") this.canvasView.loadImage(asset.name);
         var assetView = new AssetView(asset, type);
         this.assetDialog.addAsset(assetView);
     }
 
     deleteFile(assetID, fileName, type) {
-        File.deleteFile(gameFolder, assetID, fileName, type);
+        File.delete(app.loader.resources[fileName].fileId, assetID, fileName, type);
     }
 
     removeAsset(assetID, type) {
-        if (type == "Image" || type == "Animation") { // update the loader
-            var index = this.model.imageList.findIndex(i => i.id == assetID);
-            this.canvasView.deleteImage(this.model.imageList[index].name);
-        }
+        // if (type == "Image" || type == "Animation") { // update the loader
+        //     var index = this.model.imageList.findIndex(i => i.id == assetID);
+        //     this.canvasView.deleteImage(this.model.imageList[index].name);
+        // }
         this.model.removeAsset(assetID, type);
         this.assetDialog.removeAsset(assetID);
     }

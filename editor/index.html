@@ -127,7 +127,6 @@
 
 		const urlParams = new URLSearchParams(window.location.search);
 		const id = urlParams.get('id');
-		console.log(id); // mostrará "123"
 		var game = JSON.parse(localStorage.getItem("game"));
 		game.id = id;
 		var token = localStorage.getItem("token");

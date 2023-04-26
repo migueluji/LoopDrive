@@ -1,7 +1,6 @@
 class Game {
 
     constructor(game) {
-
         this.fontList = []; this.imageList = []; this.soundList = [];
         this.tagList = []; this.sceneList = [];
 

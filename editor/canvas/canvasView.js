@@ -113,27 +113,15 @@ class CanvasView {
 
         renderer.extract.canvas(stage).toBlob((blob) => {
             if (upload) {
-                var formData = new FormData();
-                formData.append("file", blob, "image.jpg");
-                File.uploadFile(blob, formData, "ScreenShoot");
+                File.uploadScreenShoot(game.id, blob);
             }
             else {
                 var image = document.querySelector("#" + sceneID).querySelector("img");
                 var url = window.URL || Window.webkitURL;
                 image.src = url.createObjectURL(blob);
             }
-        }, 'image/png');
+        });
     }
-
-    // loadImage(image) {
-    //     // while (app.loader.loading);
-    //     // app.loader.add(image);
-    // }
-
-    // deleteImage(image) {
-    //     app.loader.resources[image].texture.destroy(true);
-    //     delete app.loader.resources[image];
-    // }
 
     initApp() {
         this.appRenderer.view.style.position = "absolute";

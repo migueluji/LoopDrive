@@ -42,7 +42,10 @@ class File {
                         counter++;
                         loader.init = true;
                         if (counter === response.result.files.length) {
-                            loader.onLoad.add((loader, resource) => { console.log("Loaded :", resource.name); });
+                            loader.onLoad.add((loader, resource) => {
+                                console.log("Loaded :", resource.name);
+                                if (!loader.init) Command.addAssetCmd(resource.name, "Image")
+                            });
                             loader.onComplete.add(() => { if (loader.init) callback(loader) });
                             loader.load();
                         }
@@ -94,47 +97,33 @@ class File {
     static save(gameId, json) {
         gapi.client.drive.files.list({
             'q': `parents in "${gameId}" and name="game.json"`
-        }).then(function (response) {
+        }).then(function (response) { // return game.json file for this gameId
             if (response.result.files.length > 0) {
-                var fileId = response.result.files[0].id;
+                var fileId = response.result.files[0].id; // the game.json id
                 gapi.client.request({
                     path: `/upload/drive/v3/files/${fileId}`,
-                    method: 'PATCH',
-                    params: {
-                        uploadType: 'media'
-                    },
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
+                    method: 'PATCH', // update the game.json content
                     body: json
-                }).then(function (response) {
-                    console.log('File updated: ' + response.result.name);
-                }).catch(function (error) {
-                    console.error('Error updating file: ' + error.message);
-                });
-            } else {
-                console.log('No files found.');
+                }).then(() => {
+                    Command.takeScreenshot();
+                    alert('Game saved!!!')
+                })
             }
-        }).catch(function (error) {
-            console.error('Error listing files: ' + error.message);
-        });
+        })
     }
 
     static delete(fileId, assetID, fileName, type) {
-        console.log(app.loader, fileId, fileName, type);
         if (type == "Image" || type == "Animation") {
             app.loader.resources[fileName].texture.destroy(true);
             delete app.loader.resources[fileName];
         }
         gapi.client.drive.files.delete({
             fileId: fileId
-        }).then(function (response) {
-            Command.removeAssetCmd(assetID, type);
-        })
+        }).then(() => Command.removeAssetCmd(assetID, type))
     }
 
     static upload(gameId, file, type) {
-        console.log(file);
+        // console.log(gameId,file, type);
         var folder;
         switch (type) {
             case ("Image" || "Animation"): folder = "images"; break;
@@ -180,8 +169,6 @@ class File {
                         },
                         'body': multipartRequestBody
                     }).then(function (response) {
-                        console.log('Archivo subido a Google Drive');
-                        console.log(response);
                         gapi.client.drive.files.get({ // download from drive 
                             fileId: response.result.id,
                             alt: 'media'
@@ -193,18 +180,68 @@ class File {
                             app.loader.add(file.name, objectUrl);
                             app.loader.resources[file.name] = { "texture": texture, "fileId": response.result.id };
                             app.loader.init = false;
-                            app.loader.onLoad.add((loader, resource) => {
-                                console.log("Loaded :", resource.name);
-                                Command.addAssetCmd(resource.name, type)
-                            });
                             app.loader.load();
                         });
-                    }, function (error) {
-                        console.error('Error al subir el archivo a Google Drive', error);
-                    });
+                    })
                 }
-
             }
         })
     }
-} //
+
+    static uploadScreenShoot(gameId, blob) {
+        console.log(blob.type);
+        gapi.client.drive.files.list({
+            'q': `parents in "${gameId}" and name="image.png"`
+        }).then(function (response) {
+            if (response.result.files.length > 0) {
+                var fileId = response.result.files[0].id;
+                var metadata = {
+                    "name": "image.png",
+                    'mimeType': 'image/png',
+                    'parents': gameId
+                };
+                // Actualiza el archivo
+                var accessToken = gapi.auth.getToken().access_token;
+                var boundary = '-------314159265358979323846';
+                var delimiter = "\r\n--" + boundary + "\r\n";
+                var close_delim = "\r\n--" + boundary + "--";
+
+                var reader = new FileReader();
+                reader.readAsBinaryString(blob);
+                reader.onload = function () {
+                    var contentType = blob.type;
+                    var base64Data = btoa(reader.result);
+                    var multipartRequestBody =
+                        delimiter +
+                        'Content-Type: application/json\r\n\r\n' +
+                        JSON.stringify(metadata) +
+                        delimiter +
+                        'Content-Type: ' + contentType + '\r\n' +
+                        'Content-Transfer-Encoding: base64\r\n' +
+                        '\r\n' +
+                        base64Data +
+                        close_delim;
+
+                    gapi.client.request({
+                        'path': '/upload/drive/v3/files/' + fileId,
+                        'method': 'PATCH',
+                        'params': { 'uploadType': 'multipart' },
+                        'headers': {
+                            'Content-Type': 'multipart/related; boundary="' + boundary + '"',
+                            'Authorization': 'Bearer ' + accessToken
+                        },
+                        'body': multipartRequestBody
+                    }).then(function (response) {
+                        console.log("Archivo actualizado exitosamente.", response);
+                    });
+                }
+            } else {
+                console.log(`No se encontró el archivo image.jpg en el directorio.`);
+            }
+        });
+    }
+
+
+}
+
+

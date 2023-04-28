@@ -88,7 +88,6 @@ class Editor {
         Object.assign(gameData, this.model);
         gameData = JSON.stringify(gameData, (key, value) => { if (key != "id") return value }, '\t');
         localStorage.setItem("localStorage_GameData", gameData);
-
         var url = "../engine/?id" + JSON.parse(localStorage.getItem("game")).id;
         if (this.openWindows[url] && !this.openWindows[url].closed) {
             this.openWindows[url].location.reload();
@@ -514,8 +513,6 @@ class Editor {
     addAsset(name, type) {
         var asset = new Object({ "id": Utils.id(), "name": name });
         this.model.addAsset(asset, type);
-        console.log(this.model.imageList, name, type);
-      //  if (type == "Image" || type == "Animation") this.canvasView.loadImage(asset.name);
         var assetView = new AssetView(asset, type);
         this.assetDialog.addAsset(assetView);
     }
@@ -525,10 +522,6 @@ class Editor {
     }
 
     removeAsset(assetID, type) {
-        // if (type == "Image" || type == "Animation") { // update the loader
-        //     var index = this.model.imageList.findIndex(i => i.id == assetID);
-        //     this.canvasView.deleteImage(this.model.imageList[index].name);
-        // }
         this.model.removeAsset(assetID, type);
         this.assetDialog.removeAsset(assetID);
     }

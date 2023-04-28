@@ -1,7 +1,6 @@
 class Player {
 
     constructor(game) {
-        console.log(localStorage.getItem("game"))
         this.file = new File();
         this.gameId = game.id;
         (editor) ? this.onJsonLoaded(JSON.parse(localStorage.getItem("localStorage_GameData"))) :

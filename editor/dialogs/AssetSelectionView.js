@@ -102,7 +102,6 @@ class AssetSelectionView {
 	}
 
 	fileBrowserHandler(evt) {
-		console.log("click");
 		var files = evt.target.files;
 		var list = this.html.querySelectorAll(".mdc-image-list__label");
 		for (var i = 0; i < files.length; i++) {
@@ -115,12 +114,11 @@ class AssetSelectionView {
 			}
 			else {
 				if (confirm('The file "' + files[i].name + '" already exist. Do you want to replace it?')) {
-					Command.removeAssetCmd(list[j].parentNode.parentNode.id, this.type);
+					Command.deleteFileCmd(list[j].parentNode.parentNode.id, files[i].name, this.type);
 					Command.uploadFileCmd(files[i], this.type);
 				}
 			}
 		}
-		//this.updateLoader();
 	}
 
 	removeAssetHandler() {
@@ -131,7 +129,6 @@ class AssetSelectionView {
 				this.selectedAsset.shift();
 			}
 		}
-		//	this.updateLoader();
 	}
 
 	okButtonHandler() {
@@ -149,7 +146,6 @@ class AssetSelectionView {
 				var event = document.createEvent("HTMLEvents");
 				if (this.input.name == "script") event.initEvent("input", false, true);
 				else event.initEvent("change", false, true);
-				//event.initEvent("input", false, true);
 				this.input.dispatchEvent(event);
 				this.input.focus();
 			}
@@ -162,14 +158,5 @@ class AssetSelectionView {
 
 	cancelBackgroundHandler(e) {
 		if (e.target === this.html) this.cancelButtonHandler();
-	}
-
-	// Utils
-	updateLoader() {
-		var buttons = this.html.querySelectorAll("button");
-		buttons.forEach(i => i.disabled = true); // disable cancel, ok, upload and delete buttons
-		app.loader.load(() => {
-			buttons.forEach(i => i.disabled = false); // enable all buttons when loaded asset
-		});
 	}
 }

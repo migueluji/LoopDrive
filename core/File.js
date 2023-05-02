@@ -40,13 +40,9 @@ class File {
                         loader.add(value.name, objectUrl);
                         loader.resources[value.name] = { "texture": texture, "fileId": value.id };
                         counter++;
-                        loader.init = true;
                         if (counter === response.result.files.length) {
-                            loader.onLoad.add((loader, resource) => {
-                                console.log("Loaded :", resource.name);
-                                if (!loader.init) Command.addAssetCmd(resource.name, "Image")
-                            });
-                            loader.onComplete.add(() => { if (loader.init) callback(loader) });
+                            loader.onLoad.add((loader, resource) => { console.log("Loaded :", resource.name); });
+                            loader.onComplete.add(() => { callback(loader) });
                             loader.load();
                         }
                     })
@@ -83,9 +79,7 @@ class File {
                             onload: function () {
                                 counter++;
                                 console.log("Loaded : " + value.name);
-                                if (counter == response.result.files.length) {
-                                    callback(playList);
-                                }
+                                if (counter == response.result.files.length) { callback(playList) }
                             }
                         });
                     });
@@ -123,7 +117,6 @@ class File {
     }
 
     static upload(gameId, file, type) {
-        // console.log(gameId,file, type);
         var folder;
         switch (type) {
             case ("Image" || "Animation"): folder = "images"; break;
@@ -138,7 +131,6 @@ class File {
                     'name': file.name,
                     'parents': [response.result.files[0].id]
                 };
-                var accessToken = gapi.auth.getToken().access_token;
                 var boundary = '-------314159265358979323846';
                 var delimiter = "\r\n--" + boundary + "\r\n";
                 var close_delim = "\r\n--" + boundary + "--";
@@ -149,24 +141,15 @@ class File {
                     var contentType = file.type || 'application/octet-stream';
                     var base64Data = btoa(reader.result);
                     var multipartRequestBody =
-                        delimiter +
-                        'Content-Type: application/json\r\n\r\n' +
-                        JSON.stringify(metadata) +
-                        delimiter +
-                        'Content-Type: ' + contentType + '\r\n' +
-                        'Content-Transfer-Encoding: base64\r\n' +
-                        '\r\n' +
-                        base64Data +
-                        close_delim;
+                        delimiter + 'Content-Type: application/json\r\n\r\n' + JSON.stringify(metadata) +
+                        delimiter + 'Content-Type: ' + contentType + '\r\n' + 'Content-Transfer-Encoding: base64\r\n' +
+                        '\r\n' + base64Data + close_delim;
 
                     gapi.client.request({
                         'path': '/upload/drive/v3/files',
                         'method': 'POST',
                         'params': { 'uploadType': 'multipart' },
-                        'headers': {
-                            'Content-Type': 'multipart/related; boundary="' + boundary + '"',
-                            'Authorization': 'Bearer ' + accessToken
-                        },
+                        'headers': { 'Content-Type': 'multipart/related; boundary="' + boundary + '"', },
                         'body': multipartRequestBody
                     }).then(function (response) {
                         gapi.client.drive.files.get({ // download from drive 
@@ -176,11 +159,23 @@ class File {
                             var contentType = res.headers["Content-Type"];
                             var blob = new Blob([new Uint8Array(res.body.length).map((_, i) => res.body.charCodeAt(i))]);
                             const objectUrl = URL.createObjectURL(blob, contentType);
-                            const texture = PIXI.Texture.from(objectUrl);
-                            app.loader.add(file.name, objectUrl);
-                            app.loader.resources[file.name] = { "texture": texture, "fileId": response.result.id };
-                            app.loader.init = false;
-                            app.loader.load();
+                            if (type == "Image") {
+                                const texture = PIXI.Texture.from(objectUrl);
+                                app.loader.add(file.name, objectUrl);
+                                app.loader.resources[file.name] = { "texture": texture, "fileId": response.result.id };
+                                app.loader.onLoad.add(() => Command.addAssetCmd(file.name, "Image"));
+                                app.loader.load();
+                            }
+                            else if (type == "Sound") {
+                                app.playList[file.name] = new Howl({
+                                    src: [objectUrl],
+                                    format: contentType.split("/")[1],
+                                    onload: function () {
+                                        console.log("Loaded : " + file.name);
+                                        Command.addAssetCmd(file.name, "Sound");
+                                    }
+                                });
+                            }
                         });
                     })
                 }
@@ -189,7 +184,6 @@ class File {
     }
 
     static uploadScreenShoot(gameId, blob) {
-        console.log(blob.type);
         gapi.client.drive.files.list({
             'q': `parents in "${gameId}" and name="image.png"`
         }).then(function (response) {
@@ -200,8 +194,6 @@ class File {
                     'mimeType': 'image/png',
                     'parents': gameId
                 };
-                // Actualiza el archivo
-                var accessToken = gapi.auth.getToken().access_token;
                 var boundary = '-------314159265358979323846';
                 var delimiter = "\r\n--" + boundary + "\r\n";
                 var close_delim = "\r\n--" + boundary + "--";
@@ -212,36 +204,23 @@ class File {
                     var contentType = blob.type;
                     var base64Data = btoa(reader.result);
                     var multipartRequestBody =
-                        delimiter +
-                        'Content-Type: application/json\r\n\r\n' +
-                        JSON.stringify(metadata) +
-                        delimiter +
-                        'Content-Type: ' + contentType + '\r\n' +
-                        'Content-Transfer-Encoding: base64\r\n' +
-                        '\r\n' +
-                        base64Data +
-                        close_delim;
+                        delimiter + 'Content-Type: application/json\r\n\r\n' + JSON.stringify(metadata) +
+                        delimiter + 'Content-Type: ' + contentType + '\r\n' + 'Content-Transfer-Encoding: base64\r\n' +
+                        '\r\n' + base64Data + close_delim;
 
                     gapi.client.request({
                         'path': '/upload/drive/v3/files/' + fileId,
                         'method': 'PATCH',
                         'params': { 'uploadType': 'multipart' },
-                        'headers': {
-                            'Content-Type': 'multipart/related; boundary="' + boundary + '"',
-                            'Authorization': 'Bearer ' + accessToken
-                        },
+                        'headers': { 'Content-Type': 'multipart/related; boundary="' + boundary + '"' },
                         'body': multipartRequestBody
                     }).then(function (response) {
-                        console.log("Archivo actualizado exitosamente.", response);
+                        console.log("Screenshoot updated", response);
                     });
                 }
-            } else {
-                console.log(`No se encontró el archivo image.jpg en el directorio.`);
             }
         });
     }
-
-
 }
 
 

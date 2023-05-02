@@ -484,7 +484,6 @@ class Editor {
             case "Font": assetList = this.model.fontList; break;
             default: assetList = this.model.imageList;; break; // images and animations
         }
-
         this.assetDialog = new AssetSelectionView(assetList, input, option, this.canvasView);
 
         var assetNameList = name.split(",");// selected asset (can include multiple names for animations)

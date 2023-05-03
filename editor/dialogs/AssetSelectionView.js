@@ -47,6 +47,7 @@ class AssetSelectionView {
 			this.html.querySelector("#files").addEventListener("change", this.fileBrowserHandler.bind(this));
 		}
 		this.selectedAsset = [];
+		this.counterFiles = 0;
 	}
 
 	init(assetList, type) {
@@ -62,10 +63,13 @@ class AssetSelectionView {
 		var i = 0;
 		while (i < list.childNodes.length && name.toUpperCase() > list.childNodes[i].firstChild.nextSibling.textContent.toUpperCase()) i++;
 		list.insertBefore(assetView.html, list.childNodes[i]);
+		if (this.counterFiles > 0) this.counterFiles--;
+		if (this.counterFiles == 0) this.enableButtons();
 	}
 
 	removeAsset(assetID) {
 		this.html.querySelector("#" + assetID).remove();
+		if (this.counterFiles == 0) this.enableButtons();
 	}
 
 	updateSelectedAsset(assetIDList) { // assetIDList
@@ -103,15 +107,12 @@ class AssetSelectionView {
 
 	fileBrowserHandler(evt) {
 		var files = evt.target.files;
+		this.counterFiles = files.length;
 		var list = this.html.querySelectorAll(".mdc-image-list__label");
 		for (var i = 0; i < files.length; i++) {
 			var j = 0;
-			while ((j < list.length) && (files[i].name.toUpperCase() != list[j].innerText.toUpperCase())) {
-				j++;
-			};
-			if (j == list.length) {
-				Command.uploadFileCmd(files[i], this.type);
-			}
+			while ((j < list.length) && (files[i].name.toUpperCase() != list[j].innerText.toUpperCase())) { j++ };
+			if (j == list.length) { Command.uploadFileCmd(files[i], this.type); }
 			else {
 				if (confirm('The file "' + files[i].name + '" already exist. Do you want to replace it?')) {
 					Command.deleteFileCmd(list[j].parentNode.parentNode.id, files[i].name, this.type);
@@ -119,16 +120,18 @@ class AssetSelectionView {
 				}
 			}
 		}
+		this.disableButtons();
 	}
 
 	removeAssetHandler() {
-		if (this.selectedAsset) {
+		if (this.selectedAsset.length > 0) {
 			var name = document.querySelector("#" + this.selectedAsset).firstChild.nextSibling.textContent;
 			if (confirm('Are you sure you want to delete "' + name + '" asset?')) {
 				Command.deleteFileCmd(this.selectedAsset[0], name, this.type);
 				this.selectedAsset.shift();
 			}
 		}
+		this.disableButtons();
 	}
 
 	okButtonHandler() {
@@ -158,5 +161,16 @@ class AssetSelectionView {
 
 	cancelBackgroundHandler(e) {
 		if (e.target === this.html) this.cancelButtonHandler();
+	}
+
+	// Utils
+	disableButtons() {
+		var buttons = this.html.querySelectorAll("button");
+		buttons.forEach(i => i.disabled = true); // disable cancel, ok, upload and delete buttons
+	}
+
+	enableButtons() {
+		var buttons = this.html.querySelectorAll("button");
+		buttons.forEach(i => i.disabled = false); // disable cancel, ok, upload and delete buttons	
 	}
 }

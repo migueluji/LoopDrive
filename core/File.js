@@ -40,9 +40,13 @@ class File {
                         loader.add(value.name, objectUrl);
                         loader.resources[value.name] = { "texture": texture, "fileId": value.id };
                         counter++;
+                        loader.init = true;
                         if (counter === response.result.files.length) {
-                            loader.onLoad.add((loader, resource) => { console.log("Loaded :", resource.name); });
-                            loader.onComplete.add(() => { callback(loader) });
+                            loader.onLoad.add((loader, resource) => {
+                                console.log("Loaded :", resource.name);
+                                if (!loader.init) Command.addAssetCmd(resource.name, "Image");
+                            });
+                            loader.onComplete.once(() => { callback(loader) });
                             loader.load();
                         }
                     })
@@ -110,6 +114,7 @@ class File {
         if (type == "Image" || type == "Animation") {
             app.loader.resources[fileName].texture.destroy(true);
             delete app.loader.resources[fileName];
+            type = "Image";
         }
         gapi.client.drive.files.delete({
             fileId: fileId
@@ -119,7 +124,8 @@ class File {
     static upload(gameId, file, type) {
         var folder;
         switch (type) {
-            case ("Image" || "Animation"): folder = "images"; break;
+            case "Image": folder = "images"; break;
+            case "Animation": folder = "images"; break;
             case "Sound": folder = "sounds"; break;
             case "ScreenShoot": folder = ""; break;
         }
@@ -159,11 +165,12 @@ class File {
                             var contentType = res.headers["Content-Type"];
                             var blob = new Blob([new Uint8Array(res.body.length).map((_, i) => res.body.charCodeAt(i))]);
                             const objectUrl = URL.createObjectURL(blob, contentType);
-                            if (type == "Image") {
+                            if (type == "Image" || type == "Animation") {
                                 const texture = PIXI.Texture.from(objectUrl);
+                                while (app.loader.loading) { };
                                 app.loader.add(file.name, objectUrl);
                                 app.loader.resources[file.name] = { "texture": texture, "fileId": response.result.id };
-                                app.loader.onLoad.add(() => Command.addAssetCmd(file.name, "Image"));
+                                app.loader.init = false;
                                 app.loader.load();
                             }
                             else if (type == "Sound") {

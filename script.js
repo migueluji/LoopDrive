@@ -15,7 +15,7 @@ let gisInited = false;
 let gameNumber = 0;
 var openWindows = {};
 
-console.log(process.env.CLIENT_ID);
+// console.log(process.env.CLIENT_ID);
 
 function gapiLoaded() {
     gapi.load('client', initializeGapiClient);

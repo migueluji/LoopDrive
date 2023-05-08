@@ -6,7 +6,7 @@ window.onload = () => {
 var CLIENT_ID = '129246923501-4lk4rkmhin21kcaoul91k300s9ar9n1t.apps.googleusercontent.com';
 var API_KEY = 'AIzaSyCfXON-94Onk-fLyihh8buKZcFIjynGRTc';
 var DISCOVERY_DOCS = ["https://www.googleapis.com/discovery/v1/apis/drive/v3/rest"];
-var SCOPES = 'https://www.googleapis.com/auth/drive.file https://www.googleapis.com/auth/drive'; // access only to files created by the application
+var SCOPES = 'https://www.googleapis.com/auth/drive '; // access only to files created by the application
 var signinButton = document.getElementsByClassName('signin')[0];
 var signoutButton = document.getElementsByClassName('signout')[0];
 let tokenClient;
@@ -14,6 +14,8 @@ let gapiInited = false;
 let gisInited = false;
 let gameNumber = 0;
 var openWindows = {};
+
+console.log(process.env.CLIENT_ID);
 
 function gapiLoaded() {
     gapi.load('client', initializeGapiClient);
@@ -45,6 +47,7 @@ function maybeEnableButtons() {
 }
 
 signinButton.onclick = () => handleAuthClick() // Sign in
+
 function handleAuthClick() {
     tokenClient.callback = async (resp) => {
         if (resp.error !== undefined) {
@@ -54,12 +57,9 @@ function handleAuthClick() {
         signoutButton.style.display = 'block';
         checkFolder();
     };
-
-    if (gapi.client.getToken() === null) {
-        tokenClient.requestAccessToken({ prompt: 'consent' });
-    } else {
+    (gapi.client.getToken() === null) ?
+        tokenClient.requestAccessToken({ prompt: 'consent' }) :
         tokenClient.requestAccessToken({ prompt: '' });
-    }
 }
 
 signoutButton.onclick = () => handleSignoutClick() // Sign out
@@ -73,6 +73,7 @@ function handleSignoutClick() {
     }
 }
 
+var gamesFolderID;
 // check for a "Loop Games" folder in google drive
 function checkFolder() {
     gapi.client.drive.files.list({
@@ -80,9 +81,7 @@ function checkFolder() {
     }).then(function (response) {
         var files = response.result.files;
         if (files && files.length > 0) {
-            //for (var i = 0; i < files.length; i++) {
-            //    var file = files[0];
-            localStorage.setItem('games_folder', files[0].id);
+            gamesFolderID = files[0].id;
             // get files if folder available
             showList();
             // }
@@ -94,7 +93,8 @@ function checkFolder() {
 
 function editGame(gameHTML) {
     var game = { id: gameHTML.getAttribute('data-id'), name: gameHTML.getAttribute('data-name') }
-    localStorage.setItem("game", JSON.stringify(game));
+    console.log(game);
+    localStorage.setItem("game" + game.id, JSON.stringify(game));
     localStorage.setItem("token", JSON.stringify(gapi.client.getToken()));
     var url = "editor/?id=" + game.id;
     if (openWindows[url] && !openWindows[url].closed) openWindows[url].focus();
@@ -103,8 +103,6 @@ function editGame(gameHTML) {
 
 // now create a function to upload file
 function save() {
-    // get parent folder id from localstorage
-    const gamesFolder = localStorage.getItem('games_folder');
     // set file metadata
     var metadata = {
         name: "game" + gameNumber.toString(),
@@ -141,7 +139,7 @@ function createFolder() {
         }
     });
     request.execute(function (response) {
-        localStorage.setItem('games_folder', response.id);
+        gamesFolderID = response.id;
     })
 }
 
@@ -168,7 +166,7 @@ function expand(v) {
 // function for files list
 function showList() {
     gapi.client.drive.files.list({
-        'q': `parents in "${localStorage.getItem('games_folder')}"`// get parent folder id from localstorage
+        'q': `parents in "${gamesFolderID}"`// get parent folder id 
     }).then(function (response) {
         var files = response.result.files;
         if (files && files.length > 0) {

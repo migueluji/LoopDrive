@@ -1,13 +1,15 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Backup To Google Drive</title>
     <link rel="stylesheet" href="style.css">
-    
+
 </head>
+
 <body>
     <div class="header">
         <div class="title">Loop Drive</div>
@@ -24,9 +26,10 @@
     <h1>My Games</h1>
     <div class="list">
         <ul>
-            <div style="text-align: center;">Sign In First</div>
+            <div>Sign In First</div>
         </ul>
     </div>
+
 
     <div class="expand-container" style="display: none;">
         <ul>
@@ -38,7 +41,8 @@
     </div>
 
     <script src="script.js"></script>
-    <script async defer src="https://apis.google.com/js/api.js"></script>
-    <script async defer src="https://accounts.google.com/gsi/client"></script>
+    <script async defer src="https://apis.google.com/js/api.js" onload="gapiLoad()"></script>
+    <script async defer src="https://accounts.google.com/gsi/client" onload="gisInit()"></script>
 </body>
+
 </html>

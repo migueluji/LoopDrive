@@ -1,8 +1,3 @@
-window.onload = () => {
-    gapiLoaded();
-    gisLoaded()
-}
-
 var CLIENT_ID = '129246923501-4lk4rkmhin21kcaoul91k300s9ar9n1t.apps.googleusercontent.com';
 var API_KEY = 'AIzaSyCfXON-94Onk-fLyihh8buKZcFIjynGRTc';
 var DISCOVERY_DOCS = ["https://www.googleapis.com/discovery/v1/apis/drive/v3/rest"];
@@ -17,20 +12,22 @@ var openWindows = {};
 
 // console.log(process.env.CLIENT_ID);
 
-function gapiLoaded() {
-    gapi.load('client', initializeGapiClient);
+function gapiLoad() {
+    gapi.load('client', gapiInit);
 }
 
-async function initializeGapiClient() {
-    await gapi.client.init({
-        apiKey: API_KEY,
-        discoveryDocs: DISCOVERY_DOCS,
+function gapiInit() {
+    gapi.client.init({
+        // apiKey: API_KEY,
+        // discoveryDocs: DISCOVERY_DOCS,
+    }).then(function () {
+        gapi.client.load("https://www.googleapis.com/discovery/v1/apis/drive/v3/rest");
+        gapiInited = true;
+        maybeEnableButtons();
     });
-    gapiInited = true;
-    maybeEnableButtons();
 }
 
-function gisLoaded() {
+function gisInit() {
     tokenClient = google.accounts.oauth2.initTokenClient({
         client_id: CLIENT_ID,
         scope: SCOPES,
@@ -47,27 +44,25 @@ function maybeEnableButtons() {
 }
 
 signinButton.onclick = () => handleAuthClick() // Sign in
-
 function handleAuthClick() {
-    tokenClient.callback = async (resp) => {
-        if (resp.error !== undefined) {
-            throw (resp);
-        }
+    tokenClient.callback = (resp) => {
+        if (resp.error !== undefined) { throw (resp); }
+        console.log('gapi.client access token: ' + JSON.stringify(gapi.client.getToken()));
         signinButton.style.display = 'none';
         signoutButton.style.display = 'block';
         checkFolder();
     };
-    (gapi.client.getToken() === null) ?
-        tokenClient.requestAccessToken({ prompt: 'consent' }) :
-        tokenClient.requestAccessToken({ prompt: '' });
+    if (gapi.client.getToken() === null) tokenClient.requestAccessToken({ prompt: 'consent' });
+    else tokenClient.requestAccessToken({ prompt: '' });
 }
 
 signoutButton.onclick = () => handleSignoutClick() // Sign out
 function handleSignoutClick() {
-    const token = gapi.client.getToken();
+    let token = gapi.client.getToken();
     if (token !== null) {
-        google.accounts.oauth2.revoke(token.access_token);
+        google.accounts.oauth2.revoke(token.access_token,() => {console.log('Revoked: ' + cred.access_token)});
         gapi.client.setToken('');
+        listcontainer.innerHTML = 'Sign in First';
         signinButton.style.display = 'block'
         signoutButton.style.display = 'none'
     }
@@ -115,7 +110,7 @@ function save() {
     // formData.append("file", blob);
     fetch("https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart", {
         method: 'POST',
-        headers: new Headers({ "Authorization": "Bearer " + gapi.auth.getToken().access_token }),
+     //   headers: new Headers({ "Authorization": "Bearer " + gapi.auth.getToken().access_token }),
         body: formData
     }).then(response => response.json())
         .then(value => {
@@ -125,7 +120,7 @@ function save() {
 }
 
 function createFolder() {
-    var access_token = gapi.auth.getToken().access_token;
+   // var access_token = gapi.auth.getToken().access_token;
     var request = gapi.client.request({
         'path': 'drive/v2/files',
         'method': 'POST',
@@ -229,7 +224,7 @@ function update() {
     fetch(url, {
         method: 'PATCH',
         headers: new Headers({
-            Authorization: 'Bearer ' + gapi.auth.getToken().access_token,
+           // Authorization: 'Bearer ' + gapi.auth.getToken().access_token,
             'Content-type': 'plain/text'
         }),
         body: document.querySelector('textarea').value

@@ -164,6 +164,7 @@
 		function maybeEnable() {
 			if (gapiInited && gisInited) {
 				gapi.client.setToken(JSON.parse(token));
+				console.log(gapi.client.getToken());
 				app = new App(game);
 			}
 		}

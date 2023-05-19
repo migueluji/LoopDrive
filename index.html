@@ -14,35 +14,35 @@
     <div class="header">
         <div class="title">Loop Drive</div>
         <div class="auth-buttons">
-            <button class="signin">Sign In</button>
-            <button class="signout">Sign Out</button>
+            <button class="signin" onclick="signIn()">Sign In</button>
+            <button class="signout" onclick="signOut()">Sign Out</button>
         </div>
-    </div>
-    <div class="new">
-        <!--textarea placeholder="Enter text here ..."></textarea-->
-        <button class="upload" onclick="editGame()">New Game</button>
     </div>
 
     <h1>My Games</h1>
-    <div class="list">
-        <ul>
-            <div>Sign In First</div>
-        </ul>
-    </div>
+    
+    <div class=" new">
+                <button class="newgame" onclick="newGame()">New Game</button>
+        </div>
 
+        <div class="list">
+            <ul>
+                <div>Sign In First</div>
+            </ul>
+        </div>
 
-    <div class="expand-container" style="display: none;">
-        <ul>
-            <li onclick="readEditDownload(this, 'read')">Read</li>
-            <li onclick="readEditDownload(this, 'edit')">Edit</li>
-            <li onclick="readEditDownload(this, 'download')">Download</li>
-            <li onclick="deleteFile(this)">Delete</li>
-        </ul>
-    </div>
+        <div class="expand-container" style="display: none;">
+            <ul>
+                <li onclick="readEditDownload(this, 'read')">Read</li>
+                <li onclick="readEditDownload(this, 'edit')">Edit</li>
+                <li onclick="readEditDownload(this, 'download')">Download</li>
+                <li onclick="deleteFile(this)">Delete</li>
+            </ul>
+        </div>
 
-    <script src="script.js"></script>
-    <script async defer src="https://apis.google.com/js/api.js" onload="gapiLoad()"></script>
-    <script async defer src="https://accounts.google.com/gsi/client" onload="gisInit()"></script>
+        <script src="script.js"></script>
+        <script async defer src="https://apis.google.com/js/api.js" onload="gapiLoad()"></script>
+        <script async defer src="https://accounts.google.com/gsi/client" onload="gisInit()"></script>
 </body>
 
 </html>

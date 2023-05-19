@@ -59,7 +59,7 @@ textarea {
     box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
 }
 
-.upload {
+.newgame {
     border: 0px;
     outline: none;
     padding: 8px 30px;
@@ -70,6 +70,7 @@ textarea {
     cursor: pointer;
     float: right;
     color: #3c84f8;
+    display: none;
 }
 
 h1{

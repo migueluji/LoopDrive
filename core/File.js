@@ -4,14 +4,48 @@ class File {
         gapi.client.drive.files.list({ // find game.json id from the game folder
             'q': `parents in "${gameId}" and name="game.json"`
         }).then(function (res) {
-            gapi.client.drive.files.get({
-                fileId: res.result.files[0].id, // get the game.json file
-                alt: 'media'
-            }).then(function (res) {
-                var json = JSON.parse(res.body);
-                callback(json);
-            })
+            console.log(res.result.files);
+            if (res.result.files.length > 0) {
+                gapi.client.drive.files.get({
+                    fileId: res.result.files[0].id, // get the game.json file
+                    alt: 'media'
+                }).then(function (res) {
+                    var json = JSON.parse(res.body);
+                    callback(json);
+                }).catch(function (error) {
+                    console.error('Error loading game.json: ' + error.message);
+                });
+            } else {
+                console.log("Game.json file does not exist.");
+                throw new Error("Game.json file does not exist.");
+            }
         })
+    }
+
+    createFolder(folderName, parent) {
+        console.log(folderName, game, parent);
+        return new Promise(function (resolve, reject) {
+            var request = gapi.client.request({
+                path: '/drive/v3/files',
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + JSON.parse(token).access_token,
+                },
+                body: {
+                    'name': folderName,
+                    'mimeType': 'application/vnd.google-apps.folder',
+                    'parents': [parent]
+                }
+            });
+            request.execute(function (response) {
+                if (response.id) {
+                    resolve(response.id); // Resolves the promise with appFolderID
+                } else {
+                    reject(new Error('Failed to create folder')); // Rejects the promise with an error
+                }
+            });
+        });
     }
 
     loadImages(gameId, callback) {

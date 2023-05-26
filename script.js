@@ -1,17 +1,18 @@
 var CLIENT_ID = '129246923501-4lk4rkmhin21kcaoul91k300s9ar9n1t.apps.googleusercontent.com';
 var API_KEY = 'AIzaSyCfXON-94Onk-fLyihh8buKZcFIjynGRTc';
 var DISCOVERY_DOCS = ["https://www.googleapis.com/discovery/v1/apis/drive/v3/rest"];
-var SCOPES = 'https://www.googleapis.com/auth/drive '; // access only to files created by the application
-var signinButton = document.getElementsByClassName('signin')[0];
-var signoutButton = document.getElementsByClassName('signout')[0];
-var newgameButton = document.getElementsByClassName('newgame')[0];
+var SCOPES = 'https://www.googleapis.com/auth/drive ';
 var tokenClient;
 var token;
 var gapiInited = false;
 var gisInited = false;
 var openWindows = {};
-var appFolder = "Loop Games";
+var appFolderName = "Loop Games";
 var appFolderID;
+
+var signinButton = document.getElementsByClassName('signin')[0];
+var signoutButton = document.getElementsByClassName('signout')[0];
+var newgameButton = document.getElementsByClassName('newgame')[0];
 
 function gapiLoad() {
     gapi.load('client', gapiInit);
@@ -20,9 +21,9 @@ function gapiLoad() {
 function gapiInit() {
     gapi.client.init({
         apiKey: API_KEY,
-        discoveryDocs: DISCOVERY_DOCS,
+        discoveryDocs: DISCOVERY_DOCS
     }).then(function () {
-        gapi.client.load("https://www.googleapis.com/discovery/v1/apis/drive/v3/rest");
+       //  gapi.client.load(DISCOVERY_DOCS[0]);
         gapiInited = true;
         maybeEnableButtons();
     });
@@ -31,8 +32,8 @@ function gapiInit() {
 function gisInit() {
     tokenClient = google.accounts.oauth2.initTokenClient({
         client_id: CLIENT_ID,
-        scope: SCOPES,
-        callback: ''
+        scope: SCOPES
+       // callback: ''
     });
     gisInited = true;
     maybeEnableButtons();
@@ -57,56 +58,19 @@ function signIn() {
     // else tokenClient.requestAccessToken({ prompt: '' });
 }
 
-function signOut() {
-    // token = gapi.client.getToken();
-    // token = null;
-    // if (token !== null) {
-    //google.accounts.oauth2.revoke(token.access_token, () => { console.log('Revoked: ' + token.access_token) });
-    google.accounts.id.disableAutoSelect(); // after that the token will be undefined
-    // gapi.client.setToken('');
-    listcontainer.innerHTML = 'Sign in First';
-    signinButton.style.display = 'block'
-    signoutButton.style.display = newgameButton.style.display = 'none';
-    // }
-}
-
 async function checkDriveFolder() {
     gapi.client.drive.files.list({
-        q: "name ='" + appFolder + "'",
+        q: "name ='" + appFolderName + "'",
     }).then(async function (response) {
         var files = response.result.files;
-        if (files && files.length > 0) { // if appFolder avalaible assing appFolderID
+        if (files && files.length > 0){
             appFolderID = files[0].id;
+            listDriveGames(appFolderID);
         }
-        else {  // if folder not available then create an assign appFolderID
-            appFolderID = await createFolder(appFolder);
-        }
-        listDriveGames(appFolderID);
+        // else {  // if folder not available then create an assign appFolderID
+        //     appFolderID = await createFolder(appFolder);
+        // }
     })
-}
-
-function createFolder(folderName) {
-    return new Promise(function (resolve, reject) {
-        var request = gapi.client.request({
-            path: '/drive/v3/files',
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': 'Bearer ' + token.access_token,
-            },
-            body: {
-                'name': folderName,
-                'mimeType': 'application/vnd.google-apps.folder'
-            }
-        });
-        request.execute(function (response) {
-            if (response.id) {
-                resolve(response.id); // Resolves the promise with appFolderID
-            } else {
-                reject(new Error('Failed to create folder')); // Rejects the promise with an error
-            }
-        });
-    });
 }
 
 function listDriveGames(folderID) {
@@ -129,15 +93,53 @@ function listDriveGames(folderID) {
     })
 }
 
+function signOut() {
+    // token = gapi.client.getToken();
+    // token = null;
+    // if (token !== null) {
+    //google.accounts.oauth2.revoke(token.access_token, () => { console.log('Revoked: ' + token.access_token) });
+    google.accounts.id.disableAutoSelect(); // after that the token will be undefined
+    // gapi.client.setToken('');
+    listcontainer.innerHTML = 'Sign in First';
+    signinButton.style.display = 'block'
+    signoutButton.style.display = newgameButton.style.display = 'none';
+    // }
+}
+
+// function createFolder(folderName) {
+//     return new Promise(function (resolve, reject) {
+//         var request = gapi.client.request({
+//             path: '/drive/v3/files',
+//             method: 'POST',
+//             headers: {
+//                 'Content-Type': 'application/json',
+//                 'Authorization': 'Bearer ' + token.access_token,
+//             },
+//             body: {
+//                 'name': folderName,
+//                 'mimeType': 'application/vnd.google-apps.folder'
+//             }
+//         });
+//         request.execute(function (response) {
+//             if (response.id) {
+//                 resolve(response.id); // Resolves the promise with appFolderID
+//             } else {
+//                 reject(new Error('Failed to create folder')); // Rejects the promise with an error
+//             }
+//         });
+//     });
+// }
+
+
+
 function newGame() {
     console.log("new game");
     editGame();
 }
 
 function editGame(gameHTML) {
-    var game = {appFolderID: appFolderID, id:"",name:""};
+    var game = { appFolderID: appFolderID, id: "", name: "" };
     if (gameHTML) game = { appFolderID: appFolderID, id: gameHTML.getAttribute('data-id'), name: gameHTML.getAttribute('data-name') }
-    console.log(game);
     localStorage.setItem("game" + game.id, JSON.stringify(game));
     localStorage.setItem("token", JSON.stringify(gapi.client.getToken()));
     var url = "editor/?id=" + game.id;

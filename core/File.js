@@ -4,21 +4,13 @@ class File {
         gapi.client.drive.files.list({ // find game.json id from the game folder
             'q': `parents in "${gameId}" and name="game.json"`
         }).then(function (res) {
-            console.log(res.result.files);
-            if (res.result.files.length > 0) {
-                gapi.client.drive.files.get({
-                    fileId: res.result.files[0].id, // get the game.json file
-                    alt: 'media'
-                }).then(function (res) {
-                    var json = JSON.parse(res.body);
-                    callback(json);
-                }).catch(function (error) {
-                    console.error('Error loading game.json: ' + error.message);
-                });
-            } else {
-                console.log("Game.json file does not exist.");
-                throw new Error("Game.json file does not exist.");
-            }
+            gapi.client.drive.files.get({
+                fileId: res.result.files[0].id, // get the game.json file
+                alt: 'media'
+            }).then(function (res) {
+                var json = JSON.parse(res.body);
+                callback(json);
+            })
         })
     }
 

@@ -2,10 +2,13 @@ class App {
     constructor(game) {
         this.file = new File();
         this.gameId = game.id;
-        this.loaded = false;
         this.load = new LoadingView("var(--mdc-theme-primary)");
         document.body.appendChild(this.load.html);
-        this.file.loadJson(this.gameId, this.onJsonLoaded.bind(this));
+        if (game.id) this.file.loadJson(this.gameId, this.onJsonLoaded.bind(this));
+        else {
+            this.json = {};
+            this.launchEditor()
+        }
     }
 
     onJsonLoaded(json) {
@@ -23,10 +26,12 @@ class App {
     onSoundsLoaded(playList) {
         this.playList = playList;
         this.json.soundList = Object.keys(playList);
-        console.log(this.json.name);
+        this.launchEditor();
+    }
+
+    launchEditor() {
         var editor = new Editor(new EditorView(), new Game(this.json));
         new CmdManager(editor);
-        this.loaded = true;
         document.body.appendChild(editor.view.html);
         this.load.closeDialog();
     }

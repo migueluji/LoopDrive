@@ -84,7 +84,7 @@ class File {
     loadSounds(gameId, callback) {
         var playList = {};
         var counter = 0;
-        gapi.client.drive.files.list({ // find the images folder in the game folder
+        gapi.client.drive.files.list({ // find the sound folder in the game folder
             'q': `parents in "${gameId}" and name="sounds" and mimeType = "application/vnd.google-apps.folder"`
         }).then(function (res) {
             if (res.result.files.length === 0) {
@@ -119,21 +119,26 @@ class File {
     }
 
     static save(gameId, json) {
+
         gapi.client.drive.files.list({
             'q': `parents in "${gameId}" and name="game.json"`
-        }).then(function (response) { // return game.json file for this gameId
+        }).then(function (response) {
+            console.log(response);
             if (response.result.files.length > 0) {
-                var fileId = response.result.files[0].id; // the game.json id
+                var fileId = response.result.files[0].id;
                 gapi.client.request({
                     path: `/upload/drive/v3/files/${fileId}`,
-                    method: 'PATCH', // update the game.json content
+                    method: 'PATCH',
                     body: json
                 }).then(() => {
                     Command.takeScreenshot();
-                    alert('Game saved!!!')
-                })
+                    alert('Game saved!!!');
+                });
             }
-        })
+
+        }, function (error) {
+            console.log(error);
+        });
     }
 
     static delete(fileId, assetID, fileName, type) {

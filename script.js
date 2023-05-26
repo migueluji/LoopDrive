@@ -3,7 +3,6 @@ var API_KEY = 'AIzaSyCfXON-94Onk-fLyihh8buKZcFIjynGRTc';
 var DISCOVERY_DOCS = ["https://www.googleapis.com/discovery/v1/apis/drive/v3/rest"];
 var SCOPES = 'https://www.googleapis.com/auth/drive ';
 var tokenClient;
-var token;
 var gapiInited = false;
 var gisInited = false;
 var openWindows = {};
@@ -13,6 +12,7 @@ var appFolderID;
 var signinButton = document.getElementsByClassName('signin')[0];
 var signoutButton = document.getElementsByClassName('signout')[0];
 var newgameButton = document.getElementsByClassName('newgame')[0];
+var listcontainer = document.querySelector('.list ul');
 
 function gapiLoad() {
     gapi.load('client', gapiInit);
@@ -23,7 +23,6 @@ function gapiInit() {
         apiKey: API_KEY,
         discoveryDocs: DISCOVERY_DOCS
     }).then(function () {
-       //  gapi.client.load(DISCOVERY_DOCS[0]);
         gapiInited = true;
         maybeEnableButtons();
     });
@@ -33,43 +32,42 @@ function gisInit() {
     tokenClient = google.accounts.oauth2.initTokenClient({
         client_id: CLIENT_ID,
         scope: SCOPES
-       // callback: ''
     });
     gisInited = true;
     maybeEnableButtons();
 }
 
 function maybeEnableButtons() {
-    if (gapiInited && gisInited) {
-        signinButton.style.display = 'block';
-    }
+    if (gapiInited && gisInited) signinButton.style.display = 'block';
+}
+
+function signOut() {
+    google.accounts.id.disableAutoSelect();
+    listcontainer.innerHTML = '';
+    signinButton.style.display = 'block'
+    signoutButton.style.display = newgameButton.style.display = 'none';
 }
 
 function signIn() {
     tokenClient.callback = (accessToken) => {
         if (accessToken.error !== undefined) { throw (accessToken); }
-        token = accessToken;
+        localStorage.setItem("token", JSON.stringify(accessToken));
         signinButton.style.display = 'none';
         signoutButton.style.display = newgameButton.style.display = 'block';
-        checkDriveFolder();
+        checkDriveFolder(appFolderName);
     };
     tokenClient.requestAccessToken();
-    // if (gapi.client.getToken() === null) tokenClient.requestAccessToken({ prompt: 'consent' });
-    // else tokenClient.requestAccessToken({ prompt: '' });
 }
 
-async function checkDriveFolder() {
+function checkDriveFolder(folderName) {
     gapi.client.drive.files.list({
-        q: "name ='" + appFolderName + "'",
-    }).then(async function (response) {
+        q: "name ='" + folderName + "'",
+    }).then(function (response) {
         var files = response.result.files;
-        if (files && files.length > 0){
+        if (files && files.length > 0) {
             appFolderID = files[0].id;
             listDriveGames(appFolderID);
         }
-        // else {  // if folder not available then create an assign appFolderID
-        //     appFolderID = await createFolder(appFolder);
-        // }
     })
 }
 
@@ -87,23 +85,22 @@ function listDriveGames(folderID) {
                     <svg onclick="expand(this)" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M24 24H0V0h24v24z" fill="none" opacity=".87"/><path d="M16.59 8.59L12 13.17 7.41 8.59 6 10l6 6 6-6-1.41-1.41z"/></svg>
                 </li>`;
             }
-        } else {
-            listcontainer.innerHTML = '<div style="text-align: left;">No Files</div>'
         }
     })
 }
 
-function signOut() {
-    // token = gapi.client.getToken();
-    // token = null;
-    // if (token !== null) {
-    //google.accounts.oauth2.revoke(token.access_token, () => { console.log('Revoked: ' + token.access_token) });
-    google.accounts.id.disableAutoSelect(); // after that the token will be undefined
-    // gapi.client.setToken('');
-    listcontainer.innerHTML = 'Sign in First';
-    signinButton.style.display = 'block'
-    signoutButton.style.display = newgameButton.style.display = 'none';
-    // }
+function newGame() {
+    console.log("new game");
+    editGame();
+}
+
+function editGame(gameHTML) {
+    var game = { appFolderID: appFolderID, id: "", name: "" };
+    if (gameHTML) game = { appFolderID: appFolderID, id: gameHTML.getAttribute('data-id'), name: gameHTML.getAttribute('data-name') }
+    localStorage.setItem("game" + game.id, JSON.stringify(game));
+    var url = "editor/?id=" + game.id;
+    if (openWindows[url] && !openWindows[url].closed) openWindows[url].focus();
+    else openWindows[url] = window.open(url, "_blank");
 }
 
 // function createFolder(folderName) {
@@ -130,121 +127,102 @@ function signOut() {
 //     });
 // }
 
+// var expandContainer = document.querySelector('.expand-container');
+// var expandContainerUl = document.querySelector('.expand-container ul');
+//
+// // create a function to show hide options
+// function expand(v) {
+//     var click_position = v.getBoundingClientRect();
+//     if (expandContainer.style.display == 'block') {
+//         expandContainer.style.display = 'none';
+//         expandContainerUl.setAttribute('data-id', '');
+//         expandContainerUl.setAttribute('data-name', '');
+//     } else {
+//         expandContainer.style.display = 'block';
+//         expandContainer.style.left = (click_position.left + window.scrollX) - 120 + 'px';
+//         expandContainer.style.top = (click_position.top + window.scrollY) + 25 + 'px';
+//         // get data name & id and store it to the options
+//         expandContainerUl.setAttribute('data-id', v.parentElement.getAttribute('data-id'));
+//         expandContainerUl.setAttribute('data-name', v.parentElement.getAttribute('data-name'));
+//     }
+// }
+
+// // function for files list
 
 
-function newGame() {
-    console.log("new game");
-    editGame();
-}
+// function readEditDownload(v, condition) {
+//     var id = v.parentElement.getAttribute('data-id');
+//     var name = v.parentElement.getAttribute('data-name');
+//     v.innerHTML = '...';
+//     gapi.client.drive.files.get({
+//         fileId: id,
+//         alt: 'media'
+//     }).then(function (res) {
+//         expandContainer.style.display = 'none';
+//         expandContainerUl.setAttribute('data-id', '');
+//         expandContainerUl.setAttribute('data-name', '');
+//         if (condition == 'read') {
+//             v.innerHTML = 'Read';
+//             document.querySelector('textarea').value = res.body;
+//             document.documentElement.scrollTop = 0;
+//             console.log('Read Now')
+//         } else if (condition == 'edit') {
+//             v.innerHTML = 'Edit';
+//             document.querySelector('textarea').value = res.body;
+//             document.documentElement.scrollTop = 0;
+//             var updateBtn = document.getElementsByClassName('upload')[0];
+//             updateBtn.innerHTML = 'Update';
+//             // we will make the update function later
+//             updateBtn.setAttribute('onClick', 'update()');
+//             document.querySelector('textarea').setAttribute('data-update-id', id);
+//             console.log('File ready for update');
+//         } else {
+//             v.innerHTML = 'Download';
+//             var blob = new Blob([res.body], { type: 'plain/text' });
+//             var a = document.createElement('a');
+//             a.href = window.URL.createObjectURL(blob);
+//             a.download = name;
+//             a.click();
+//         }
+//     })
+// }
 
-function editGame(gameHTML) {
-    var game = { appFolderID: appFolderID, id: "", name: "" };
-    if (gameHTML) game = { appFolderID: appFolderID, id: gameHTML.getAttribute('data-id'), name: gameHTML.getAttribute('data-name') }
-    localStorage.setItem("game" + game.id, JSON.stringify(game));
-    localStorage.setItem("token", JSON.stringify(gapi.client.getToken()));
-    var url = "editor/?id=" + game.id;
-    if (openWindows[url] && !openWindows[url].closed) openWindows[url].focus();
-    else openWindows[url] = window.open(url, "_blank");
-}
+// // new create update function
+// function update() {
+//     var updateId = document.querySelector('textarea').getAttribute('data-update-id');
+//     var url = 'https://www.googleapis.com/upload/drive/v3/files/' + updateId + '?uploadType=media';
+//     fetch(url, {
+//         method: 'PATCH',
+//         headers: new Headers({
+//             // Authorization: 'Bearer ' + gapi.auth.getToken().access_token,
+//             'Content-type': 'plain/text'
+//         }),
+//         body: document.querySelector('textarea').value
+//     }).then(value => {
+//         console.log('File updated successfully');
+//         document.querySelector('textarea').setAttribute('data-update-id', '');
+//         var updateBtn = document.getElementsByClassName('upload')[0];
+//         updateBtn.innerHTML = 'Backup';
+//         updateBtn.setAttribute('onClick', 'uploaded()');
+//     }).catch(err => console.error(err))
+// }
 
-
-
-var expandContainer = document.querySelector('.expand-container');
-var expandContainerUl = document.querySelector('.expand-container ul');
-var listcontainer = document.querySelector('.list ul');
-// create a function to show hide options
-function expand(v) {
-    var click_position = v.getBoundingClientRect();
-    if (expandContainer.style.display == 'block') {
-        expandContainer.style.display = 'none';
-        expandContainerUl.setAttribute('data-id', '');
-        expandContainerUl.setAttribute('data-name', '');
-    } else {
-        expandContainer.style.display = 'block';
-        expandContainer.style.left = (click_position.left + window.scrollX) - 120 + 'px';
-        expandContainer.style.top = (click_position.top + window.scrollY) + 25 + 'px';
-        // get data name & id and store it to the options
-        expandContainerUl.setAttribute('data-id', v.parentElement.getAttribute('data-id'));
-        expandContainerUl.setAttribute('data-name', v.parentElement.getAttribute('data-name'));
-    }
-}
-
-// function for files list
-
-
-function readEditDownload(v, condition) {
-    var id = v.parentElement.getAttribute('data-id');
-    var name = v.parentElement.getAttribute('data-name');
-    v.innerHTML = '...';
-    gapi.client.drive.files.get({
-        fileId: id,
-        alt: 'media'
-    }).then(function (res) {
-        expandContainer.style.display = 'none';
-        expandContainerUl.setAttribute('data-id', '');
-        expandContainerUl.setAttribute('data-name', '');
-        if (condition == 'read') {
-            v.innerHTML = 'Read';
-            document.querySelector('textarea').value = res.body;
-            document.documentElement.scrollTop = 0;
-            console.log('Read Now')
-        } else if (condition == 'edit') {
-            v.innerHTML = 'Edit';
-            document.querySelector('textarea').value = res.body;
-            document.documentElement.scrollTop = 0;
-            var updateBtn = document.getElementsByClassName('upload')[0];
-            updateBtn.innerHTML = 'Update';
-            // we will make the update function later
-            updateBtn.setAttribute('onClick', 'update()');
-            document.querySelector('textarea').setAttribute('data-update-id', id);
-            console.log('File ready for update');
-        } else {
-            v.innerHTML = 'Download';
-            var blob = new Blob([res.body], { type: 'plain/text' });
-            var a = document.createElement('a');
-            a.href = window.URL.createObjectURL(blob);
-            a.download = name;
-            a.click();
-        }
-    })
-}
-
-// new create update function
-function update() {
-    var updateId = document.querySelector('textarea').getAttribute('data-update-id');
-    var url = 'https://www.googleapis.com/upload/drive/v3/files/' + updateId + '?uploadType=media';
-    fetch(url, {
-        method: 'PATCH',
-        headers: new Headers({
-            // Authorization: 'Bearer ' + gapi.auth.getToken().access_token,
-            'Content-type': 'plain/text'
-        }),
-        body: document.querySelector('textarea').value
-    }).then(value => {
-        console.log('File updated successfully');
-        document.querySelector('textarea').setAttribute('data-update-id', '');
-        var updateBtn = document.getElementsByClassName('upload')[0];
-        updateBtn.innerHTML = 'Backup';
-        updateBtn.setAttribute('onClick', 'uploaded()');
-    }).catch(err => console.error(err))
-}
-
-function deleteFile(v) {
-    var id = v.parentElement.getAttribute('data-id');
-    v.innerHTML = '...';
-    var request = gapi.client.drive.files.delete({
-        'fileId': id
-    });
-    request.execute(function (res) {
-        console.log('File Deleted');
-        v.innerHTML = 'Delete';
-        expandContainer.style.display = 'none';
-        expandContainerUl.setAttribute('data-id', '');
-        expandContainerUl.setAttribute('data-name', '');
-        // after delete update the list
-        showList();
-    })
-}
+// function deleteFile(v) {
+//     var id = v.parentElement.getAttribute('data-id');
+//     v.innerHTML = '...';
+//     var request = gapi.client.drive.files.delete({
+//         'fileId': id
+//     });
+//     request.execute(function (res) {
+//         console.log('File Deleted');
+//         v.innerHTML = 'Delete';
+//         expandContainer.style.display = 'none';
+//         expandContainerUl.setAttribute('data-id', '');
+//         expandContainerUl.setAttribute('data-name', '');
+//         // after delete update the list
+//         showList();
+//     })
+// }
 
 // now create a function to upload file
 // function save() {

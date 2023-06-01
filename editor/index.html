@@ -129,7 +129,7 @@
 		const id = urlParams.get('id');
 		var game = JSON.parse(localStorage.getItem("game"));
 		game.id = id;
-		var token = localStorage.getItem("token");
+		var token = JSON.parse(localStorage.getItem("token"));
 
 		var CLIENT_ID = '129246923501-4lk4rkmhin21kcaoul91k300s9ar9n1t.apps.googleusercontent.com';
 		var API_KEY = 'AIzaSyCfXON-94Onk-fLyihh8buKZcFIjynGRTc';
@@ -163,7 +163,7 @@
 
 		function maybeEnable() {
 			if (gapiInited && gisInited) {
-				gapi.client.setToken(JSON.parse(token));
+				gapi.client.setToken(token);
 				app = new App(game);
 			}
 		}

@@ -1,59 +1,45 @@
 class File {
 
     loadJson(gameId, callback) {
-        gapi.client.drive.files.list({ // find game.json id from the game folder
-            'q': `parents in "${gameId}" and name="game.json"`
+        gapi.client.drive.files.list({
+            'q': `parents in "${gameId}" and name="game.json" and trashed=false` // Agregar "and trashed=false" al query
         }).then(function (res) {
-            gapi.client.drive.files.get({
-                fileId: res.result.files[0].id, // get the game.json file
-                alt: 'media'
-            }).then(function (res) {
-                var json = JSON.parse(res.body);
-                callback(json);
-            })
-        })
-    }
-
-    createFolder(folderName, parent) {
-        console.log(folderName, game, parent);
-        return new Promise(function (resolve, reject) {
-            var request = gapi.client.request({
-                path: '/drive/v3/files',
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': 'Bearer ' + JSON.parse(token).access_token,
-                },
-                body: {
-                    'name': folderName,
-                    'mimeType': 'application/vnd.google-apps.folder',
-                    'parents': [parent]
-                }
-            });
-            request.execute(function (response) {
-                if (response.id) {
-                    resolve(response.id); // Resolves the promise with appFolderID
-                } else {
-                    reject(new Error('Failed to create folder')); // Rejects the promise with an error
-                }
-            });
+            if (res.result.files.length > 0) {
+                gapi.client.drive.files.get({
+                    fileId: res.result.files[0].id,
+                    alt: 'media'
+                }).then(function (res) {
+                    var json;
+                    if (res.body == "") json = JSON.parse("{}")
+                    else json = JSON.parse(res.body);
+                    console.log(json);
+                    callback(json);
+                })
+            }
         });
     }
 
-    loadImages(gameId, callback) {
-        var loader = new PIXI.Loader();
+    loadImages(gameId, loader, callback) {
+        console.log(loader);
         var counter = 0;
         gapi.client.drive.files.list({ // find the images folder in the game folder
             'q': `parents in "${gameId}" and name="images" and mimeType = "application/vnd.google-apps.folder"`
         }).then(function (res) {
+            console.log(res.result.files[0].id);
             if (res.result.files.length === 0) {
                 console.log("No images folder found.");
+                console.log(loader);
                 callback(loader);
                 return;
             }
             gapi.client.drive.files.list({ // list the images in the image folder
                 'q': `parents in "${res.result.files[0].id}"`,
             }).then(function (response) {
+                if (response.result.files.length === 0) {
+                    console.log("No images found in the images folder.");
+                    callback(loader);
+                    return;
+                  }
                 Object.entries(response.result.files).forEach(([key, value]) => { // key is the image name and value.id their id in google drive
                     gapi.client.drive.files.get({
                         fileId: value.id,
@@ -72,7 +58,7 @@ class File {
                                 console.log("Loaded :", resource.name);
                                 if (!loader.init) Command.addAssetCmd(resource.name, "Image");
                             });
-                            loader.onComplete.once(() => { callback(loader) });
+                            loader.onComplete.once(() => { callback() });
                             loader.load();
                         }
                     })
@@ -81,8 +67,7 @@ class File {
         })
     }
 
-    loadSounds(gameId, callback) {
-        var playList = {};
+    loadSounds(gameId, playList, callback) {
         var counter = 0;
         gapi.client.drive.files.list({ // find the sound folder in the game folder
             'q': `parents in "${gameId}" and name="sounds" and mimeType = "application/vnd.google-apps.folder"`
@@ -95,6 +80,11 @@ class File {
             gapi.client.drive.files.list({ // list the images in the image folder
                 'q': `parents in "${res.result.files[0].id}"`,
             }).then(function (response) {
+                if (response.result.files.length === 0) {
+                    console.log("No sounds found in the images folder.");
+                    callback(playList);
+                    return;
+                  }
                 Object.entries(response.result.files).forEach(([key, value]) => {
                     gapi.client.drive.files.get({
                         fileId: value.id,
@@ -119,7 +109,6 @@ class File {
     }
 
     static save(gameId, json) {
-
         gapi.client.drive.files.list({
             'q': `parents in "${gameId}" and name="game.json"`
         }).then(function (response) {
@@ -153,6 +142,7 @@ class File {
     }
 
     static upload(gameId, file, type) {
+        console.log(gameId, file, type);
         var folder;
         switch (type) {
             case "Image": folder = "images"; break;
@@ -259,6 +249,31 @@ class File {
             }
         });
     }
+
+
+    // createFolder(folderName, parent) {
+    //     console.log(folderName, game, parent);
+    //     return new Promise(function (resolve, reject) {
+    //         var request = gapi.client.request({
+    //             path: '/drive/v3/files',
+    //             method: 'POST',
+    //             headers: {
+    //                 'Content-Type': 'application/json',
+    //                 'Authorization': 'Bearer ' + JSON.parse(token).access_token,
+    //             },
+    //             body: {
+    //                 'name': folderName,
+    //                 'mimeType': 'application/vnd.google-apps.folder',
+    //                 'parents': [parent]
+    //             }
+    //         });
+    //         request.execute(function (response) {
+    //             if (response.id) {
+    //                 resolve(response.id); // Resolves the promise with appFolderID
+    //             } else {
+    //                 reject(new Error('Failed to create folder')); // Rejects the promise with an error
+    //             }
+    //         });
+    //     });
+    // }
 }
-
-

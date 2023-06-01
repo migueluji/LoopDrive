@@ -49,31 +49,46 @@ function signOut() {
 }
 
 function signIn() {
-    tokenClient.callback = (accessToken) => {
-        if (accessToken.error !== undefined) { throw (accessToken); }
-        localStorage.setItem("token", JSON.stringify(accessToken));
+    tokenClient.callback = (token) => {
+        if (token.error !== undefined) { throw (token); }
+        localStorage.setItem("token", JSON.stringify(token));
         signinButton.style.display = 'none';
         signoutButton.style.display = newgameButton.style.display = 'block';
-        checkDriveFolder(appFolderName);
+        checkDriveFolder(appFolderName).then(function (folderId) {
+            appFolderID = folderId;
+            listDriveGames(appFolderID);
+        }).catch(function (error) {
+            console.error(error);
+        });
     };
     tokenClient.requestAccessToken();
 }
 
-function checkDriveFolder(folderName) {
-    gapi.client.drive.files.list({
-        q: "name ='" + folderName + "'",
-    }).then(function (response) {
-        var files = response.result.files;
-        if (files && files.length > 0) {
-            appFolderID = files[0].id;
-            listDriveGames(appFolderID);
-        }
-    })
+function checkDriveFolder(appFolderName) {
+    return new Promise(function (resolve, reject) {
+        gapi.client.drive.files.list({
+            q: "name ='" + appFolderName + "' and trashed=false",
+        }).then(function (response) {
+            var files = response.result.files;
+            if (files && files.length > 0) {
+                resolve(files[0].id);
+            } else {
+                createFolder(appFolderName, 'root').then(function (folderId) {
+                    resolve(folderId);
+                }).catch(function (error) {
+                    reject(new Error('Failed to create folder: ' + error.message));
+                });
+            }
+        }).catch(function (error) {
+            reject(new Error('Failed to list files: ' + error.message));
+        });
+    });
 }
 
-function listDriveGames(folderID) {
+
+function listDriveGames(appFolderID) {
     gapi.client.drive.files.list({
-        'q': `parents in "${folderID}"`// get parent folder id 
+        'q': `parents in "${appFolderID}"` // list user games
     }).then(function (response) {
         var files = response.result.files;
         if (files && files.length > 0) {
@@ -89,10 +104,42 @@ function listDriveGames(folderID) {
     })
 }
 
+// function newGame() {
+//     var gameID; // Variable local para almacenar gameID
+//     createFolder("Untitled Game", appFolderID).then(function (folderId) {
+//         gameID = folderId; // Asignar el valor de folderId a gameID
+//         createEmptyJson(gameID);
+//         var url = "/image.jpg";
+//         upLoadImage(gameID,url);
+//         return createFolder("images", gameID);
+//     }).then(function () {
+//         return createFolder("sounds", gameID);
+//     }).then(function () {
+//         listDriveGames(appFolderID);
+//     }).catch(function (error) {
+//         console.error("Failed to create game:", error);
+//     });
+// }
+
 function newGame() {
-    console.log("new game");
-    editGame();
-}
+    var gameID; // Variable local para almacenar gameID
+    createFolder("Untitled Game", appFolderID).then(function(folderId) {
+      gameID = folderId; // Asignar el valor de folderId a gameID
+      createEmptyJson(gameID);
+      var imageUrl = "/white.png";
+      return uploadImage(gameID, imageUrl);
+    }).then(function(imageFileId) {
+      console.log('Image uploaded successfully. File ID:', imageFileId);
+      return createFolder("images", gameID);
+    }).then(function() {
+      return createFolder("sounds", gameID);
+    }).then(function() {
+      listDriveGames(appFolderID);
+    }).catch(function(error) {
+      console.error("Failed to create game:", error);
+    });
+  }
+
 
 function editGame(gameHTML) {
     var game = { appFolderID: appFolderID, id: "", name: "" };
@@ -103,29 +150,127 @@ function editGame(gameHTML) {
     else openWindows[url] = window.open(url, "_blank");
 }
 
-// function createFolder(folderName) {
-//     return new Promise(function (resolve, reject) {
-//         var request = gapi.client.request({
-//             path: '/drive/v3/files',
-//             method: 'POST',
-//             headers: {
-//                 'Content-Type': 'application/json',
-//                 'Authorization': 'Bearer ' + token.access_token,
-//             },
-//             body: {
-//                 'name': folderName,
-//                 'mimeType': 'application/vnd.google-apps.folder'
-//             }
-//         });
-//         request.execute(function (response) {
-//             if (response.id) {
-//                 resolve(response.id); // Resolves the promise with appFolderID
-//             } else {
-//                 reject(new Error('Failed to create folder')); // Rejects the promise with an error
-//             }
-//         });
-//     });
-// }
+function createFolder(folderName, parent) {
+    return new Promise(function (resolve, reject) {
+        var request = gapi.client.request({
+            path: '/drive/v3/files',
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + JSON.parse(localStorage.getItem("token")).access_token,
+            },
+            body: {
+                'name': folderName,
+                'mimeType': 'application/vnd.google-apps.folder',
+                'parents': [parent]
+            }
+        });
+        request.execute(function (response) {
+            if (response.error) {
+                reject(new Error('Failed to create folder: ' + response.error.message));
+            } else if (response.id) {
+                resolve(response.id);
+            } else {
+                reject(new Error('Failed to create folder.'));
+            }
+        });
+    });
+}
+
+function createEmptyJson(gameID) {
+    return new Promise(function(resolve, reject) {
+      var request = gapi.client.request({
+        path: '/drive/v3/files',
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + JSON.parse(localStorage.getItem("token")).access_token,
+        },
+        body: {
+          'name': 'game.json',
+          'mimeType': 'application/json',
+          'parents': [gameID]
+        }
+      });
+  
+      request.execute(function(response) {
+        if (response.error) {
+          reject(new Error('Failed to create JSON file: ' + response.error.message));
+        } else if (response.id) {
+          resolve(response.id);
+        } else {
+          reject(new Error('Failed to create JSON file.'));
+        }
+      });
+    });
+  }
+  
+  
+  function uploadImage(gameID, imageUrl) {
+    return new Promise(function(resolve, reject) {
+      var accessToken = JSON.parse(localStorage.getItem('token')).access_token;
+  
+      var metadata = {
+        'name': 'image.jpg',
+        'parents': [gameID]
+      };
+  
+      var fileData = new Blob([imageUrl], { type: 'image/jpeg' });
+      var reader = new FileReader();
+      reader.readAsBinaryString(fileData);
+  
+      reader.onload = function(e) {
+        var requestData = reader.result;
+        var boundary = '-------314159265358979323846';
+        var delimiter = '\r\n--' + boundary + '\r\n';
+        var close_delim = '\r\n--' + boundary + '--';
+  
+        var multipartRequestBody =
+          delimiter +
+          'Content-Type: application/json\r\n\r\n' +
+          JSON.stringify(metadata) +
+          delimiter +
+          'Content-Type: image/jpeg\r\n' +
+          'Content-Transfer-Encoding: base64\r\n' +
+          '\r\n' +
+          btoa(requestData) +
+          close_delim;
+  
+        gapi.client.request({
+          path: '/upload/drive/v3/files',
+          method: 'POST',
+          params: {
+            'uploadType': 'multipart'
+          },
+          headers: {
+            'Content-Type': 'multipart/related; boundary="' + boundary + '"',
+            'Authorization': 'Bearer ' + accessToken
+          },
+          body: multipartRequestBody
+        }).then(function(response) {
+          var fileId = response.result.id;
+          resolve(fileId);
+        }).catch(function(error) {
+          reject(new Error('Failed to upload image: ' + error.result.error.message));
+        });
+      };
+  
+      reader.onerror = function(e) {
+        reject(new Error('Failed to read image data.'));
+      };
+    });
+  }
+  
+  
+  
+  
+  
+  
+  
+  
+
+
+
 
 // var expandContainer = document.querySelector('.expand-container');
 // var expandContainerUl = document.querySelector('.expand-container ul');

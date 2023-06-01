@@ -77,7 +77,6 @@ class CanvasView {
     }
 
     takeScreenshot(w, h, sceneID, actorList, upload) {
-
         var renderer = this.appRenderer;
         var stage = new PIXI.Container();
 

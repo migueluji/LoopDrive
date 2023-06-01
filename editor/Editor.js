@@ -76,7 +76,7 @@ class Editor {
         delete saveToFile.fontList;
         delete saveToFile.imageList;
         delete saveToFile.soundList;
-        File.save(JSON.parse(localStorage.getItem("game")).id, JSON.stringify(saveToFile, (key, value) => { if (key != "id") return value }, '\t'));
+        File.save(JSON.parse(localStorage.getItem("game")), JSON.stringify(saveToFile, (key, value) => { if (key != "id") return value }, '\t'));
     }
 
     takeScreenshot() {

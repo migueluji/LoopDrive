@@ -104,27 +104,40 @@ class File {
         })
     }
 
-    static save(gameId, json) {
+    static save(game, json) {
+        console.log(game.id,game.name);
+        var gameId = game.id;
         gapi.client.drive.files.list({
             'q': `parents in "${gameId}" and name="game.json"`
-        }).then(function (response) {
+        }).then(function(response) {
             console.log(response);
             if (response.result.files.length > 0) {
                 var fileId = response.result.files[0].id;
+                
+                // Modificar el nombre del directorio con json.name
                 gapi.client.request({
-                    path: `/upload/drive/v3/files/${fileId}`,
+                    path: `/drive/v3/files/${gameId}`,
                     method: 'PATCH',
-                    body: json
+                    body: {
+                        name: game.name
+                    }
                 }).then(() => {
-                    Command.takeScreenshot();
-                    alert('Game saved!!!');
+                    // Guardar el archivo json con el nuevo nombre
+                    gapi.client.request({
+                        path: `/upload/drive/v3/files/${fileId}`,
+                        method: 'PATCH',
+                        body: json
+                    }).then(() => {
+                        Command.takeScreenshot();
+                        alert('Game saved!!!');
+                    });
                 });
             }
-
-        }, function (error) {
+        }, function(error) {
             console.log(error);
         });
     }
+    
 
     static delete(fileId, assetID, fileName, type) {
         if (type == "Image" || type == "Animation") {

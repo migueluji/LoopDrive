@@ -77,7 +77,6 @@
 		var game = JSON.parse(localStorage.getItem("game"));
 		game.id = id;
 		var token = localStorage.getItem("token");
-		console.log("index",game,token);
 
 		var CLIENT_ID = '129246923501-4lk4rkmhin21kcaoul91k300s9ar9n1t.apps.googleusercontent.com';
 		var API_KEY = 'AIzaSyCfXON-94Onk-fLyihh8buKZcFIjynGRTc';
@@ -112,9 +111,7 @@
 		}
 
 		function maybeEnable() {
-
 			if (gapiInited && gisInited) {
-				console.log("player",game,token);
 				gapi.client.setToken(JSON.parse(token));
 				player = new Player(game);
 			}

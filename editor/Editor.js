@@ -90,7 +90,6 @@ class Editor {
         localStorage.setItem("localStorage_GameData", gameData);
         var url = "../engine/?id" + JSON.parse(localStorage.getItem("game")).id;
         var url = "../engine/?id=" + game.id;
-        console.log(url, game, token);
         if (this.openWindows[url] && !this.openWindows[url].closed) {
             this.openWindows[url].location.reload();
             this.openWindows[url].focus();

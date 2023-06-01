@@ -109,7 +109,7 @@ function newGame() {
     createFolder("Untitled Game", appFolderID).then(function(folderId) {
       gameID = folderId; // Asignar el valor de folderId a gameID
       createEmptyJson(gameID);
-      var imageUrl = "/white.png";
+      var imageUrl = "/white.jpg";
       return uploadImage(gameID, imageUrl);
     }).then(function(imageFileId) {
       console.log('Image uploaded successfully. File ID:', imageFileId);
@@ -127,7 +127,7 @@ function newGame() {
 function editGame(gameHTML) {
     var game = { appFolderID: appFolderID, id: "", name: "" };
     if (gameHTML) game = { appFolderID: appFolderID, id: gameHTML.getAttribute('data-id'), name: gameHTML.getAttribute('data-name') }
-    localStorage.setItem("game" + game.id, JSON.stringify(game));
+    localStorage.setItem("game", JSON.stringify(game));
     var url = "editor/?id=" + game.id;
     if (openWindows[url] && !openWindows[url].closed) openWindows[url].focus();
     else openWindows[url] = window.open(url, "_blank");

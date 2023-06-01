@@ -12,7 +12,6 @@ class File {
                     var json;
                     if (res.body == "") json = JSON.parse("{}")
                     else json = JSON.parse(res.body);
-                    console.log(json);
                     callback(json);
                 })
             }
@@ -20,15 +19,17 @@ class File {
     }
 
     loadImages(gameId, loader, callback) {
-        console.log(loader);
+        loader.init = true;
+        loader.onLoad.add((loader, resource) => {
+            console.log("Loaded :", resource.name);
+            if (!loader.init) Command.addAssetCmd(resource.name, "Image");
+        });
         var counter = 0;
         gapi.client.drive.files.list({ // find the images folder in the game folder
             'q': `parents in "${gameId}" and name="images" and mimeType = "application/vnd.google-apps.folder"`
         }).then(function (res) {
-            console.log(res.result.files[0].id);
             if (res.result.files.length === 0) {
-                console.log("No images folder found.");
-                console.log(loader);
+                console.log("No images folder found");
                 callback(loader);
                 return;
             }
@@ -36,10 +37,10 @@ class File {
                 'q': `parents in "${res.result.files[0].id}"`,
             }).then(function (response) {
                 if (response.result.files.length === 0) {
-                    console.log("No images found in the images folder.");
+                    console.log("No images found in the images folder");
                     callback(loader);
                     return;
-                  }
+                }
                 Object.entries(response.result.files).forEach(([key, value]) => { // key is the image name and value.id their id in google drive
                     gapi.client.drive.files.get({
                         fileId: value.id,
@@ -52,12 +53,7 @@ class File {
                         loader.add(value.name, objectUrl);
                         loader.resources[value.name] = { "texture": texture, "fileId": value.id };
                         counter++;
-                        loader.init = true;
                         if (counter === response.result.files.length) {
-                            loader.onLoad.add((loader, resource) => {
-                                console.log("Loaded :", resource.name);
-                                if (!loader.init) Command.addAssetCmd(resource.name, "Image");
-                            });
                             loader.onComplete.once(() => { callback() });
                             loader.load();
                         }
@@ -73,7 +69,7 @@ class File {
             'q': `parents in "${gameId}" and name="sounds" and mimeType = "application/vnd.google-apps.folder"`
         }).then(function (res) {
             if (res.result.files.length === 0) {
-                console.log("No sounds folder found.");
+                console.log("No sounds folder found");
                 callback(playList);
                 return;
             }
@@ -81,10 +77,10 @@ class File {
                 'q': `parents in "${res.result.files[0].id}"`,
             }).then(function (response) {
                 if (response.result.files.length === 0) {
-                    console.log("No sounds found in the images folder.");
+                    console.log("No sounds found in the sounds folder");
                     callback(playList);
                     return;
-                  }
+                }
                 Object.entries(response.result.files).forEach(([key, value]) => {
                     gapi.client.drive.files.get({
                         fileId: value.id,
@@ -142,6 +138,7 @@ class File {
     }
 
     static upload(gameId, file, type) {
+        console.log("upload ", gameId, file, type);
         var folder;
         switch (type) {
             case "Image": folder = "images"; break;
@@ -212,13 +209,13 @@ class File {
 
     static uploadScreenShoot(gameId, blob) {
         gapi.client.drive.files.list({
-            'q': `parents in "${gameId}" and name="image.png"`
+            'q': `parents in "${gameId}" and name="image.jpg"`
         }).then(function (response) {
             if (response.result.files.length > 0) {
                 var fileId = response.result.files[0].id;
                 var metadata = {
-                    "name": "image.png",
-                    'mimeType': 'image/png',
+                    "name": "image.jpg",
+                    'mimeType': 'image/jpg',
                     'parents': gameId
                 };
                 var boundary = '-------314159265358979323846';

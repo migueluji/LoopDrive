@@ -104,23 +104,6 @@ function listDriveGames(appFolderID) {
     })
 }
 
-// function newGame() {
-//     var gameID; // Variable local para almacenar gameID
-//     createFolder("Untitled Game", appFolderID).then(function (folderId) {
-//         gameID = folderId; // Asignar el valor de folderId a gameID
-//         createEmptyJson(gameID);
-//         var url = "/image.jpg";
-//         upLoadImage(gameID,url);
-//         return createFolder("images", gameID);
-//     }).then(function () {
-//         return createFolder("sounds", gameID);
-//     }).then(function () {
-//         listDriveGames(appFolderID);
-//     }).catch(function (error) {
-//         console.error("Failed to create game:", error);
-//     });
-// }
-
 function newGame() {
     var gameID; // Variable local para almacenar gameID
     createFolder("Untitled Game", appFolderID).then(function(folderId) {
@@ -215,51 +198,60 @@ function createEmptyJson(gameID) {
         'parents': [gameID]
       };
   
-      var fileData = new Blob([imageUrl], { type: 'image/jpeg' });
-      var reader = new FileReader();
-      reader.readAsBinaryString(fileData);
+      fetch(imageUrl)
+        .then(function(response) {
+          return response.blob();
+        })
+        .then(function(fileData) {
+          var reader = new FileReader();
+          reader.readAsDataURL(fileData);
   
-      reader.onload = function(e) {
-        var requestData = reader.result;
-        var boundary = '-------314159265358979323846';
-        var delimiter = '\r\n--' + boundary + '\r\n';
-        var close_delim = '\r\n--' + boundary + '--';
+          reader.onload = function(e) {
+            var requestData = reader.result.split(',')[1];
+            var boundary = '-------314159265358979323846';
+            var delimiter = '\r\n--' + boundary + '\r\n';
+            var close_delim = '\r\n--' + boundary + '--';
   
-        var multipartRequestBody =
-          delimiter +
-          'Content-Type: application/json\r\n\r\n' +
-          JSON.stringify(metadata) +
-          delimiter +
-          'Content-Type: image/jpeg\r\n' +
-          'Content-Transfer-Encoding: base64\r\n' +
-          '\r\n' +
-          btoa(requestData) +
-          close_delim;
+            var multipartRequestBody =
+              delimiter +
+              'Content-Type: application/json\r\n\r\n' +
+              JSON.stringify(metadata) +
+              delimiter +
+              'Content-Type: image/jpeg\r\n' +
+              'Content-Transfer-Encoding: base64\r\n' +
+              '\r\n' +
+              requestData +
+              close_delim;
   
-        gapi.client.request({
-          path: '/upload/drive/v3/files',
-          method: 'POST',
-          params: {
-            'uploadType': 'multipart'
-          },
-          headers: {
-            'Content-Type': 'multipart/related; boundary="' + boundary + '"',
-            'Authorization': 'Bearer ' + accessToken
-          },
-          body: multipartRequestBody
-        }).then(function(response) {
-          var fileId = response.result.id;
-          resolve(fileId);
-        }).catch(function(error) {
-          reject(new Error('Failed to upload image: ' + error.result.error.message));
+            gapi.client.request({
+              path: '/upload/drive/v3/files',
+              method: 'POST',
+              params: {
+                'uploadType': 'multipart'
+              },
+              headers: {
+                'Content-Type': 'multipart/related; boundary="' + boundary + '"',
+                'Authorization': 'Bearer ' + accessToken
+              },
+              body: multipartRequestBody
+            }).then(function(response) {
+              var fileId = response.result.id;
+              resolve(fileId);
+            }).catch(function(error) {
+              reject(new Error('Failed to upload image: ' + error.result.error.message));
+            });
+          };
+  
+          reader.onerror = function(e) {
+            reject(new Error('Failed to read image data.'));
+          };
+        })
+        .catch(function(error) {
+          reject(new Error('Failed to fetch image: ' + error));
         });
-      };
-  
-      reader.onerror = function(e) {
-        reject(new Error('Failed to read image data.'));
-      };
     });
   }
+  
   
   
   

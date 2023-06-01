@@ -142,7 +142,6 @@ class File {
     }
 
     static upload(gameId, file, type) {
-        console.log(gameId, file, type);
         var folder;
         switch (type) {
             case "Image": folder = "images"; break;
@@ -249,31 +248,4 @@ class File {
             }
         });
     }
-
-
-    // createFolder(folderName, parent) {
-    //     console.log(folderName, game, parent);
-    //     return new Promise(function (resolve, reject) {
-    //         var request = gapi.client.request({
-    //             path: '/drive/v3/files',
-    //             method: 'POST',
-    //             headers: {
-    //                 'Content-Type': 'application/json',
-    //                 'Authorization': 'Bearer ' + JSON.parse(token).access_token,
-    //             },
-    //             body: {
-    //                 'name': folderName,
-    //                 'mimeType': 'application/vnd.google-apps.folder',
-    //                 'parents': [parent]
-    //             }
-    //         });
-    //         request.execute(function (response) {
-    //             if (response.id) {
-    //                 resolve(response.id); // Resolves the promise with appFolderID
-    //             } else {
-    //                 reject(new Error('Failed to create folder')); // Rejects the promise with an error
-    //             }
-    //         });
-    //     });
-    // }
 }

@@ -10,7 +10,7 @@
 
 </head>
 
-<body>
+<body  onfocus="listDriveGames(appFolderID)">
     <div class="header">
         <div class="title">Loop Drive</div>
         <div class="auth-buttons">
@@ -33,10 +33,10 @@
 
         <div class="expand-container" style="display: none;">
             <ul>
-                <li onclick="readEditDownload(this, 'read')">Read</li>
-                <li onclick="readEditDownload(this, 'edit')">Edit</li>
-                <li onclick="readEditDownload(this, 'download')">Download</li>
-                <li onclick="deleteFile(this)">Delete</li>
+                <li onclick="editGame(this.parentNode)">Edit</li>
+                <li onclick="playGame(this.parentNode, 'download')">Play</li>
+                <li onclick="duplicateGame(this.parentNode, 'download')">Duplicate</li>
+                <li onclick="deleteGame(this.parentNode)">Delete</li>
             </ul>
         </div>
 

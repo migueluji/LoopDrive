@@ -73,32 +73,36 @@ textarea {
     display: none;
 }
 
-h1{
+h1 {
     color: #3c84f8;
     background-color: rgb(224, 224, 224, 0.5);
     border: 1px solid rgb(224, 224, 224, 1);
 }
-.list{
+
+.list {
     padding: 0px 187px;
     text-align: left;
 }
-.list ul li{
+
+.list ul li {
     list-style: none;
     background-color: #3c84f8;
     color: white;
     display: inline-block;
     padding: 15px 60px 15px 20px;
-    width: 228px;
+    width: 175px;
     text-overflow: ellipsis;
     white-space: nowrap;
     overflow: hidden;
     position: relative;
 }
-.list ul li span{
+
+.list ul li span {
     position: relative;
     top: -1px;
 }
-.list ul li svg{
+
+.list ul li svg {
     fill: white;
     position: absolute;
     width: 30px;
@@ -109,18 +113,21 @@ h1{
     border-radius: 8px;
     cursor: pointer;
 }
-.expand-container{
+
+.expand-container {
     width: 150px;
     height: 0px;
     position: absolute;
 }
-.expand-container ul{
+
+.expand-container ul {
     position: relative;
     left: -40px;
     top: -10px;
     width: 100%;
 }
-.expand-container ul li{
+
+.expand-container ul li {
     text-align: left;
     list-style: none;
     border: 1px solid rgb(207, 207, 207);
@@ -130,6 +137,7 @@ h1{
     padding-left: 16px;
     cursor: pointer;
 }
-.expand-container ul li:last-child{
+
+.expand-container ul li:last-child {
     border-bottom: 1px solid rgb(207, 207, 207);
 }

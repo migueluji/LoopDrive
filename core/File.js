@@ -19,6 +19,7 @@ class File {
     }
 
     loadImages(gameId, loader, callback) {
+        console.log(gameId);
         loader.init = true;
         loader.onLoad.add((loader, resource) => {
             console.log("Loaded :", resource.name);
@@ -104,22 +105,18 @@ class File {
         })
     }
 
-    static save(game, json) {
-        console.log(game.id,game.name);
-        var gameId = game.id;
+    static save(gameID, gameName, json) {
         gapi.client.drive.files.list({
-            'q': `parents in "${gameId}" and name="game.json"`
+            'q': `parents in "${gameID}" and name="game.json"`
         }).then(function(response) {
-            console.log(response);
             if (response.result.files.length > 0) {
                 var fileId = response.result.files[0].id;
-                
                 // Modificar el nombre del directorio con json.name
                 gapi.client.request({
-                    path: `/drive/v3/files/${gameId}`,
+                    path: `/drive/v3/files/${gameID}`,
                     method: 'PATCH',
                     body: {
-                        name: game.name
+                        name: gameName
                     }
                 }).then(() => {
                     // Guardar el archivo json con el nuevo nombre
@@ -151,7 +148,6 @@ class File {
     }
 
     static upload(gameId, file, type) {
-        console.log("upload ", gameId, file, type);
         var folder;
         switch (type) {
             case "Image": folder = "images"; break;
@@ -252,7 +248,7 @@ class File {
                         'headers': { 'Content-Type': 'multipart/related; boundary="' + boundary + '"' },
                         'body': multipartRequestBody
                     }).then(function (response) {
-                        console.log("Screenshoot updated", response);
+                        console.log("Screenshoot updated");
                     });
                 }
             }

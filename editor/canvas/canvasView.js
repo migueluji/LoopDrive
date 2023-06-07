@@ -112,7 +112,7 @@ class CanvasView {
 
         renderer.extract.canvas(stage).toBlob((blob) => {
             if (upload) {
-                File.uploadScreenShoot(game.id, blob);
+                File.uploadScreenShoot(gameID, blob);
             }
             else {
                 var image = document.querySelector("#" + sceneID).querySelector("img");

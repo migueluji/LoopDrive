@@ -1,9 +1,10 @@
 class App {
-    constructor(game) {
+    constructor(gameID) {
+        console.log(gameID);
         this.file = new File();
         this.loader = new PIXI.Loader();
         this.playList = {};
-        this.gameId = game.id;
+        this.gameId = gameID;
         this.json = {};
         this.load = new LoadingView("var(--mdc-theme-primary)");
         document.body.appendChild(this.load.html);

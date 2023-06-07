@@ -76,7 +76,7 @@ class Editor {
         delete saveToFile.fontList;
         delete saveToFile.imageList;
         delete saveToFile.soundList;
-        File.save(JSON.parse(localStorage.getItem("game")), JSON.stringify(saveToFile, (key, value) => { if (key != "id") return value }, '\t'));
+        File.save(gameID, this.model.name, JSON.stringify(saveToFile, (key, value) => { if (key != "id") return value }, '\t'));
     }
 
     takeScreenshot() {
@@ -88,8 +88,7 @@ class Editor {
         Object.assign(gameData, this.model);
         gameData = JSON.stringify(gameData, (key, value) => { if (key != "id") return value }, '\t');
         localStorage.setItem("localStorage_GameData", gameData);
-        var url = "../engine/?id" + JSON.parse(localStorage.getItem("game")).id;
-        var url = "../engine/?id=" + game.id;
+        var url = "../engine/?id=" + gameID;
         if (this.openWindows[url] && !this.openWindows[url].closed) {
             this.openWindows[url].location.reload();
             this.openWindows[url].focus();
@@ -507,7 +506,7 @@ class Editor {
     }
 
     uploadFile(file, type) {
-        File.upload(JSON.parse(localStorage.getItem("game")).id, file, type);
+        File.upload(gameID, file, type);
     }
 
     addAsset(name, type) {

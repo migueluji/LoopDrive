@@ -126,9 +126,9 @@
 		window.onbeforeunload = () => ""; // This event enables the web page to trigger a confirmation dialog asking the user if they really want to leave the page
 
 		const urlParams = new URLSearchParams(window.location.search);
-		const id = urlParams.get('id');
-		var game = JSON.parse(localStorage.getItem("game"));
-		game.id = id;
+		const gameID = urlParams.get('id');
+		// var game = JSON.parse(localStorage.getItem("game"));
+		// game.id = id;
 		var token = JSON.parse(localStorage.getItem("token"));
 
 		var CLIENT_ID = '129246923501-4lk4rkmhin21kcaoul91k300s9ar9n1t.apps.googleusercontent.com';
@@ -164,7 +164,7 @@
 		function maybeEnable() {
 			if (gapiInited && gisInited) {
 				gapi.client.setToken(token);
-				app = new App(game);
+				app = new App(gameID);
 			}
 		}
 

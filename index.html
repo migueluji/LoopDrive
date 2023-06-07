@@ -10,7 +10,7 @@
 
 </head>
 
-<body  onfocus="listDriveGames(appFolderID)">
+<body onfocus="listDriveGames(appFolderID)">
     <div class="header">
         <div class="title">Loop Drive</div>
         <div class="auth-buttons">
@@ -20,29 +20,29 @@
     </div>
 
     <h1>My Games</h1>
-    
+
     <div class=" new">
-                <button class="newgame" onclick="newGame()">New Game</button>
-        </div>
+        <button class="newgame" onclick="newGame()">New Game</button>
+    </div>
 
-        <div class="list">
-            <ul>
-                <div></div>
-            </ul>
-        </div>
+    <div class="list">
+        <ul>
+            <div></div>
+        </ul>
+    </div>
 
-        <div class="expand-container" style="display: none;">
-            <ul>
-                <li onclick="editGame(this.parentNode)">Edit</li>
-                <li onclick="playGame(this.parentNode, 'download')">Play</li>
-                <li onclick="duplicateGame(this.parentNode, 'download')">Duplicate</li>
-                <li onclick="deleteGame(this.parentNode)">Delete</li>
-            </ul>
-        </div>
+    <div class="expand-container" style="display: none;">
+        <ul>
+            <li onclick="editGame(this)">Edit</li>
+            <li onclick="playGame(this)">Play</li>
+            <li onclick="duplicateGame(this)">Duplicate</li>
+            <li onclick="deleteGame(this)">Delete</li>
+        </ul>
+    </div>
 
-        <script src="script.js"></script>
-        <script async defer src="https://apis.google.com/js/api.js" onload="gapiLoad()"></script>
-        <script async defer src="https://accounts.google.com/gsi/client" onload="gisInit()"></script>
+    <script src="script.js"></script>
+    <script async defer src="https://apis.google.com/js/api.js" onload="gapiLoad()"></script>
+    <script async defer src="https://accounts.google.com/gsi/client" onload="gisInit()"></script>
 </body>
 
 </html>

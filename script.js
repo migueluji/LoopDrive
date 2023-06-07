@@ -96,13 +96,26 @@ function listDriveGames(appFolderID) {
         listcontainer.innerHTML = '';
         for (var i = files.length - 1; i >= 0; i--) {
           listcontainer.innerHTML += `
-                <li data-id="${files[i].id}" data-name="${files[i].name}" >
-                    <span  onclick=editGame(this.parentNode)>${files[i].name}</span>
-                    <svg onclick="expand(this.parentNode)" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M24 24H0V0h24v24z" fill="none" opacity=".87"/><path d="M16.59 8.59L12 13.17 7.41 8.59 6 10l6 6 6-6-1.41-1.41z"/></svg>
+                <li>
+                    <span >${files[i].name}</span>
+                    <svg  gameid="${files[i].id}" onclick="expand(this)" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M24 24H0V0h24v24z" fill="none" opacity=".87"/><path d="M16.59 8.59L12 13.17 7.41 8.59 6 10l6 6 6-6-1.41-1.41z"/></svg>
                 </li>`;
         }
       }
     })
+}
+
+function expand(v) {
+  var click_position = v.getBoundingClientRect();
+  if (expandContainer.style.display == 'block') {
+    expandContainer.style.display = 'none';
+    expandContainerUl.setAttribute('data-id', '');
+  } else {
+    expandContainer.style.display = 'block';
+    expandContainer.style.left = (click_position.left + window.scrollX) - 120 + 'px';
+    expandContainer.style.top = (click_position.top + window.scrollY) + 25 + 'px';
+    expandContainerUl.setAttribute('gameid', v.getAttribute('gameid'));
+  }
 }
 
 function newGame() {
@@ -123,28 +136,35 @@ function newGame() {
   });
 }
 
-function editGame(gameHTML) {
-  var game = { appFolderID: appFolderID, id: "", name: "" };
-  if (gameHTML) game = { appFolderID: appFolderID, id: gameHTML.getAttribute('data-id'), name: gameHTML.getAttribute('data-name') }
-  localStorage.setItem("game"+game.id, JSON.stringify(game));
-  var url = "editor/?id=" + game.id;
+function editGame(menuItemHTML) {
+  var gameId = menuItemHTML.parentNode.getAttribute("gameid"); // the id is in the menu container
+  var url = "editor/?id=" + gameId;
   if (openWindows[url] && !openWindows[url].closed) openWindows[url].focus();
   else openWindows[url] = window.open(url, "_blank");
   expandContainer.style.display = 'none';
-  expandContainerUl.setAttribute('data-id', '');
-  expandContainerUl.setAttribute('data-name', '');
+  expandContainerUl.setAttribute('gameid', '');
 }
 
-function playGame(gameHTML) {
-  var game = { appFolderID: appFolderID, id: "", name: "" };
-  if (gameHTML) game = { appFolderID: appFolderID, id: gameHTML.getAttribute('data-id'), name: gameHTML.getAttribute('data-name') }
-  localStorage.setItem("game", JSON.stringify(game));
-  var url = "engine/?id=" + game.id;
+function playGame(menuItemHTML) {
+  var gameId = menuItemHTML.parentNode.getAttribute("gameid");
+  var url = "engine/?id=" + gameId;
   if (openWindows[url] && !openWindows[url].closed) openWindows[url].focus();
   else openWindows[url] = window.open(url, "_blank");
   expandContainer.style.display = 'none';
-  expandContainerUl.setAttribute('data-id', '');
-  expandContainerUl.setAttribute('data-name', '');
+  expandContainerUl.setAttribute('gameid', '');
+}
+
+function deleteGame(menuItemHTML) {
+  var gameId = menuItemHTML.parentNode.getAttribute("gameid");
+  var request = gapi.client.drive.files.delete({
+    'fileId': gameId
+  });
+  request.execute(function (res) {
+    console.log('File Deleted');
+    expandContainer.style.display = 'none';
+    expandContainerUl.setAttribute('gameid', '');
+    listDriveGames(appFolderID);
+  })
 }
 
 function createFolder(folderName, parent) {
@@ -266,34 +286,4 @@ function uploadImage(gameID, imageUrl) {
   });
 }
 
-function expand(v) {
-  var click_position = v.children[1].getBoundingClientRect();
-  if (expandContainer.style.display == 'block') {
-    expandContainer.style.display = 'none';
-    expandContainerUl.setAttribute('data-id', '');
-    expandContainerUl.setAttribute('data-name', '');
-  } else {
-    expandContainer.style.display = 'block';
-    expandContainer.style.left = (click_position.left + window.scrollX) - 120 + 'px';
-    expandContainer.style.top = (click_position.top + window.scrollY) + 25 + 'px';
-    // get data name & id and store it to the options
-    expandContainerUl.setAttribute('data-id', v.getAttribute('data-id'));
-    expandContainerUl.setAttribute('data-name', v.getAttribute('data-name'));
-  }
-}
 
-function deleteGame(v) {
-  var gameId = v.getAttribute('data-id');
-  var element = document.querySelector('[data-id="' + gameId + '"]');
-  console.log(element);
-  var request = gapi.client.drive.files.delete({
-    'fileId': gameId
-  });
-  request.execute(function (res) {
-    console.log('File Deleted');
-    expandContainer.style.display = 'none';
-    expandContainerUl.setAttribute('data-id', '');
-    expandContainerUl.setAttribute('data-name', '');
-    listDriveGames(appFolderID);
-  })
-}

@@ -73,9 +73,8 @@
 
 		// Game info 
 		const urlParams = new URLSearchParams(window.location.search);
-		const id = urlParams.get('id');
-		var game = JSON.parse(localStorage.getItem("game"));
-		game.id = id;
+		const gameID= urlParams.get('id');
+		console.log(urlParams,gameID);
 		var token = localStorage.getItem("token");
 
 		var CLIENT_ID = '129246923501-4lk4rkmhin21kcaoul91k300s9ar9n1t.apps.googleusercontent.com';
@@ -113,7 +112,7 @@
 		function maybeEnable() {
 			if (gapiInited && gisInited) {
 				gapi.client.setToken(JSON.parse(token));
-				player = new Player(game);
+				player = new Player(gameID);
 			}
 		}
 

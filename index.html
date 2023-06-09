@@ -5,14 +5,14 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Backup To Google Drive</title>
+    <title>Loop for Google Drive</title>
     <link rel="stylesheet" href="style.css">
 
 </head>
 
-<body onfocus="listDriveGames(appFolderID)">
+<body onfocus="listDriveGames(appFolderID)" onclick="deleteMenu(event)">
     <div class="header">
-        <div class="title">Loop Drive</div>
+        <div class="title">Loop</div>
         <div class="auth-buttons">
             <button class="signin" onclick="signIn()">Sign In</button>
             <button class="signout" onclick="signOut()">Sign Out</button>

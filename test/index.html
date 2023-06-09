@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Loop Games</title>
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
+  <script>
+    var CLIENT_ID = '129246923501-4lk4rkmhin21kcaoul91k300s9ar9n1t.apps.googleusercontent.com';
+    var REDIRECT_URI = 'https://localhost/login.html';
+    var SCOPES = 'https://www.googleapis.com/auth/drive';
+    var appFolderName = 'Loop Games';
+    var appFolderID;
+    var listcontainer;
+
+    function authorize() {
+      google.accounts.id.initialize({
+        client_id: CLIENT_ID,
+        callback: handleCredentialResponse
+      });
+      google.accounts.id.prompt();
+    }
+
+    function handleCredentialResponse(response) {
+      if (response.error) {
+        console.error(response.error);
+        return;
+      }
+
+      var credential = response.credential;
+      var authCode = credential.code;
+
+      fetchAccessToken(authCode);
+    }
+
+    function fetchAccessToken(authCode) {
+      var xhr = new XMLHttpRequest();
+      xhr.open('POST', 'https://oauth2.googleapis.com/token');
+      xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+      xhr.onload = function() {
+        if (xhr.status === 200) {
+          var response = JSON.parse(xhr.responseText);
+          var accessToken = response.access_token;
+          var expiresIn = response.expires_in;
+          var tokenExpiration = new Date().getTime() + (expiresIn * 1000);
+
+          localStorage.setItem('accessToken', accessToken);
+          localStorage.setItem('tokenExpiration', tokenExpiration);
+
+          listDriveGames();
+        } else {
+          console.error('Error fetching access token: ' + xhr.statusText);
+        }
+      };
+      xhr.onerror = function() {
+        console.error('Network error');
+      };
+      xhr.send('code=' + encodeURIComponent(authCode) +
+               '&client_id=' + encodeURIComponent(CLIENT_ID) +
+               '&redirect_uri=' + encodeURIComponent(REDIRECT_URI) +
+               '&grant_type=authorization_code');
+    }
+
+    function listDriveGames() {
+      var accessToken = localStorage.getItem('accessToken');
+
+      if (!accessToken) {
+        console.error('Access token not found');
+        return;
+      }
+
+      var xhr = new XMLHttpRequest();
+      xhr.open('GET', 'https://www.googleapis.com/drive/v3/files?q=name%3D%27' + appFolderName + '%27+and+mimeType%3D%27application%2Fvnd.google-apps.folder%27+and+trashed%3Dfalse');
+      xhr.setRequestHeader('Authorization', 'Bearer ' + accessToken);
+      xhr.onload = function() {
+        if (xhr.status === 200) {
+          var response = JSON.parse(xhr.responseText);
+          var files = response.files;
+          if (files.length > 0) {
+            appFolderID = files[0].id;
+            var xhr2 = new XMLHttpRequest();
+            xhr2.open('GET', 'https://www.googleapis.com/drive/v3/files?q=%27' + appFolderID + '%27+in+parents+and+trashed%3Dfalse');
+            xhr2.setRequestHeader('Authorization', 'Bearer ' + accessToken);
+            xhr2.onload = function() {
+              if (xhr2.status === 200) {
+                var response = JSON.parse(xhr2.responseText);
+                var files = response.files;
+                listcontainer.innerHTML = '';
+                files.forEach(function(file) {
+                  var li = document.createElement('li');
+                  li.appendChild(document.createTextNode(file.name));
+                  listcontainer.appendChild(li);
+                });
+              } else {
+                console.error('Error listing files: ' + xhr2.statusText);
+              }
+            };
+            xhr2.onerror = function() {
+              console.error('Network error');
+            };
+            xhr2.send();
+          } else {
+            console.error('App folder not found');
+          }
+        } else {
+          console.error('Error fetching app folder: ' + xhr.statusText);
+        }
+      };
+      xhr.onerror = function() {
+        console.error('Network error');
+      };
+      xhr.send();
+    }
+  </script>
+</head>
+<body>
+  <h1 class="title">Loop Games</h1>
+  <button onclick="authorize()">Sign In</button>
+  <div class="list">
+    <ul></ul>
+  </div>
+  <script>
+    window.onload = function() {
+      listcontainer = document.querySelector('.list ul');
+    };
+  </script>
+</body>
+</html>
+
+

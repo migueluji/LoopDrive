@@ -74,9 +74,11 @@
 		// Game info 
 		const urlParams = new URLSearchParams(window.location.search);
 		const gameID= urlParams.get('id');
-		console.log(urlParams,gameID);
+		const editor = urlParams.get('edit'); /* to kown if the engine has been launched from the editor */
 		var token = localStorage.getItem("token");
 
+		console.log(urlParams,gameID,editor);
+		
 		var CLIENT_ID = '129246923501-4lk4rkmhin21kcaoul91k300s9ar9n1t.apps.googleusercontent.com';
 		var API_KEY = 'AIzaSyCfXON-94Onk-fLyihh8buKZcFIjynGRTc';
 		var DISCOVERY_DOCS = ["https://www.googleapis.com/discovery/v1/apis/drive/v3/rest"];
@@ -86,7 +88,6 @@
 		let gisInited = false;
 		let player;
 
-		var editor = true; /* to kown if the engine has been launched from the editor */
 
 		function gapiLoaded() { gapi.load('client', initializeGapiClient); }
 

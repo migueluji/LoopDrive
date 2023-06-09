@@ -88,7 +88,7 @@ class Editor {
         Object.assign(gameData, this.model);
         gameData = JSON.stringify(gameData, (key, value) => { if (key != "id") return value }, '\t');
         localStorage.setItem("localStorage_GameData", gameData);
-        var url = "../engine/?id=" + gameID;
+        var url = "../engine/?id=" + gameID + "&edit=true";
         if (this.openWindows[url] && !this.openWindows[url].closed) {
             this.openWindows[url].location.reload();
             this.openWindows[url].focus();

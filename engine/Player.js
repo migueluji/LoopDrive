@@ -6,7 +6,6 @@ class Player {
         this.playList = {};
         this.gameId = gameID;
         this.json = {};
-        editor = true;
         (editor) ? this.onJsonLoaded(JSON.parse(localStorage.getItem("localStorage_GameData"))) :
             this.file.loadJson(this.gameId, this.onJsonLoaded.bind(this));
     }

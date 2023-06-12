@@ -19,7 +19,6 @@ class File {
     }
 
     loadImages(gameId, loader, callback) {
-        console.log(gameId);
         loader.init = true;
         loader.onLoad.add((loader, resource) => {
             console.log("Loaded :", resource.name);
@@ -108,7 +107,7 @@ class File {
     static save(gameID, gameName, json) {
         gapi.client.drive.files.list({
             'q': `parents in "${gameID}" and name="game.json"`
-        }).then(function(response) {
+        }).then(function (response) {
             if (response.result.files.length > 0) {
                 var fileId = response.result.files[0].id;
                 // Modificar el nombre del directorio con json.name
@@ -130,11 +129,11 @@ class File {
                     });
                 });
             }
-        }, function(error) {
+        }, function (error) {
             console.log(error);
         });
     }
-    
+
 
     static delete(fileId, assetID, fileName, type) {
         if (type == "Image" || type == "Animation") {

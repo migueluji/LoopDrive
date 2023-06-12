@@ -16,13 +16,11 @@ class Player {
     }
 
     onImagesLoaded() {
-        console.log("images");
         this.json.imageList = Object.keys(this.loader.resources);
         this.file.loadSounds(this.gameId, this.playList, this.onSoundsLoaded.bind(this));
     }
 
     onSoundsLoaded(playList) {
-    console.log("sounds");
         this.json.soundList = Object.keys(playList);
         new Engine(new Game(this.json));
     }

@@ -33,7 +33,8 @@ function gapiInit() {
 function gisInit() {
   tokenClient = google.accounts.oauth2.initTokenClient({
     client_id: CLIENT_ID,
-    scope: SCOPES
+    scope: SCOPES,
+    prompt :''
   });
   gisInited = true;
   maybeEnableButtons();
@@ -52,7 +53,7 @@ function signOut() {
 
 function signIn() {
   tokenClient.callback = (token) => {
-    if (token.error !== undefined) { throw (token); }
+    console.log(token);
     localStorage.setItem("token", JSON.stringify(token));
     const tokenExpiration = new Date().getTime() + (token.expires_in * 1000);
     localStorage.setItem('tokenExpiration', tokenExpiration);
@@ -66,16 +67,17 @@ function signIn() {
       console.error(error);
     });
   };
-  tokenClient.requestAccessToken();
+  tokenClient.requestAccessToken({prompt:''});
 }
 
 function checkTokenExpiration() {
   const tokenExpiration = localStorage.getItem('tokenExpiration');
   var now = new Date().getTime();
-  var timeRemaining = Math.floor((tokenExpiration - now) / 1000); // Convertir a segundo
+  var timeRemaining = Math.floor((tokenExpiration - now) / 1000); // convert to seconds
   var minutes = Math.floor(timeRemaining / 60)
   var seconds = timeRemaining % 60;
   document.querySelector('.title').innerHTML = "Loop: " + user + " (" + minutes + " : " + seconds + ")";
+  if (timeRemaining < 0) signIn();
 }
 
 function checkDriveFolder(appFolderName) {

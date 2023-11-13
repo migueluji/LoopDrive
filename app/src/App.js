@@ -1,19 +1,11 @@
-
 import './App.css';
-import Navbar from './components/Navbar';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-
-
+import Dummy from './components/Dummy';
 
 function App() {
   return (
-    <Router>
-      <Navbar />
-      <Routes>
-        <Route path="/" />
-        {/* Add more routes here */}
-      </Routes>
-    </Router>
+    <div className="App">
+      <Dummy />
+    </div>
   );
 }
 

@@ -42,6 +42,7 @@ function gisInit() {
 
 function maybeEnableButtons() {
   if (gapiInited && gisInited) signinButton.style.display = 'block';
+  console.log("every thing initialized!");
 }
 
 function signOut() {

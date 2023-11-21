@@ -1,86 +1,67 @@
-import './App.css';
-import { useEffect, useState } from 'react';
-import { jwtDecode } from "jwt-decode";
-
-const CLIENT_ID = "129246923501-4lk4rkmhin21kcaoul91k300s9ar9n1t.apps.googleusercontent.com";
-const SCOPES = "https://www.googleapis.com/auth/drive";
+import React, { useState, useEffect } from 'react';
+import { Routes, Route, useNavigate, Router } from 'react-router-dom';
+import { initGoogleAPI, signOut, signIn } from './googleAPI';
+import { AppBar, Toolbar, Typography, Button } from '@mui/material';
+import Home from './pages/Home';
+import Games from './pages/Games';
 
 function App() {
-
-  const [user, setUser] = useState({});
-  const [tokenClient, setTokenClient] = useState({});
-
-  function handleCallbackResponse(response) {
-    console.log(response.credential);
-    var userObject = jwtDecode(response.credential);
-    console.log(userObject);
-    setUser(userObject);
-    document.getElementById('signInDiv').hidden = true;
-  }
-
-  function handleSignOut(event) {
-    setUser({});
-    document.getElementById('signInDiv').hidden = false;
-  }
-
-  function createDriveFile() {
-    tokenClient.requestAccessToken();
-  }
+  const [token, setToken] = useState(null);
+  const [userName, setUserName] = useState(null);
+  const [signInButtonVisible, setSignInButtonVisible] = useState(true);
+  const [signOutButtonVisible, setSignOutButtonVisible] = useState(false);
+  const navigate = useNavigate(); // Agrega esta línea
 
   useEffect(() => {
-    /* global google */
-    const google = window.google;
-    google.accounts.id.initialize({
-      client_id: CLIENT_ID,
-      callback: handleCallbackResponse
-    });
+    setSignInButtonVisible(!token || !token.access_token);
+    setSignOutButtonVisible(!!token && !!token.access_token);
+  }, [token]);
 
-    google.accounts.id.renderButton(
-      document.getElementById("signInDiv"),
-      { theme: "outline", size: "large" }
-    );
+  const handleSignOutClick = async () => {
+    const newToken = await signOut()
+    setToken(newToken);
+    navigate('/home');
+  };
 
-    // Access Tokens
-    setTokenClient(
-      google.accounts.oauth2.initTokenClient({
-        client_id: CLIENT_ID,
-        scope: SCOPES,
-        callback: (tokenResponse) => {
-          console.log(tokenResponse);
-          if (tokenResponse && tokenResponse.access_token) {
-            fetch("https://www.googleapis.com/drive/v3/files", {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${tokenResponse.access_token}`
-              },
-              body: JSON.stringify({ "name": "loop test", "mimeType": "text/plain" })
-            }
-            ); // gapi
-          }
-          // we now have access to a live token to use for GOOGLE DRIVE API
-        }
-      })
-    );
-    // tokenClient.requestAccessTokn();
-    google.accounts.id.prompt();
-  }, []);
+  const handleSignInClick = async () => {
+    await initGoogleAPI();
+    const { token, userInfo } = await signIn();
+    console.log(userInfo.name, token);
+    setToken(token);
+    setUserName(userInfo.name);
+    navigate('/games');
+  };
 
   return (
-    <div className="App">
-      <div id="signInDiv"></div>
-      {Object.keys(user).length != 0 &&
-        <button onClick={(e) => handleSignOut(e)}>Sign Out</button>
-      }
-      {user &&
-        <div>
-          <img src={user.picture}></img>
-          <h3>{user.given_name}</h3>
-          <input type='submit' onClick={createDriveFile} value="Create File" />
-        </div>
-      }
+
+    <div>
+      <AppBar position="static">
+        <Toolbar>
+          <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
+            Loop
+          </Typography>
+          {signInButtonVisible && <Button color="inherit" onClick={handleSignInClick}>Login</Button>}
+          {signOutButtonVisible && (
+            <>
+              <Typography variant="h6" sx={{ marginRight: '10px' }}>
+                {userName}
+              </Typography>
+              <Button color="inherit" onClick={handleSignOutClick}>
+                Logout
+              </Button>
+            </>
+          )}
+        </Toolbar>
+      </AppBar>
+
+      <Routes>
+        <Route path="/home" element={<Home token={token} />} />
+        <Route path="/games" element={<Games token={token} />} />
+      </Routes>
     </div>
+
   );
 }
 
 export default App;
+

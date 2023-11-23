@@ -4,11 +4,16 @@ import React, { useState } from 'react';
 import { AppBar, Toolbar, Button, Avatar, Typography } from '@mui/material';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import UserMenu from './UserMenu';
+var loginButtonVisible = true;
 
-const NavBar = ({ userName, userPicture, onSignOutClick, onSignInClick, navigate, signInButtonVisible, signOutButtonVisible }) => {
+
+const NavBar = ({ userInfo, handleLogin, handleLogout, navigate }) => {
+
+  if (userInfo) loginButtonVisible = false;
+
   const [menuAnchorEl, setMenuAnchorEl] = useState(null);
 
-  const handleMenuClick = (event) => {
+  const handleMenuOpen = (event) => {
     setMenuAnchorEl(event.currentTarget);
   };
 
@@ -19,29 +24,36 @@ const NavBar = ({ userName, userPicture, onSignOutClick, onSignInClick, navigate
   const onMyGamesClick = () => {
     navigate('/games');
     handleMenuClose();
+    console.log("menu cerrado");
+  };
+
+  const onLogoutClick = () => {
+    handleLogout();
+    navigate('/');
+    handleMenuClose();
+    loginButtonVisible = true;
   };
 
   return (
     <AppBar position="static">
       <Toolbar>
-        <Typography variant="h4" component="div" sx={{ flexGrow: 1 }}>
+        <Typography variant="h4" component="div" sx={{ flexGrow: 1, fontWeight: 'bold' }}>
           Loop
         </Typography>
-        {signInButtonVisible && (
-          <Button variant='outlined' color="inherit" onClick={onSignInClick} startIcon={<AccountCircleIcon />}>
+        {loginButtonVisible && (
+          <Button variant='outlined' color="inherit" onClick={handleLogin} startIcon={<AccountCircleIcon />}>
             Login
           </Button>
         )}
-        {signOutButtonVisible && (
+        {!loginButtonVisible && (
           <>
-            <Button color="inherit" onClick={handleMenuClick}>
-              <Avatar alt={userName} src={userPicture} />
+            <Button color="inherit" onClick={handleMenuOpen}>
+              <Avatar alt={userInfo.name} src={userInfo.picture} />
             </Button>
             <UserMenu
-              userName={userName}
-              userPicture={userPicture}
+              userInfo={userInfo}
               onMyGamesClick={onMyGamesClick}
-              onLogoutClick={onSignOutClick}
+              onLogoutClick={onLogoutClick}
               anchorEl={menuAnchorEl}
               onClose={handleMenuClose}
             />

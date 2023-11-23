@@ -4,7 +4,7 @@ import { Menu, MenuItem, Avatar, Typography, Divider, ListItemIcon } from '@mui/
 import GamesIcon from '@mui/icons-material/SportsEsports';
 import LogoutIcon from '@mui/icons-material/Logout';
 
-const UserMenu = ({ userName, userPicture, onMyGamesClick, onLogoutClick, anchorEl, onClose }) => {
+const UserMenu = ({ userInfo, onMyGamesClick, onLogoutClick, anchorEl, onClose }) => {
   return (
     <Menu
       anchorEl={anchorEl}
@@ -12,8 +12,8 @@ const UserMenu = ({ userName, userPicture, onMyGamesClick, onLogoutClick, anchor
       onClose={onClose}
     >
       <div style={{ padding: '16px', textAlign: 'center' }}>
-        <Avatar alt={userName} src={userPicture} sx={{ margin: 'auto', width: 60, height: 60 }} />
-        <Typography variant="body1" sx={{ marginTop: 1 }}>{userName}</Typography>
+        <Avatar alt={userInfo.name} src={userInfo.picture} sx={{ margin: 'auto', width: 124, height: 124 }} />
+        <Typography variant="body1" sx={{ marginTop: 1, fontWeight: 'bold' }}>{userInfo.name}</Typography>
       </div>
       <Divider />
       <MenuItem onClick={onMyGamesClick}>

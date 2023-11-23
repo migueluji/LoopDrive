@@ -1,56 +1,44 @@
+// App.js
 import React, { useState, useEffect } from 'react';
 import { Routes, Route, useNavigate } from 'react-router-dom';
-import { initGoogleAPI, signOut, signIn } from './googleAPI';
+import { initGoogleAPI, login, logout } from './googleAPI';
 import NavBar from './components/NavBar';
-import Home from './pages/Home';
+import Wellcome from './pages/Home';
 import Games from './pages/Games';
 
 function App() {
   const [token, setToken] = useState(null);
-  const [userName, setUserName] = useState(null);
-  const [userPicture, setUserPicture] = useState(null);
-  const [signInButtonVisible, setSignInButtonVisible] = useState(true);
-  const [signOutButtonVisible, setSignOutButtonVisible] = useState(false);
+  const [userInfo, setUserInfo] = useState(null);
   const navigate = useNavigate();
 
-  useEffect(() => {
-    setSignInButtonVisible(!token || !token.access_token);
-    setSignOutButtonVisible(!!token && !!token.access_token);
-  }, [token]);
+  // useEffect(() => {
+  //   console.log("app se renderiza");
+  // }, []);
 
-  const handleSignOutClick = async () => {
-    const newToken = await signOut();
-    setToken(newToken);
-    navigate('/home');
+  const handleLogout = async () => {
+    const token = await logout();
+    setToken(token);
+    setUserInfo(null);
   };
 
-  const handleSignInClick = async () => {
-    try {
+  const handleLogin = async () => {
       await initGoogleAPI();
-      const { token, userInfo } = await signIn();
+      const { token, userInfo } = await login();
       setToken(token);
-      setUserName(userInfo.name);
-      setUserPicture(userInfo.picture);
-    } catch (error) {
-      console.error('Error al iniciar sesión:', error);
-    }
+      setUserInfo(userInfo);
+      navigate('/games');
   };
-
 
   return (
     <div>
       <NavBar
-        userName={userName}
-        userPicture={userPicture}
-        onSignOutClick={handleSignOutClick}
-        onSignInClick={handleSignInClick}
-        signInButtonVisible={signInButtonVisible}
-        signOutButtonVisible={signOutButtonVisible}
+        userInfo={userInfo}
+        handleLogin={handleLogin}
+        handleLogout={handleLogout}
         navigate={navigate}
       />
-
       <Routes>
-        <Route path="/home" element={<Home token={token} />} />
+        <Route path="/" element={<Wellcome token={token} />} />
         <Route path="/games" element={<Games token={token} />} />
       </Routes>
     </div>

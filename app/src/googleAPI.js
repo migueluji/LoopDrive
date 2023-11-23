@@ -1,15 +1,14 @@
-// api.js
+// googleAPI.js
 /* global gapi, google  */
 
 const CLIENT_ID = '129246923501-4lk4rkmhin21kcaoul91k300s9ar9n1t.apps.googleusercontent.com';
 const API_KEY = 'AIzaSyCfXON-94Onk-fLyihh8buKZcFIjynGRTc';
 const DISCOVERY_DOCS = ["https://www.googleapis.com/discovery/v1/apis/drive/v3/rest"];
-const SCOPES = 'https://www.googleapis.com/auth/drive ';
+const SCOPES = 'https://www.googleapis.com/auth/drive.file ';
 
 let tokenClient;
 
 export function initGoogleAPI() {
-
   const gapiInitPromise = new Promise((resolve, reject) => {
     gapi.load('client', () => {
       gapi.client.init({
@@ -33,14 +32,14 @@ export function initGoogleAPI() {
   return Promise.all([gapiInitPromise, gisInitPromise]);
 }
 
-export function signOut() {
+export function logout() {
   return new Promise((resolve) => {
     google.accounts.id.disableAutoSelect();
     resolve({ access_token: '', expires_in: 0 });
   });
 }
 
-export function signIn() {
+export function login() {
   return new Promise((resolve) => {
     tokenClient.callback = (token) => {
       getUserInfo(token.access_token)
@@ -50,7 +49,6 @@ export function signIn() {
   });
 }
 
-
 function getUserInfo(accessToken) {
   const userInfoEndpoint = 'https://www.googleapis.com/oauth2/v1/userinfo';
   return fetch(userInfoEndpoint, {
@@ -58,4 +56,3 @@ function getUserInfo(accessToken) {
   })
     .then(response => response.json())
 }
-

@@ -1,6 +1,6 @@
 import React from 'react';
 
-const Home = ({ user }) => {
+const Wellcome = ({ user }) => {
   return (
     <div>
       <h1> Welcome to Loop Game Engine</h1>
@@ -9,4 +9,4 @@ const Home = ({ user }) => {
   );
 };
 
-export default Home;
+export default Wellcome;

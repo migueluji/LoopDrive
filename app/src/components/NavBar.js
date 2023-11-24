@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import { AppBar, Toolbar, Button, Avatar, Typography } from '@mui/material';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
+import AllInclusiveIcon from '@mui/icons-material/AllInclusive';
 import UserMenu from './UserMenu';
 var loginButtonVisible = true;
 
@@ -24,7 +25,6 @@ const NavBar = ({ userInfo, handleLogin, handleLogout, navigate }) => {
   const onMyGamesClick = () => {
     navigate('/games');
     handleMenuClose();
-    console.log("menu cerrado");
   };
 
   const onLogoutClick = () => {
@@ -37,6 +37,7 @@ const NavBar = ({ userInfo, handleLogin, handleLogout, navigate }) => {
   return (
     <AppBar position="static">
       <Toolbar>
+        <AllInclusiveIcon sx={{ fontSize: "3.125rem", marginRight: '16px' }} />
         <Typography variant="h4" component="div" sx={{ flexGrow: 1, fontWeight: 'bold' }}>
           Loop
         </Typography>

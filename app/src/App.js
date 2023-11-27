@@ -12,10 +12,6 @@ function App() {
   const [userInfo, setUserInfo] = useState(null);
   const navigate = useNavigate();
 
-  // useEffect(() => {
-  //   console.log("app se renderiza");
-  // }, []);
-
   const handleLogout = async () => {
     const token = await logout();
     setToken(token);
@@ -36,12 +32,11 @@ function App() {
         userInfo={userInfo}
         handleLogin={handleLogin}
         handleLogout={handleLogout}
-        navigate={navigate}
       />
       <Routes>
         <Route path="/" element={<Wellcome token={token} />} />
-        <Route path="/games" element={<Games token={token} navigate={navigate} />} />
-        <Route path="/editor" element={<Editor token={token} />} />
+        <Route path="/games" element={<Games token={token} />} />
+        <Route path="/editor/:gameID" element={<Editor token={token} />} />
       </Routes>
     </div>
   );

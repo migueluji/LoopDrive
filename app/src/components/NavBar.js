@@ -5,10 +5,12 @@ import { AppBar, Toolbar, Button, Avatar, Typography } from '@mui/material';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import AllInclusiveIcon from '@mui/icons-material/AllInclusive';
 import UserMenu from './UserMenu';
+import { useNavigate } from 'react-router-dom';
 var loginButtonVisible = true;
 
 
-const NavBar = ({ userInfo, handleLogin, handleLogout, navigate }) => {
+const NavBar = ({ userInfo, handleLogin, handleLogout }) => {
+  const navigate = useNavigate();
 
   if (userInfo) loginButtonVisible = false;
 

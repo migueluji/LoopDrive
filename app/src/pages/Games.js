@@ -1,5 +1,6 @@
 // src/pages/Games.js
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { folderExists, createFolder, listDriveGames, newGame, duplicateGame, deleteGame } from '../driveAPI';
 import Button from '@mui/material/Button';
 import CircularProgress from '@mui/material/CircularProgress';
@@ -7,10 +8,11 @@ import Box from '@mui/material/Box';
 import AddIcon from '@mui/icons-material/Add';
 import GameCard from '../components/GameCard'; // Ajusta la ruta según tu estructura de carpetas
 
-const Games = ({ token, navigate }) => {
+const Games = ({ token }) => {
   const [appFolderID, setAppFolderID] = useState([]);
   const [gameList, setGameList] = useState([]);
   const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const initDrive = async () => {
@@ -47,7 +49,7 @@ const Games = ({ token, navigate }) => {
   };
 
   const handleEditGame = async (gameID) => {
-    navigate('/editor');
+    navigate(`/editor/${gameID}`);
   };
 
   const handleDuplicateGame = async (gameID) => {

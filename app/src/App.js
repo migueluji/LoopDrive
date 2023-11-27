@@ -1,10 +1,11 @@
 // App.js
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Routes, Route, useNavigate } from 'react-router-dom';
 import { initGoogleAPI, login, logout } from './googleAPI';
 import NavBar from './components/NavBar';
 import Wellcome from './pages/Home';
 import Games from './pages/Games';
+import Editor from './pages/Editor';
 
 function App() {
   const [token, setToken] = useState(null);
@@ -22,11 +23,11 @@ function App() {
   };
 
   const handleLogin = async () => {
-      await initGoogleAPI();
-      const { token, userInfo } = await login();
-      setToken(token);
-      setUserInfo(userInfo);
-      navigate('/games');
+    await initGoogleAPI();
+    const { token, userInfo } = await login();
+    setToken(token);
+    setUserInfo(userInfo);
+    navigate('/games');
   };
 
   return (
@@ -39,7 +40,8 @@ function App() {
       />
       <Routes>
         <Route path="/" element={<Wellcome token={token} />} />
-        <Route path="/games" element={<Games token={token} />} />
+        <Route path="/games" element={<Games token={token} navigate={navigate} />} />
+        <Route path="/editor" element={<Editor token={token} />} />
       </Routes>
     </div>
   );

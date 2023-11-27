@@ -7,7 +7,7 @@ import Box from '@mui/material/Box';
 import AddIcon from '@mui/icons-material/Add';
 import GameCard from '../components/GameCard'; // Ajusta la ruta según tu estructura de carpetas
 
-const Games = ({ token }) => {
+const Games = ({ token, navigate }) => {
   const [appFolderID, setAppFolderID] = useState([]);
   const [gameList, setGameList] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -46,6 +46,10 @@ const Games = ({ token }) => {
     }
   };
 
+  const handleEditGame = async (gameID) => {
+    navigate('/editor');
+  };
+
   const handleDuplicateGame = async (gameID) => {
     try {
       setLoading(true);
@@ -82,7 +86,7 @@ const Games = ({ token }) => {
           <Box
             style={{ position: 'fixed', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', zIndex: 9999 }}
           >
-            <CircularProgress size={64}/>
+            <CircularProgress size={64} />
           </Box>
         </>
       )}
@@ -101,6 +105,7 @@ const Games = ({ token }) => {
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '16px' }}>
           {gameList.map((game) => (
             <GameCard key={game.id} game={game}
+              handleEditGame={handleEditGame}
               handleDuplicateGame={handleDuplicateGame}
               handleDeleteGame={handleDeleteGame}
             />

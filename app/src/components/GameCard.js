@@ -11,7 +11,7 @@ import FileCopyIcon from '@mui/icons-material/FileCopy';
 import DeleteIcon from '@mui/icons-material/Delete';
 import Typography from '@mui/material/Typography';
 
-const GameCard = ({ game, handleDuplicateGame, handleDeleteGame }) => (
+const GameCard = ({ game, handleEditGame, handleDuplicateGame, handleDeleteGame }) => (
     <Card style={{ maxWidth: '240px', minWidth: '240px' }}>
         <CardMedia
             component="img"
@@ -27,7 +27,7 @@ const GameCard = ({ game, handleDuplicateGame, handleDeleteGame }) => (
         </CardContent>
         {/* Acciones de la tarjeta */}
         <CardActions>
-            <IconButton>
+            <IconButton onClick={() => handleEditGame(game.id)}>
                 <EditIcon />
             </IconButton>
             <IconButton>

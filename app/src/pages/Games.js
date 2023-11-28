@@ -6,9 +6,12 @@ import Button from '@mui/material/Button';
 import CircularProgress from '@mui/material/CircularProgress';
 import Box from '@mui/material/Box';
 import AddIcon from '@mui/icons-material/Add';
-import GameCard from '../components/GameCard'; // Ajusta la ruta según tu estructura de carpetas
+import GameCard from '../components/GameCard';
+import { useAppContext } from '../AppContext';
 
-const Games = ({ token }) => {
+
+const Games = () => {
+  const { token, setGameID } = useAppContext(); // Obtén token desde el contexto
   const [appFolderID, setAppFolderID] = useState([]);
   const [gameList, setGameList] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -20,7 +23,7 @@ const Games = ({ token }) => {
         setLoading(true); // Inicia la carga
 
         let folderID = await folderExists("Loop Games");
-        if (!folderID) folderID = await createFolder("Loop Games", 'root', token.access_token);
+        if (!folderID) folderID = await createFolder("Loop Games", 'root', token?.access_token);
         setAppFolderID(folderID);
 
         const gameList = await listDriveGames(folderID);
@@ -33,7 +36,7 @@ const Games = ({ token }) => {
     };
 
     initDrive();
-  }, [token.access_token]);
+  }, [token]);
 
   const handleNewGame = async () => {
     try {
@@ -49,7 +52,9 @@ const Games = ({ token }) => {
   };
 
   const handleEditGame = async (gameID) => {
-    navigate(`/editor/${gameID}`);
+    setGameID(gameID);
+    console.log(gameID, token);
+    navigate('/editor');
   };
 
   const handleDuplicateGame = async (gameID) => {

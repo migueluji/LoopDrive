@@ -1,15 +1,15 @@
-// App.js
-import React, { useState } from 'react';
-import { Routes, Route, useNavigate } from 'react-router-dom';
+import React from 'react';
+import { Routes, Route } from 'react-router-dom';
 import { initGoogleAPI, login, logout } from './googleAPI';
 import NavBar from './components/NavBar';
 import Wellcome from './pages/Home';
 import Games from './pages/Games';
 import Editor from './pages/Editor';
+import { useNavigate } from 'react-router-dom';
+import { useAppContext } from './AppContext'; // Importa el AppContextProvider
 
 function App() {
-  const [token, setToken] = useState(null);
-  const [userInfo, setUserInfo] = useState(null);
+  const { userInfo, token, setToken, setUserInfo } = useAppContext();
   const navigate = useNavigate();
 
   const handleLogout = async () => {
@@ -22,11 +22,13 @@ function App() {
     await initGoogleAPI();
     const { token, userInfo } = await login();
     setToken(token);
+    console.log(token);
     setUserInfo(userInfo);
     navigate('/games');
   };
 
   return (
+
     <div>
       <NavBar
         userInfo={userInfo}
@@ -36,12 +38,15 @@ function App() {
       <Routes>
         <Route path="/" element={<Wellcome token={token} />} />
         <Route path="/games" element={<Games token={token} />} />
-        <Route path="/editor/:gameID" element={<Editor token={token} />} />
+        <Route path="/editor" element={<Editor token={token} />} />
       </Routes>
     </div>
+
   );
 }
 
 export default App;
+
+
 
 

@@ -1,11 +1,15 @@
-import React from 'react';
-import { useParams } from 'react-router-dom';
+import React, { useEffect } from 'react';
+import { useAppContext } from '../AppContext';
 
-const Editor = ({ token }) => {
+const Editor = () => {
+  const { gameID, token } = useAppContext();
   const navbarHeight = 68; // Ajusta esto según la altura de tu barra de navegación
-  const { gameID } = useParams();
-  localStorage.setItem("token", JSON.stringify(token));
-  console.log(token, gameID);
+
+  useEffect(() => {
+    // Puedes realizar acciones adicionales cuando el componente se monta o el gameID cambia
+    console.log('Editor mounted with gameID:', gameID, token);
+    localStorage.setItem("token", JSON.stringify(token));
+  }, [gameID, token]);
 
   return (
     <div style={{ width: '100%', height: `calc(100vh - ${navbarHeight}px)` }}>
@@ -19,5 +23,6 @@ const Editor = ({ token }) => {
 };
 
 export default Editor;
+
 
 

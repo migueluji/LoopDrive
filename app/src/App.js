@@ -1,3 +1,4 @@
+// App.js 
 import React from 'react';
 import { Routes, Route } from 'react-router-dom';
 import { initGoogleAPI, login, logout } from './googleAPI';
@@ -6,7 +7,7 @@ import Wellcome from './pages/Home';
 import Games from './pages/Games';
 import Editor from './pages/Editor';
 import { useNavigate } from 'react-router-dom';
-import { useAppContext } from './AppContext'; // Importa el AppContextProvider
+import { useAppContext } from './AppContext'; 
 
 function App() {
   const { userInfo, token, setToken, setUserInfo } = useAppContext();
@@ -22,13 +23,11 @@ function App() {
     await initGoogleAPI();
     const { token, userInfo } = await login();
     setToken(token);
-    console.log(token);
     setUserInfo(userInfo);
     navigate('/games');
   };
 
   return (
-
     <div>
       <NavBar
         userInfo={userInfo}
@@ -41,7 +40,6 @@ function App() {
         <Route path="/editor" element={<Editor token={token} />} />
       </Routes>
     </div>
-
   );
 }
 

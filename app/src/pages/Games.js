@@ -1,6 +1,5 @@
 // src/pages/Games.js
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { folderExists, createFolder, listDriveGames, newGame, duplicateGame, deleteGame } from '../driveAPI';
 import Button from '@mui/material/Button';
 import CircularProgress from '@mui/material/CircularProgress';
@@ -9,13 +8,11 @@ import AddIcon from '@mui/icons-material/Add';
 import GameCard from '../components/GameCard';
 import { useAppContext } from '../AppContext';
 
-
 const Games = () => {
   const { token, setGameID } = useAppContext(); // Obtén token desde el contexto
   const [appFolderID, setAppFolderID] = useState([]);
   const [gameList, setGameList] = useState([]);
   const [loading, setLoading] = useState(false);
-  const navigate = useNavigate();
 
   useEffect(() => {
     const initDrive = async () => {
@@ -53,8 +50,16 @@ const Games = () => {
 
   const handleEditGame = async (gameID) => {
     setGameID(gameID);
-    console.log(gameID, token);
-    navigate('/editor');
+    localStorage.setItem("token", JSON.stringify(token));
+    const editorUrl = `${window.location.origin}/editor/?id=${gameID}`;
+    window.open(editorUrl, '_blank');
+  };
+
+  const handlePlayGame = async (gameID) => {
+    setGameID(gameID);
+    localStorage.setItem("token", JSON.stringify(token));
+    const engineUrl = `${window.location.origin}/engine/?id=${gameID}`;
+    window.open(engineUrl, '_blank');
   };
 
   const handleDuplicateGame = async (gameID) => {
@@ -113,6 +118,7 @@ const Games = () => {
           {gameList.map((game) => (
             <GameCard key={game.id} game={game}
               handleEditGame={handleEditGame}
+              handlePlayGame={handlePlayGame}
               handleDuplicateGame={handleDuplicateGame}
               handleDeleteGame={handleDeleteGame}
             />

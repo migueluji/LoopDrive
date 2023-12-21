@@ -3,7 +3,7 @@
 
 <head>
 	<meta charset="UTF-8">
-	<title>Gamesonomy Editor</title>
+	<title>Loop Engine</title>
 
 	<link rel="stylesheet" type="text/css"
 		href="https://unpkg.com/material-components-web@10.0.0/dist/material-components-web.min.css">
@@ -122,24 +122,16 @@
 
 	<script>
 
-		window.onload = () => { gapiLoaded(); gisLoaded() }
+		window.onload = () => { gapiLoaded()}
 		window.onbeforeunload = () => ""; // This event enables the web page to trigger a confirmation dialog asking the user if they really want to leave the page
+
+		var API_KEY = 'AIzaSyCfXON-94Onk-fLyihh8buKZcFIjynGRTc';
+		var DISCOVERY_DOCS = ["https://www.googleapis.com/discovery/v1/apis/drive/v3/rest"];
+		let app;
 
 		const urlParams = new URLSearchParams(window.location.search);
 		const gameID = urlParams.get('id');
-		// var game = JSON.parse(localStorage.getItem("game"));
-		// game.id = id;
 		var token = JSON.parse(localStorage.getItem("token"));
-		console.log("editor", urlParams, token);
-
-		var CLIENT_ID = '129246923501-4lk4rkmhin21kcaoul91k300s9ar9n1t.apps.googleusercontent.com';
-		var API_KEY = 'AIzaSyCfXON-94Onk-fLyihh8buKZcFIjynGRTc';
-		var DISCOVERY_DOCS = ["https://www.googleapis.com/discovery/v1/apis/drive/v3/rest"];
-		var SCOPES = 'https://www.googleapis.com/auth/drive'; // access to files created by the application
-		let tokenClient;
-		let gapiInited = false;
-		let gisInited = false;
-		let app;
 
 		function gapiLoaded() { gapi.load('client', initializeGapiClient); }
 
@@ -148,27 +140,9 @@
 				apiKey: API_KEY,
 				discoveryDocs: DISCOVERY_DOCS,
 			});
-			gapiInited = true;
-			maybeEnable();
+			gapi.client.setToken(token);
+			app = new App(gameID);
 		}
-
-		function gisLoaded() {
-			// tokenClient = google.accounts.oauth2.initTokenClient({
-			// 	client_id: CLIENT_ID,
-			// 	scope: SCOPES,
-			// 	callback: ''
-			// });
-			gisInited = true;
-			maybeEnable();
-		}
-
-		function maybeEnable() {
-			if (gapiInited && gisInited) {
-				gapi.client.setToken(token);
-				app = new App(gameID);
-			}
-		}
-
 
 	</script>
 </body>

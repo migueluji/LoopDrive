@@ -26,9 +26,9 @@ class App {
     }
 
     launchEditor() {
-        var editor = new Editor(new EditorView(), new Game(this.json));
-        new CmdManager(editor);
-        document.body.appendChild(editor.view.html);
-        this.load.closeDialog();
+       var editor = new Editor(new EditorView(), new Game(this.json));
+       new CmdManager(editor);
+       document.body.appendChild(editor.view.html);
+       this.load.closeDialog();
     }
 }

@@ -11,7 +11,7 @@ import FileCopyIcon from '@mui/icons-material/FileCopy';
 import DeleteIcon from '@mui/icons-material/Delete';
 import Typography from '@mui/material/Typography';
 
-const GameCard = ({ game, handleEditGame, handleDuplicateGame, handleDeleteGame }) => (
+const GameCard = ({ game, handleEditGame, handlePlayGame, handleDuplicateGame, handleDeleteGame }) => (
     <Card style={{ maxWidth: '240px', minWidth: '240px' }}>
         <CardMedia
             component="img"
@@ -30,7 +30,7 @@ const GameCard = ({ game, handleEditGame, handleDuplicateGame, handleDeleteGame 
             <IconButton onClick={() => handleEditGame(game.id)}>
                 <EditIcon />
             </IconButton>
-            <IconButton>
+            <IconButton onClick={() => handlePlayGame(game.id)}>
                 <PlayCircleFilledIcon />
             </IconButton>
             <IconButton onClick={() => handleDuplicateGame(game.id)}>

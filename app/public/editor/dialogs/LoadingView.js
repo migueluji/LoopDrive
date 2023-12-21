@@ -5,7 +5,7 @@ class LoadingView {
 			this.html.className +="dialog-full-screen";
 			this.html.style="background:"+color;
 			this.html.innerHTML =
-				'<div class="mdc-circular-progress" role="progressbar" aria-label="Example Progress Bar" aria-valuemin="0" aria-valuemax="1">'+
+				'<div class="mdc-circular-progress" role="progressbar" aria-label="Example Progress Bar" aria-valuemin="0" aria-valuemax="1" style="width:96px; height:96px">'+
 					'<div class="mdc-circular-progress__determinate-container">'+
 						'<svg class="mdc-circular-progress__determinate-circle-graphic" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">'+
 						'<circle class="mdc-circular-progress__determinate-track" cx="24" cy="24" r="18" stroke-width="4"/>'+

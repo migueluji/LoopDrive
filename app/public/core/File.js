@@ -2,7 +2,7 @@ class File {
 
     loadJson(gameId, callback) {
         gapi.client.drive.files.list({
-            'q': `parents in "${gameId}" and name="game.json" and trashed=false` // Agregar "and trashed=false" al query
+            'q': `parents in "${gameId}" and name="game.json" and trashed=false`
         }).then(function (res) {
             if (res.result.files.length > 0) {
                 gapi.client.drive.files.get({
@@ -10,11 +10,16 @@ class File {
                     alt: 'media'
                 }).then(function (res) {
                     var json;
-                    if (res.body == "") json = JSON.parse("{}")
-                    else json = JSON.parse(res.body);
+                    (res.body === "") ? json = {} : json = JSON.parse(res.body);
                     callback(json);
-                })
+                }).catch(function (error) {
+                    console.error("Error fetching game.json file:", error);
+                });
+            } else {
+                console.log("game.json file not found in the specified folder.");
             }
+        }).catch(function (error) {
+            console.error("Error listing files:", error);
         });
     }
 

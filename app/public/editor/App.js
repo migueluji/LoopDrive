@@ -1,5 +1,6 @@
 class App {
     constructor(gameID) {
+        console.log("init editor");
         this.file = new File();
         this.loader = new PIXI.Loader();
         this.playList = {};
@@ -11,6 +12,7 @@ class App {
     }
 
     onJsonLoaded(json) {
+        console.log(json);
         this.json = json;
         this.file.loadImages(this.gameId, this.loader, this.onImagesLoaded.bind(this));
     }

@@ -8,6 +8,7 @@ import Games from './pages/Games';
 import { useNavigate } from 'react-router-dom';
 import { useAppContext } from './AppContext';
 
+
 function App() {
   const { userInfo, setToken, setUserInfo } = useAppContext();
   const navigate = useNavigate();

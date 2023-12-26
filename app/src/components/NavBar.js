@@ -1,8 +1,6 @@
-// NavBar.js
 import React, { useState } from 'react';
-import { AppBar, Toolbar, Button, Avatar, Typography } from '@mui/material';
+import { AppBar, Toolbar, Button, Avatar, Box } from '@mui/material';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
-import AllInclusiveIcon from '@mui/icons-material/AllInclusive';
 import UserMenu from './UserMenu';
 import { useNavigate } from 'react-router-dom';
 
@@ -29,13 +27,17 @@ const NavBar = ({ userInfo, handleLogin, handleLogout }) => {
     handleMenuClose();
   };
 
+  const onLogoClick = () => {
+    navigate('/');
+  };
+
   return (
     <AppBar position="static">
       <Toolbar>
-        <AllInclusiveIcon sx={{ fontSize: '3.125rem', marginRight: '16px' }} />
-        <Typography variant="h4" component="div" sx={{ flexGrow: 1, fontWeight: 'bold' }}>
-          Loop
-        </Typography>
+        <Button onClick={onLogoClick} style={{ padding: 0, marginRight: '16px' }}>
+          <img src="/loop.png" alt="Loop Logo" style={{ height: '2rem' }} />
+        </Button>
+        <Box sx={{ flexGrow: 1 }} />
         {userInfo ? (
           <>
             <Button color="inherit" onClick={handleMenuOpen}>

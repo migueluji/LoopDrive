@@ -1,6 +1,6 @@
 // src/pages/Games.js
-import React, { useState, useEffect } from 'react';
-import { folderExists, createFolder, listDriveGames, newGame, duplicateGame, deleteGame } from '../driveAPI';
+import React, { useEffect } from 'react';
+import { newGame, duplicateGame, deleteGame, listDriveGames } from '../driveAPI';
 import Button from '@mui/material/Button';
 import CircularProgress from '@mui/material/CircularProgress';
 import Box from '@mui/material/Box';
@@ -9,31 +9,22 @@ import GameCard from '../components/GameCard';
 import { useAppContext } from '../AppContext';
 
 const Games = () => {
-  const { token, setGameID } = useAppContext(); // Obtén token desde el contexto
-  const [appFolderID, setAppFolderID] = useState([]);
-  const [gameList, setGameList] = useState([]);
-  const [loading, setLoading] = useState(false);
+  const { token, setGameID, gameList, setGameList, loadGames, appFolderID} = useAppContext();
+  const [loading, setLoading] = React.useState(false);
 
   useEffect(() => {
-    const initDrive = async () => {
+    const fetchGames = async () => {
+      setLoading(true);
       try {
-        setLoading(true); // Inicia la carga
-
-        let folderID = await folderExists("Loop Games");
-        if (!folderID) folderID = await createFolder("Loop Games", 'root', token?.access_token);
-        setAppFolderID(folderID);
-
-        const gameList = await listDriveGames(folderID);
-        setGameList(gameList);
+        await loadGames(); // Esta función cargará los juegos si aún no se han cargado
       } catch (error) {
-        console.error('Error fetching data:', error.message);
+        console.error('Error fetching games:', error.message);
       } finally {
-        setLoading(false); // Finaliza la carga, ya sea con éxito o error
+        setLoading(false);
       }
     };
-
-    initDrive();
-  }, [token]);
+    fetchGames();
+  }, [token, loadGames, gameList]); // Dependencias: token y loadGames
 
   const handleNewGame = async () => {
     try {

@@ -1,3 +1,4 @@
+// src/pages/home.js
 import React from 'react';
 
 const Wellcome = ({ user }) => {

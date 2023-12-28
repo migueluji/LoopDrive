@@ -1,20 +1,15 @@
 
 //driverAPI.js
 /* global gapi */
-
-let accessToken;
 var openWindows = {};
 var expandContainer = document.querySelector('.expand-container');
 var expandContainerUl = document.querySelector('.expand-container ul');
-
-function setDriveAccessToken(token) {
-  accessToken = token;
-}
 
 function folderExists(folderName) {
   return new Promise((resolve, reject) => {
     gapi.client.drive.files.list({
       q: `name='${folderName}' and trashed=false`,
+    //  headers: token ? { Authorization: `Bearer ${token}` } : {}
     }).then(response => {
       if (response.result.files && response.result.files.length > 0) {
         const folderId = response.result.files[0].id;
@@ -29,25 +24,29 @@ function folderExists(folderName) {
   });
 }
 
-
-function checkDriveFolder(loopGamesFolder) {
+function createFolder(folderName, parent, token) {
   return new Promise(function (resolve, reject) {
-    gapi.client.drive.files.list({
-      q: "name ='" + loopGamesFolder + "' and trashed=false",
-      fields: 'files(id,name,owners(displayName))'
-    }).then(function (response) {
-      var files = response.result.files;
-      if (files && files.length > 0) {
-        resolve(files[0].id);
-      } else {
-        createFolder(loopGamesFolder, 'root', accessToken).then(function (folderId) {
-          resolve(folderId);
-        }).catch(function (error) {
-          reject(new Error('Failed to create folder: ' + error.message));
-        });
+    var request = gapi.client.request({
+      path: '/drive/v3/files',
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': token ? `Bearer ${token}` : ''
+      },
+      body: {
+        'name': folderName,
+        'mimeType': 'application/vnd.google-apps.folder',
+        'parents': [parent]
       }
-    }).catch(function (error) {
-      reject(new Error('Failed to list files: ' + error.message));
+    });
+    request.execute(function (response) {
+      if (response.error) {
+        reject(new Error('Failed to create folder: ' + response.error.message));
+      } else if (response.id) {
+        resolve(response.id);
+      } else {
+        reject(new Error('Failed to create folder.'));
+      }
     });
   });
 }
@@ -56,8 +55,9 @@ function listDriveGames(appFolderID) {
   return new Promise((resolve, reject) => {
     if (appFolderID) {
       gapi.client.drive.files.list({
-        'q': `parents in "${appFolderID}"`, // Listar juegos del usuario
+        'q': `parents in "${appFolderID}"`, 
         'fields': 'files(id, name)',
+   //     'headers': token ? { Authorization: `Bearer ${token}` } : {}
       }).then(async response => {
         const files = response.result.files;
         for (let i = files.length - 1; i >= 0; i--) {
@@ -78,7 +78,6 @@ function listDriveGames(appFolderID) {
 
 function getImageDownloadUrl(gameFolderID) {
   return new Promise((resolve, reject) => {
-    // Buscar el archivo de la imagen por nombre en el directorio del juego
     gapi.client.drive.files.list({
       'q': `name='image.jpg' and '${gameFolderID}' in parents`,
       'fields': 'files(id)',
@@ -104,22 +103,22 @@ function getImageDownloadUrl(gameFolderID) {
   });
 }
 
-async function newGame(appFolderID, accessToken) {
+async function newGame(appFolderID, token) {
   var gameID;
   return new Promise((resolve, reject) => {
-    createFolder("Untitled Game", appFolderID, accessToken)
+    createFolder("Untitled Game", appFolderID, token)
       .then(function (folderId) {
         gameID = folderId;
-        return createEmptyJson(gameID, accessToken);
+        return createEmptyJson(gameID, token);
       })
       .then(function () {
-        return createEmptyImage(gameID, accessToken);
+        return createEmptyImage(gameID, token);
       })
       .then(function () {
-        return createFolder("images", gameID, accessToken);
+        return createFolder("images", gameID, token);
       })
       .then(function () {
-        return createFolder("sounds", gameID, accessToken);
+        return createFolder("sounds", gameID, token);
       })
       .then(function () {
         resolve(gameID);
@@ -150,7 +149,6 @@ function playGame(menuItemHTML) {
 }
 
 async function duplicateGame(gameID) {
-
   return new Promise((resolve, reject) => {
     gapi.client.drive.files.get({
       'fileId': gameID,
@@ -300,43 +298,14 @@ function duplicateSubdirectory(sourceSubdirectoryId, destinationParentId) {
   });
 }
 
-
-function createFolder(folderName, parent, accessToken) {
-  console.log("createFolder ", folderName, parent);
+function createEmptyJson(gameID, token) {
   return new Promise(function (resolve, reject) {
     var request = gapi.client.request({
       path: '/drive/v3/files',
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': 'Bearer ' + accessToken,
-      },
-      body: {
-        'name': folderName,
-        'mimeType': 'application/vnd.google-apps.folder',
-        'parents': [parent]
-      }
-    });
-    request.execute(function (response) {
-      if (response.error) {
-        reject(new Error('Failed to create folder: ' + response.error.message));
-      } else if (response.id) {
-        resolve(response.id);
-      } else {
-        reject(new Error('Failed to create folder.'));
-      }
-    });
-  });
-}
-// Exporta las funciones necesarias si es necesario
-function createEmptyJson(gameID, accessToken) {
-  return new Promise(function (resolve, reject) {
-    var request = gapi.client.request({
-      path: '/drive/v3/files',
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer ' + accessToken,
+        'Authorization': 'Bearer ' + token,
       },
       body: {
         'name': 'game.json',
@@ -356,19 +325,19 @@ function createEmptyJson(gameID, accessToken) {
   });
 }
 
-function createEmptyImage(gameID, accessToken) {
+function createEmptyImage(gameID, token) {
   return new Promise(function (resolve, reject) {
 
     var metadata = {
       'name': 'image.jpg',
       'parents': [gameID]
     };
-    // Crear una imagen en blanco de 1x1 píxeles
+    // Create a blank image of 1x1 pixels
     var canvas = document.createElement('canvas');
     canvas.width = 1;
     canvas.height = 1;
     var context = canvas.getContext('2d');
-    context.fillStyle = '#ffffff'; // Color blanco
+    context.fillStyle = '#ffffff'; // White color
     context.fillRect(0, 0, 1, 1);
     canvas.toBlob(function (blob) {
       var reader = new FileReader();
@@ -398,7 +367,7 @@ function createEmptyImage(gameID, accessToken) {
           },
           headers: {
             'Content-Type': 'multipart/related; boundary="' + boundary + '"',
-            'Authorization': 'Bearer ' + accessToken
+            'Authorization': 'Bearer ' + token
           },
           body: multipartRequestBody
         }).then(function (response) {
@@ -415,10 +384,8 @@ function createEmptyImage(gameID, accessToken) {
 }
 
 export {
-  setDriveAccessToken,
   folderExists,
   createFolder,
-  checkDriveFolder,
   listDriveGames,
   newGame,
   editGame,

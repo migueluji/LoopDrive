@@ -1,12 +1,12 @@
 // App.js 
 import React from 'react';
 import { Routes, Route, useLocation } from 'react-router-dom';
-import { initGoogleAPI, login, logout } from './googleAPI';
+import { initGoogleAPI, login, logout } from './apis/googleAPI';
 import NavBar from './components/NavBar';
 import Wellcome from './pages/Home';
 import Games from './pages/Games';
 import { useNavigate } from 'react-router-dom';
-import { useAppContext } from './AppContext';
+import { useAppContext } from './context';
 
 
 function App() {

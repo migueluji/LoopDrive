@@ -1,10 +1,9 @@
-// googleAPI.js
+// /src/api/googleAPI.js
 /* global gapi, google  */
-
-const CLIENT_ID = '129246923501-4lk4rkmhin21kcaoul91k300s9ar9n1t.apps.googleusercontent.com';
-const API_KEY = 'AIzaSyCfXON-94Onk-fLyihh8buKZcFIjynGRTc';
+const CLIENT_ID = process.env.REACT_APP_CLIENT_ID;
+const API_KEY = process.env.REACT_APP_API_KEY;
 const DISCOVERY_DOCS = ["https://www.googleapis.com/discovery/v1/apis/drive/v3/rest"];
-const SCOPES = 'https://www.googleapis.com/auth/drive.file ';
+const SCOPES = 'https://www.googleapis.com/auth/drive.file';
 
 let tokenClient;
 

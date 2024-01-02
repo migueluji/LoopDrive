@@ -1,10 +1,9 @@
-// index.js
+// /src/index.js
 import { createRoot } from 'react-dom/client';
-import reportWebVitals from './reportWebVitals';
 import { BrowserRouter } from 'react-router-dom';
 import React from 'react';
-import App from './App';
-import { AppContextProvider } from './AppContext';
+import Loop from './loop';
+import { AppContextProvider } from './context';
 import theme from './theme';
 import { ThemeProvider } from '@mui/material/styles';
 
@@ -13,11 +12,10 @@ root.render(
   <BrowserRouter>
     <AppContextProvider>
       <ThemeProvider theme={theme}>
-        <App />
+        <Loop />
       </ThemeProvider>,
     </AppContextProvider>
   </BrowserRouter>
 );
 
-reportWebVitals();
 

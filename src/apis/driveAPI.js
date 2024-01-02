@@ -1,15 +1,12 @@
 
-//driverAPI.js
+// /apis/driverAPI.js
 /* global gapi */
-var openWindows = {};
-var expandContainer = document.querySelector('.expand-container');
-var expandContainerUl = document.querySelector('.expand-container ul');
 
-function folderExists(folderName) {
+function folderExists(folderName, token) {
   return new Promise((resolve, reject) => {
     gapi.client.drive.files.list({
       q: `name='${folderName}' and trashed=false`,
-    //  headers: token ? { Authorization: `Bearer ${token}` } : {}
+      headers: token ? { Authorization: `Bearer ${token}` } : {}
     }).then(response => {
       if (response.result.files && response.result.files.length > 0) {
         const folderId = response.result.files[0].id;
@@ -51,13 +48,13 @@ function createFolder(folderName, parent, token) {
   });
 }
 
-function listDriveGames(appFolderID) {
+function listDriveGames(appFolderID, token) {
   return new Promise((resolve, reject) => {
     if (appFolderID) {
       gapi.client.drive.files.list({
         'q': `parents in "${appFolderID}"`, 
         'fields': 'files(id, name)',
-   //     'headers': token ? { Authorization: `Bearer ${token}` } : {}
+        'headers': token ? { Authorization: `Bearer ${token}` } : {}
       }).then(async response => {
         const files = response.result.files;
         for (let i = files.length - 1; i >= 0; i--) {
@@ -128,24 +125,6 @@ async function newGame(appFolderID, token) {
         reject(error);
       });
   });
-}
-
-function editGame(menuItemHTML) {
-  var gameID = menuItemHTML.parentNode.getAttribute("gameid");
-  var url = "editor/?id=" + gameID;
-  if (openWindows[url] && !openWindows[url].closed) openWindows[url].focus();
-  else openWindows[url] = window.open(url, "_blank");
-  expandContainer.style.display = 'none';
-  expandContainerUl.setAttribute('gameid', '');
-}
-
-function playGame(menuItemHTML) {
-  var gameID = menuItemHTML.parentNode.getAttribute("gameid");
-  var url = "engine/?id=" + gameID;
-  if (openWindows[url] && !openWindows[url].closed) openWindows[url].focus();
-  else openWindows[url] = window.open(url, "_blank");
-  expandContainer.style.display = 'none';
-  expandContainerUl.setAttribute('gameid', '');
 }
 
 async function duplicateGame(gameID) {
@@ -232,7 +211,6 @@ function getJson(directoryId) {
     'q': "name='game.json' and '" + directoryId + "' in parents",
     'fields': 'files(id)'
   });
-
   return new Promise(function (resolve, reject) {
     request.execute(function (res) {
       if (res.files.length > 0) {
@@ -250,13 +228,10 @@ function changeNameInJson(duplicatedDirectoryId, originalGameJsonId, newName) {
     'fileId': originalGameJsonId,
     'alt': 'media'
   });
-
   request.execute(function (res) {
     var gameJsonContent = res;
     gameJsonContent.name = newName;
-
     var updatedJsonString = JSON.stringify(gameJsonContent);
-
     var updateRequest = gapi.client.request({
       'path': '/upload/drive/v3/files/' + duplicatedDirectoryId,
       'method': 'PATCH',
@@ -268,7 +243,6 @@ function changeNameInJson(duplicatedDirectoryId, originalGameJsonId, newName) {
       },
       'body': updatedJsonString
     });
-
     updateRequest.execute(function (updateRes) {
       console.log('Nombre del juego duplicado actualizado: ' + newName);
     });
@@ -327,7 +301,6 @@ function createEmptyJson(gameID, token) {
 
 function createEmptyImage(gameID, token) {
   return new Promise(function (resolve, reject) {
-
     var metadata = {
       'name': 'image.jpg',
       'parents': [gameID]
@@ -388,8 +361,6 @@ export {
   createFolder,
   listDriveGames,
   newGame,
-  editGame,
-  playGame,
   deleteGame,
   duplicateGame
 };

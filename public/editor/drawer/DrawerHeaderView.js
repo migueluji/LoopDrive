@@ -55,9 +55,6 @@ class DrawerHeaderView {
     onChangeInputHandler(input) {
         this.value = String(input.value).trim();
         if (this.value === "") this.value = "Untitled Game";
-        var game = JSON.parse(localStorage.getItem("game"));
-        game.name = this.value;
-        localStorage.setItem("game", JSON.stringify(game));
         CmdManager.changeGamePropertyCmd("name", this.value);
     }
 }

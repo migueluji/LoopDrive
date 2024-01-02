@@ -1,22 +1,22 @@
 // src/pages/Games.js
 import React, { useEffect } from 'react';
-import { newGame, duplicateGame, deleteGame, listDriveGames } from '../driveAPI';
+import { newGame, duplicateGame, deleteGame, listDriveGames } from '../apis/driveAPI';
 import Button from '@mui/material/Button';
 import CircularProgress from '@mui/material/CircularProgress';
 import Box from '@mui/material/Box';
 import AddIcon from '@mui/icons-material/Add';
 import GameCard from '../components/GameCard';
-import { useAppContext } from '../AppContext';
+import { useAppContext } from '../context';
 
 const Games = () => {
-  const { token, setGameID, gameList, setGameList, loadGames, appFolderID} = useAppContext();
+  const { token, setGameID, gameList, setGameList, loadGames, appFolderID } = useAppContext();
   const [loading, setLoading] = React.useState(false);
 
   useEffect(() => {
     const fetchGames = async () => {
       setLoading(true);
       try {
-        await loadGames(); // Esta función cargará los juegos si aún no se han cargado
+        await loadGames();
       } catch (error) {
         console.error('Error fetching games:', error.message);
       } finally {
@@ -24,7 +24,29 @@ const Games = () => {
       }
     };
     fetchGames();
-  }, [token, loadGames, gameList]); // Dependencias: token y loadGames
+  }, [token, loadGames]);
+
+  useEffect(() => {
+    const handleSavedGame = (event) => {
+      if (event.origin !== "http://localhost:3000") return;
+      if (event.data.type === 'game_saved') {
+        const savedGameData = event.data.data;
+        setGameList(currentGameList => {
+          return currentGameList.map(game => {
+            if (game.id === savedGameData.id) {
+              return { ...game, ...savedGameData };
+            }
+            return game;
+          });
+        });
+      }
+    };
+    window.addEventListener('message', handleSavedGame);
+    return () => {
+      window.removeEventListener('message', handleSavedGame);
+    };
+  }, [setGameList]);
+
 
   const handleNewGame = async () => {
     try {

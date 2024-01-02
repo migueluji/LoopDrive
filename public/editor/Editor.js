@@ -76,6 +76,11 @@ class Editor {
         delete saveToFile.fontList;
         delete saveToFile.imageList;
         delete saveToFile.soundList;
+
+        // ... lógica para guardar el juego en saveToFile
+        const gameData = { "name": this.model.name, "id":gameID };
+        window.opener.postMessage({ type: 'game_saved', data: gameData }, '*');
+
         File.save(gameID, this.model.name, JSON.stringify(saveToFile, (key, value) => { if (key != "id") return value }, '\t'));
     }
 

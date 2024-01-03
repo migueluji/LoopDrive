@@ -1,5 +1,5 @@
-// src/pages/Games.js
-import React, { useEffect } from 'react';
+// Games.js
+import React, { useEffect, useState } from 'react';
 import { newGame, duplicateGame, deleteGame, listDriveGames } from '../apis/driveAPI';
 import Button from '@mui/material/Button';
 import CircularProgress from '@mui/material/CircularProgress';
@@ -7,24 +7,36 @@ import Box from '@mui/material/Box';
 import AddIcon from '@mui/icons-material/Add';
 import GameCard from '../components/GameCard';
 import { useAppContext } from '../context';
+import { useNavigate } from 'react-router-dom';
 
 const Games = () => {
-  const { token, setGameID, gameList, setGameList, loadGames, appFolderID } = useAppContext();
-  const [loading, setLoading] = React.useState(false);
+  const { gamesLoaded, setGamesLoaded, userInfo, token, setGameID, gameList, setGameList, appFolderID } = useAppContext();
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!userInfo) {
+      // Si el usuario no está autenticado, redirige a la página de inicio
+      navigate("/");
+    }
+  }, [userInfo, navigate]);
 
   useEffect(() => {
     const fetchGames = async () => {
       setLoading(true);
       try {
-        await loadGames();
+        const updatedgameList = await listDriveGames(appFolderID);
+        setGameList(updatedgameList);
+        setGamesLoaded(true);
       } catch (error) {
         console.error('Error fetching games:', error.message);
       } finally {
         setLoading(false);
       }
     };
-    fetchGames();
-  }, [token, loadGames]);
+    // Solo carga los juegos si gamesLoaded es false
+    if (!gamesLoaded) fetchGames();
+  }, [token, appFolderID, setGameList, gamesLoaded]);
 
   useEffect(() => {
     const handleSavedGame = (event) => {

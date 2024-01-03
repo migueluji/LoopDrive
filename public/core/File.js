@@ -130,6 +130,8 @@ class File {
                         body: json
                     }).then(() => {
                         Command.takeScreenshot();
+                        const gameData = { "name": gameName, "id": gameID };
+                        window.opener.postMessage({ type: 'game_saved', data: gameData }, '*');
                         alert('Game saved!!!');
                     });
                 });

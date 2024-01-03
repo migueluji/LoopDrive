@@ -1,4 +1,4 @@
-// src/components/GameCard.js
+// GameCard.js
 import React from 'react';
 import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
@@ -10,6 +10,7 @@ import PlayCircleFilledIcon from '@mui/icons-material/PlayCircleFilled';
 import FileCopyIcon from '@mui/icons-material/FileCopy';
 import DeleteIcon from '@mui/icons-material/Delete';
 import Typography from '@mui/material/Typography';
+import Tooltip from '@mui/material/Tooltip';
 
 const GameCard = ({ game, handleEditGame, handlePlayGame, handleDuplicateGame, handleDeleteGame }) => (
     <Card style={{ maxWidth: '240px', minWidth: '240px' }}>
@@ -27,18 +28,26 @@ const GameCard = ({ game, handleEditGame, handlePlayGame, handleDuplicateGame, h
         </CardContent>
         {/* Acciones de la tarjeta */}
         <CardActions>
-            <IconButton onClick={() => handleEditGame(game.id)}>
-                <EditIcon />
-            </IconButton>
-            <IconButton onClick={() => handlePlayGame(game.id)}>
-                <PlayCircleFilledIcon />
-            </IconButton>
-            <IconButton onClick={() => handleDuplicateGame(game.id)}>
-                <FileCopyIcon />
-            </IconButton>
-            <IconButton onClick={() => handleDeleteGame(game.id, game.name)}>
-                <DeleteIcon />
-            </IconButton>
+            <Tooltip title="Edit game">
+                <IconButton onClick={() => handleEditGame(game.id)}>
+                    <EditIcon />
+                </IconButton>
+            </Tooltip>
+            <Tooltip title="Play game">
+                <IconButton onClick={() => handlePlayGame(game.id)}>
+                    <PlayCircleFilledIcon />
+                </IconButton>
+            </Tooltip>
+            <Tooltip title="Duplicate game">
+                <IconButton onClick={() => handleDuplicateGame(game.id)}>
+                    <FileCopyIcon />
+                </IconButton>
+            </Tooltip>
+            <Tooltip title="Delete game">
+                <IconButton onClick={() => handleDeleteGame(game.id, game.name)}>
+                    <DeleteIcon />
+                </IconButton>
+            </Tooltip>
         </CardActions>
     </Card>
 );

@@ -1,11 +1,10 @@
-// src/pages/home.js
+// Home.js
 import React from 'react';
 
-const Wellcome = ({ user }) => {
+const Wellcome = () => {
   return (
     <div>
       <h1> Welcome to Loop Game Engine</h1>
-      {user && <p>Hello, {user}!</p>}
     </div>
   );
 };

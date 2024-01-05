@@ -255,7 +255,7 @@ class File {
                         'headers': { 'Content-Type': 'multipart/related; boundary="' + boundary + '"' },
                         'body': multipartRequestBody
                     }).then(function (response) {
-                        console.log("Screenshoot updated");
+                       // console.log("Screenshoot updated");
                     });
                 }
             }

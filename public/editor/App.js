@@ -11,7 +11,6 @@ class App {
     }
 
     onJsonLoaded(json) {
-        console.log(json);
         this.json = json;
         this.file.loadImages(this.gameId, this.loader, this.onImagesLoaded.bind(this));
     }

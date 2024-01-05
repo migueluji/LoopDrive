@@ -131,7 +131,7 @@ class File {
                     }).then(() => {
                         Command.takeScreenshot();
                         const gameData = { "name": gameName, "id": gameID };
-                        window.opener.postMessage({ type: 'game_saved', data: gameData }, '*');
+                        window.parent.postMessage({ type: 'game_saved', data: gameData }, window.location.origin);
                         alert('Game saved!!!');
                     });
                 });
@@ -140,6 +140,7 @@ class File {
             console.log(error);
         });
     }
+
 
 
     static delete(fileId, assetID, fileName, type) {

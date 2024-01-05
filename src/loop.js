@@ -1,17 +1,20 @@
 // loop.js
 import React from 'react';
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, useLocation, useNavigate } from 'react-router-dom';
 import { initGoogleAPI, login, logout } from './apis/googleAPI';
 import NavBar from './components/NavBar';
-import Wellcome from './pages/Home';
+import Home from './pages/Home';
 import Games from './pages/Games';
-import { useNavigate } from 'react-router-dom';
+import Editor from './pages/Editor';
+import Play from './pages/Play';
 import { useAppContext } from './context';
-import { folderExists, createFolder, } from './apis/driveAPI';
+import { folderExists, createFolder } from './apis/driveAPI';
+
 
 function Loop() {
-  const { setGamesLoaded, setGameList, setAppFolderID, userInfo, expirationTime, setExpirationTime, setToken, setUserInfo } = useAppContext();
+  const { setGamesLoaded, setAppFolderID, userInfo, expirationTime, setExpirationTime, setToken, setUserInfo } = useAppContext();
   const navigate = useNavigate();
+  const location = useLocation();
 
   const handleLogout = async () => {
     const token = await logout();
@@ -39,18 +42,27 @@ function Loop() {
     navigate('/games');
   };
 
+  // Verifica si estás en la página del editor para no mostrar la barra global
+  const isEditorPage = location.pathname.includes('/editor');
+
   return (
-    <div>
-      <NavBar userInfo={userInfo} expirationTime={expirationTime} handleLogin={handleLogin} handleLogout={handleLogout} />
+    <div style={{ height: '0px' }}>
+      {!isEditorPage && (
+        // Renderiza la barra global en todas las páginas excepto en la del editor
+        <NavBar userInfo={userInfo} expirationTime={expirationTime} handleLogin={handleLogin} handleLogout={handleLogout} />
+      )}
       <Routes>
-        <Route path="/" element={<Wellcome />} />
+        <Route path="/" element={<Home />} />
         <Route path="/games" element={<Games />} />
+        <Route path="/editor" element={<Editor />} />
+        <Route path="/play" element={<Play />} />
       </Routes>
     </div>
   );
 }
 
 export default Loop;
+
 
 
 

@@ -18,6 +18,7 @@ class AppBarView {
 				'<button id="redo" class="material-icons mdc-top-app-bar__action-item mdc-icon-button">redo</button>'+
 				'<button id="cast" class="material-icons mdc-top-app-bar__action-item mdc-icon-button">list</button>'+
 				'<button id="settings" class="material-icons mdc-top-app-bar__action-item  mdc-icon-button">settings</button>'+
+				'<button id="close" class="material-icons mdc-top-app-bar__action-item  mdc-icon-button">close</button>'+
 			'</section>'+
 		'</div>';
 		this.updateSceneName(sceneName);	
@@ -28,6 +29,7 @@ class AppBarView {
 		this.html.querySelector("#cast").addEventListener("click",Command.openCastCmd.bind(Command));
 		this.html.querySelector("#play").addEventListener("click",Command.playGameCmd.bind(Command));
 		this.html.querySelector("#settings").addEventListener("click",Command.openGamePropertiesCmd.bind(Command));
+		this.html.querySelector("#close").addEventListener("click",Command.closeEditorCmd.bind(Command));
 
 		mdc.topAppBar.MDCTopAppBar.attachTo(this.html);
   	}

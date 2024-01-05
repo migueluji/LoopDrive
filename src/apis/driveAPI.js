@@ -48,30 +48,67 @@ function createFolder(folderName, parent, token) {
   });
 }
 
-function listDriveGames(appFolderID, token) {
-  return new Promise((resolve, reject) => {
-    if (appFolderID) {
-      gapi.client.drive.files.list({
-        'q': `parents in "${appFolderID}"`, 
-        'fields': 'files(id, name)',
-        'headers': token ? { Authorization: `Bearer ${token}` } : {}
-      }).then(async response => {
-        const files = response.result.files;
-        for (let i = files.length - 1; i >= 0; i--) {
-          const gameFolderID = files[i].id;
-          try {
-            files[i].imageUrl = await getImageDownloadUrl(gameFolderID);
-          } catch (error) {
-            console.error(error.message);
-          }
-        }
-        resolve(files);
-      }).catch(error => {
-        reject(new Error('Error al listar los juegos de Google Drive: ' + error.message));
-      });
+async function listDriveGames(appFolderID, token) {
+  return new Promise(async (resolve, reject) => {
+    if (!appFolderID) {
+      resolve([]); // No hay carpeta de aplicaciones, por lo que no hay juegos que listar
+      return;
     }
+    const files = [];
+    let pageToken = null;
+    do {
+      try {
+        const response = await gapi.client.drive.files.list({
+          q: `parents in "${appFolderID}"`,
+          fields: 'nextPageToken, files(id, name)',
+          headers: token ? { Authorization: `Bearer ${token}` } : {},
+          pageToken: pageToken,
+        });
+        const gameFiles = response.result.files;
+        // Recopilar todas las solicitudes de imágenes en un array
+        const imageRequests = gameFiles.map(async (file) => {
+          file.imageUrl = await getImageDownloadUrl(file.id);
+          return file;
+        });
+        // Esperar a que todas las imágenes se carguen en paralelo
+        const gameFilesWithImages = await Promise.all(imageRequests);
+        // Agregar los archivos a la lista
+        files.push(...gameFilesWithImages);
+        // Actualizar el token de página para la siguiente página (si la hay)
+        pageToken = response.result.nextPageToken;
+      } catch (error) {
+        reject(new Error('Error al listar los juegos de Google Drive: ' + error.message));
+        return;
+      }
+    } while (pageToken);
+    resolve(files);
   });
 }
+
+// function listDriveGames(appFolderID, token) {
+//   return new Promise((resolve, reject) => {
+//     if (appFolderID) {
+//       gapi.client.drive.files.list({
+//         'q': `parents in "${appFolderID}"`, 
+//         'fields': 'files(id, name)',
+//         'headers': token ? { Authorization: `Bearer ${token}` } : {}
+//       }).then(async response => {
+//         const files = response.result.files;
+//         for (let i = files.length - 1; i >= 0; i--) {
+//           const gameFolderID = files[i].id;
+//           try {
+//             files[i].imageUrl = await getImageDownloadUrl(gameFolderID);
+//           } catch (error) {
+//             console.error(error.message);
+//           }
+//         }
+//         resolve(files);
+//       }).catch(error => {
+//         reject(new Error('Error al listar los juegos de Google Drive: ' + error.message));
+//       });
+//     }
+//   });
+// }
 
 function getImageDownloadUrl(gameFolderID) {
   return new Promise((resolve, reject) => {

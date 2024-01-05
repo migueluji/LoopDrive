@@ -121,10 +121,7 @@
 	<script async defer src="https://accounts.google.com/gsi/client"></script>
 
 	<script>
-
-		window.onload = () => { gapiLoaded()}
-		window.onbeforeunload = () => ""; // This event enables the web page to trigger a confirmation dialog asking the user if they really want to leave the page
-
+		window.onload = () => { gapiLoaded() }
 		var API_KEY = 'AIzaSyCfXON-94Onk-fLyihh8buKZcFIjynGRTc';
 		var DISCOVERY_DOCS = ["https://www.googleapis.com/discovery/v1/apis/drive/v3/rest"];
 		let app;
@@ -140,7 +137,6 @@
 				apiKey: API_KEY,
 				discoveryDocs: DISCOVERY_DOCS,
 			});
-			console.log(gameID, token);
 			gapi.client.setToken(token);
 			app = new App(gameID);
 		}

@@ -1,6 +1,5 @@
 class App {
     constructor(gameID) {
-        console.log("init editor");
         this.file = new File();
         this.loader = new PIXI.Loader();
         this.playList = {};

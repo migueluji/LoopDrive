@@ -22,6 +22,9 @@ class Command {
         this.editor.playGame();
     }
 
+    static closeEditorCmd() {
+        this.editor.closeEditor();
+    }
     // SCENES
     static openSceneMenuCmd(sceneID, x, y) {
         this.editor.openSceneMenu(sceneID, x, y);

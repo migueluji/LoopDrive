@@ -89,11 +89,24 @@ class Editor {
         gameData = JSON.stringify(gameData, (key, value) => { if (key != "id") return value }, '\t');
         localStorage.setItem("localStorage_GameData", gameData);
         var url = "../engine/?id=" + gameID + "&edit=true";
+        var width = this.model.displayWidth; // Ancho del juego
+        var height = this.model.displayHeight; // Alto del juego
+        var left = (window.screen.width - width) / 2; // Calcula la posición izquierda para centrarla
+        var top = (window.screen.height - height) / 2; // Calcula la posición superior para centrarla
+
         if (this.openWindows[url] && !this.openWindows[url].closed) {
             this.openWindows[url].location.reload();
             this.openWindows[url].focus();
+        } else {
+            this.openWindows[url] = window.open(url, "_blank", `width=${width}, height=${height}, left=${left}, top=${top}, location=no`);
         }
-        else this.openWindows[url] = window.open(url, "_blank");
+    }
+
+    closeEditor() {
+        const userResponse = window.confirm("¿Deseas cerrar la aplicación sin guardar los cambios?");
+        if (userResponse) {
+            window.parent.postMessage('cerrarApp', '*');
+        }
     }
 
     //SCENES

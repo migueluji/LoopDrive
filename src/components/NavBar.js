@@ -3,12 +3,14 @@ import React, { useState, useEffect } from 'react';
 import { AppBar, Toolbar, Button, Avatar, Box, Tooltip } from '@mui/material';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import UserMenu from './UserMenu';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 const NavBar = ({ userInfo, expirationTime, handleLogin, handleLogout }) => {
   const navigate = useNavigate();
   const [menuAnchorEl, setMenuAnchorEl] = useState(null);
   const [remainingTime, setRemainingTime] = useState('');
+  const location = useLocation();
+  const isEditorPage = location.pathname === '/editor';
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -40,12 +42,6 @@ const NavBar = ({ userInfo, expirationTime, handleLogin, handleLogout }) => {
     handleMenuClose();
   };
 
-  const onLoginClick = () => {
-    handleLogin();
-    navigate('/games');
-    handleMenuClose();
-  }
-
   const onLogoutClick = () => {
     handleLogout();
     navigate('/');
@@ -57,45 +53,47 @@ const NavBar = ({ userInfo, expirationTime, handleLogin, handleLogout }) => {
   };
 
   return (
-    <AppBar position="static">
-      <Toolbar>
-        <Button onClick={onLogoClick} style={{ padding: 0, marginRight: '16px' }}>
-          <img src="/loop.png" alt="Loop Logo" style={{ height: '2rem' }} />
-        </Button>
-        <Box sx={{ flexGrow: 1 }} />
-        {userInfo ? (
-          <>
-            {/* Texto del tiempo restante */}
-            <span style={{ marginRight: '10px', color: 'white', alignSelf: 'center', fontFamily: 'sans-serif', fontWeight: 'bold' }}>
-              {remainingTime}
-            </span>
-            {/* Tooltip y Avatar */}
-            <Tooltip title={userInfo.name}>
-              <Button color="inherit" onClick={handleMenuOpen}>
-                <Avatar
-                  alt={userInfo.name}
-                  src={userInfo.picture}
-                  style={{ border: '2px solid white' }}
+    <div>
+      {!isEditorPage && (
+        <AppBar position="static">
+          <Toolbar>
+            <Button onClick={onLogoClick} style={{ padding: 0, marginRight: '16px' }}>
+              <img src="/loop.png" alt="Loop Logo" style={{ height: '2rem' }} />
+            </Button>
+            <Box sx={{ flexGrow: 1 }} />
+            {userInfo ? (
+              <>
+                {/* Texto del tiempo restante */}
+                <span style={{ marginRight: '10px', color: 'white', alignSelf: 'center', fontFamily: 'sans-serif', fontWeight: 'bold' }}>
+                  {remainingTime}
+                </span>
+                {/* Tooltip y Avatar */}
+                <Tooltip title={userInfo.name}>
+                  <Button color="inherit" onClick={handleMenuOpen}>
+                    <Avatar
+                      alt={userInfo.name}
+                      src={userInfo.picture}
+                    />
+                  </Button>
+                </Tooltip>
+                <UserMenu
+                  userInfo={userInfo}
+                  onMyGamesClick={onMyGamesClick}
+                  onLogoutClick={onLogoutClick}
+                  anchorEl={menuAnchorEl}
+                  onClose={handleMenuClose}
                 />
+              </>
+            ) : (
+              <Button variant='outlined' color="inherit" onClick={handleLogin} startIcon={<AccountCircleIcon />}>
+                Login
               </Button>
-            </Tooltip>
-            <UserMenu
-              userInfo={userInfo}
-              onMyGamesClick={onMyGamesClick}
-              onLoginClick={onLoginClick}
-              onLogoutClick={onLogoutClick}
-              anchorEl={menuAnchorEl}
-              onClose={handleMenuClose}
-            />
-          </>
-        ) : (
-          <Button variant='outlined' color="inherit" onClick={handleLogin} startIcon={<AccountCircleIcon />}>
-            Login
-          </Button>
-        )}
-      </Toolbar>
-    </AppBar>
+            )}
+          </Toolbar>
+        </AppBar>)}
+    </div>
   );
 };
 
 export default NavBar;
+

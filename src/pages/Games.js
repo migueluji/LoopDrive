@@ -10,7 +10,7 @@ import { useAppContext } from '../context';
 import { useNavigate } from 'react-router-dom';
 
 const Games = () => {
-  const { gamesLoaded, setGamesLoaded, userInfo, token, setGameID, gameList, setGameList, appFolderID } = useAppContext();
+  const { savedGameData, setSavedGameData, gamesLoaded, setGamesLoaded, userInfo, token, setGameID, gameList, setGameList, appFolderID } = useAppContext();
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
@@ -22,42 +22,36 @@ const Games = () => {
   }, [userInfo, navigate]);
 
   useEffect(() => {
-    const fetchGames = async () => {
+    if (!gamesLoaded) {
       setLoading(true);
-      try {
-        const updatedgameList = await listDriveGames(appFolderID);
-        setGameList(updatedgameList);
-        setGamesLoaded(true);
-      } catch (error) {
-        console.error('Error fetching games:', error.message);
-      } finally {
-        setLoading(false);
-      }
-    };
-    // Solo carga los juegos si gamesLoaded es false
-    if (!gamesLoaded) fetchGames();
-  }, [token, appFolderID, setGameList, gamesLoaded]);
+      listDriveGames(appFolderID)
+        .then(updatedgameList => {
+          setGameList(updatedgameList);
+          setGamesLoaded(true);
+        })
+        .catch(error => {
+          console.error('Error fetching games:', error.message);
+        })
+        .finally(() => {
+          setLoading(false);
+        });
+    }
+  }, [gamesLoaded, setGameList, setGamesLoaded, appFolderID, token]);
 
   useEffect(() => {
-    const handleSavedGame = (event) => {
-      if (event.origin !== "http://localhost:3000") return;
-      if (event.data.type === 'game_saved') {
-        const savedGameData = event.data.data;
-        setGameList(currentGameList => {
-          return currentGameList.map(game => {
-            if (game.id === savedGameData.id) {
-              return { ...game, ...savedGameData };
-            }
-            return game;
-          });
+    if (savedGameData) {
+      // Actualiza la lista de juegos utilizando savedGameData
+      setGameList(currentGameList => {
+        return currentGameList.map(game => {
+          if (game.id === savedGameData.id) {
+            return { ...game, ...savedGameData }; // Asegúrate de actualizar todos los campos necesarios
+          }
+          return game;
         });
-      }
-    };
-    window.addEventListener('message', handleSavedGame);
-    return () => {
-      window.removeEventListener('message', handleSavedGame);
-    };
-  }, [setGameList]);
+      });
+      setSavedGameData(null); // Resetea savedGameData después de usarlo
+    }
+  }, [savedGameData, setSavedGameData, setGameList]);
 
 
   const handleNewGame = async () => {
@@ -76,15 +70,13 @@ const Games = () => {
   const handleEditGame = async (gameID) => {
     setGameID(gameID);
     localStorage.setItem("token", JSON.stringify(token));
-    const editorUrl = `${window.location.origin}/editor/?id=${gameID}`;
-    window.open(editorUrl, '_blank');
+    navigate(`/editor/?id=${gameID}`);
   };
 
   const handlePlayGame = async (gameID) => {
     setGameID(gameID);
     localStorage.setItem("token", JSON.stringify(token));
-    const engineUrl = `${window.location.origin}/engine/?id=${gameID}`;
-    window.open(engineUrl, '_blank');
+    navigate(`/play/?id=${gameID}`);
   };
 
   const handleDuplicateGame = async (gameID) => {

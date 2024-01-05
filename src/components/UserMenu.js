@@ -1,11 +1,9 @@
-// UserMenu.js
 import React from 'react';
-import { Menu, MenuItem, Avatar, Typography, Divider, ListItemIcon, Button } from '@mui/material';
+import { Menu, MenuItem, Avatar, Typography, Divider, ListItemIcon } from '@mui/material';
 import GamesIcon from '@mui/icons-material/SportsEsports';
 import LogoutIcon from '@mui/icons-material/Logout';
-import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 
-const UserMenu = ({ userInfo, onMyGamesClick, onLogoutClick, onLoginClick, anchorEl, onClose }) => {
+const UserMenu = ({ userInfo, onMyGamesClick, onLogoutClick, anchorEl, onClose }) => {
   return (
     <>
       {userInfo ? (
@@ -25,12 +23,6 @@ const UserMenu = ({ userInfo, onMyGamesClick, onLogoutClick, onLoginClick, ancho
             </ListItemIcon>
             My Games
           </MenuItem>
-          <MenuItem onClick={onLoginClick}> {/* Cambia el orden aquí */}
-            <ListItemIcon>
-              <AccountCircleIcon />
-            </ListItemIcon>
-            Login Again
-          </MenuItem>
           <MenuItem onClick={onLogoutClick}>
             <ListItemIcon>
               <LogoutIcon />
@@ -38,13 +30,10 @@ const UserMenu = ({ userInfo, onMyGamesClick, onLogoutClick, onLoginClick, ancho
             Logout
           </MenuItem>
         </Menu>
-      ) : (
-        <Button variant='outlined' color="inherit" onClick={onLoginClick} startIcon={<AccountCircleIcon />}>
-          Login
-        </Button>
-      )}
+      ) : null}
     </>
   );
 };
 
 export default UserMenu;
+

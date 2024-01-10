@@ -1,4 +1,5 @@
 // Editor.js
+// Editor.js
 import React, { useEffect } from 'react';
 import { useAppContext } from '../context';
 import { useNavigate } from 'react-router-dom';
@@ -10,27 +11,23 @@ function Editor() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const handleIframeMessage = (event) => {
+    const handleMessage = (event) => {
       if (event.origin !== window.location.origin) return;
-      if (event.data === 'cerrarApp') {
-        navigate('/games');
-      }
-    };
 
-    const handleSavedGame = (event) => {
-      if (event.origin !== window.location.origin) return;
-      if (event.data.type === 'game_saved') {
-        const savedGameData = event.data.data;
+      const eventType = event.data.type;
+
+      if (eventType === 'closeEditor') {
+        navigate('/games');
+      } else if (eventType === 'gameSaved') {
+        const savedGameData = event.data.gameData;
         setSavedGameData(savedGameData);
       }
     };
 
-    window.addEventListener('message', handleIframeMessage);
-    window.addEventListener('message', handleSavedGame);
+    window.addEventListener('message', handleMessage);
 
     return () => {
-      window.removeEventListener('message', handleIframeMessage);
-      window.removeEventListener('message', handleSavedGame);
+      window.removeEventListener('message', handleMessage);
     };
   }, [setSavedGameData, navigate]);
 
@@ -46,3 +43,4 @@ function Editor() {
 }
 
 export default Editor;
+

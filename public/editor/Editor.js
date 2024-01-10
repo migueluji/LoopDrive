@@ -103,9 +103,9 @@ class Editor {
     }
 
     closeEditor() {
-        const userResponse = window.confirm("¿Deseas cerrar la aplicación sin guardar los cambios?");
+        const userResponse = window.confirm("¿Do you want to close the editor?");
         if (userResponse) {
-            window.parent.postMessage('cerrarApp', '*');
+            window.parent.postMessage({ type: 'closeEditor' }, '*');
         }
     }
 

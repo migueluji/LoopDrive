@@ -131,7 +131,7 @@ class File {
                     }).then(() => {
                         Command.takeScreenshot();
                         const gameData = { "name": gameName, "id": gameID };
-                        window.parent.postMessage({ type: 'game_saved', data: gameData }, window.location.origin);
+                        window.parent.postMessage({ type: 'gameSaved', gameData: gameData }, window.location.origin);
                         alert('Game saved!!!');
                     });
                 });

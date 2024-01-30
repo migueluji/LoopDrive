@@ -124,22 +124,15 @@ class File {
                             name: gameName
                         }
                     }).then(() => {
-                        // Guardar el archivo json con el nuevo nombre
-                        gapi.client.request({
-                            path: `/upload/drive/v3/files/${fileId}`,
-                            method: 'PATCH',
-                            body: json
-                        }).then(() => {
-                            Command.takeScreenshot();
-                            const gameData = { "name": gameName, "id": gameID };
-                            window.parent.postMessage({ type: 'game_saved', data: gameData }, window.location.origin);
-                            resolve(); // Resolvemos la promesa cuando se haya completado todo correctamente
-                        }).catch(reject); // Si hay un error, rechazamos la promesa
-                    }).catch(reject); // Si hay un error, rechazamos la promesa
-                } else {
-                    reject("game.json file not found in the specified folder.");
-                }
-            }).catch(reject); // Si hay un error, rechazamos la promesa
+                        Command.takeScreenshot();
+                        const gameData = { "name": gameName, "id": gameID };
+                        window.parent.postMessage({ type: 'gameSaved', gameData: gameData }, window.location.origin);
+                        alert('Game saved!!!');
+                    });
+                });
+            }
+        }, function (error) {
+            console.log(error);
         });
     }
     // static save(gameID, gameName, json) {

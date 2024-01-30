@@ -110,38 +110,69 @@ class File {
     }
 
     static save(gameID, gameName, json) {
-        gapi.client.drive.files.list({
-            'q': `parents in "${gameID}" and name="game.json"`
-        }).then(function (response) {
-            if (response.result.files.length > 0) {
-                var fileId = response.result.files[0].id;
-                // Modificar el nombre del directorio con json.name
-                gapi.client.request({
-                    path: `/drive/v3/files/${gameID}`,
-                    method: 'PATCH',
-                    body: {
-                        name: gameName
-                    }
-                }).then(() => {
-                    // Guardar el archivo json con el nuevo nombre
+        return new Promise((resolve, reject) => {
+            gapi.client.drive.files.list({
+                'q': `parents in "${gameID}" and name="game.json"`
+            }).then(function (response) {
+                if (response.result.files.length > 0) {
+                    var fileId = response.result.files[0].id;
+                    // Modificar el nombre del directorio con json.name
                     gapi.client.request({
-                        path: `/upload/drive/v3/files/${fileId}`,
+                        path: `/drive/v3/files/${gameID}`,
                         method: 'PATCH',
-                        body: json
+                        body: {
+                            name: gameName
+                        }
                     }).then(() => {
-                        Command.takeScreenshot();
-                        const gameData = { "name": gameName, "id": gameID };
-                        window.parent.postMessage({ type: 'game_saved', data: gameData }, window.location.origin);
-                        alert('Game saved!!!');
-                    });
-                });
-            }
-        }, function (error) {
-            console.log(error);
+                        // Guardar el archivo json con el nuevo nombre
+                        gapi.client.request({
+                            path: `/upload/drive/v3/files/${fileId}`,
+                            method: 'PATCH',
+                            body: json
+                        }).then(() => {
+                            Command.takeScreenshot();
+                            const gameData = { "name": gameName, "id": gameID };
+                            window.parent.postMessage({ type: 'game_saved', data: gameData }, window.location.origin);
+                            resolve(); // Resolvemos la promesa cuando se haya completado todo correctamente
+                        }).catch(reject); // Si hay un error, rechazamos la promesa
+                    }).catch(reject); // Si hay un error, rechazamos la promesa
+                } else {
+                    reject("game.json file not found in the specified folder.");
+                }
+            }).catch(reject); // Si hay un error, rechazamos la promesa
         });
     }
-
-
+    // static save(gameID, gameName, json) {
+    //     gapi.client.drive.files.list({
+    //         'q': `parents in "${gameID}" and name="game.json"`
+    //     }).then(function (response) {
+    //         if (response.result.files.length > 0) {
+    //             var fileId = response.result.files[0].id;
+    //             // Modificar el nombre del directorio con json.name
+    //             gapi.client.request({
+    //                 path: `/drive/v3/files/${gameID}`,
+    //                 method: 'PATCH',
+    //                 body: {
+    //                     name: gameName
+    //                 }
+    //             }).then(() => {
+    //                 // Guardar el archivo json con el nuevo nombre
+    //                 gapi.client.request({
+    //                     path: `/upload/drive/v3/files/${fileId}`,
+    //                     method: 'PATCH',
+    //                     body: json
+    //                 }).then(() => {
+    //                     Command.takeScreenshot();
+    //                     const gameData = { "name": gameName, "id": gameID };
+    //                     window.parent.postMessage({ type: 'game_saved', data: gameData }, window.location.origin);
+    //                    // alert('Game saved!!!');
+    //                 });
+    //             });
+    //         }
+    //     }, function (error) {
+    //         console.log(error);
+    //     });
+    // }
 
     static delete(fileId, assetID, fileName, type) {
         if (type == "Image" || type == "Animation") {

@@ -37,6 +37,10 @@ class AppBarView {
 	updateSceneName(sceneName) {
 		this.html.querySelector("#sceneName").innerText=sceneName.split("_").join(" ");;
 	}
+
+	updateSaveButton(value){
+		this.html.querySelector("#save").innerHTML=value;
+	}
 	
  	drawerToogle() {
         const drawer = mdc.drawer.MDCDrawer.attachTo(document.querySelector('.mdc-drawer'));

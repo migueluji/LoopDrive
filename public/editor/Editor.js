@@ -37,6 +37,9 @@ class Editor {
         this.actorScriptsView = new ActorScriptsView();
         this.sideSheetView.addView(this.actorScriptsView.html);
         this.view.addView(this.sideSheetView.html);
+
+        // Automatic Save Game
+        setInterval(() => { this.saveGame("automatic"); }, 30000);
     }
 
     // GAME
@@ -70,13 +73,25 @@ class Editor {
         this.view.openCanvas("canvas");
     }
 
-    saveGame() {
+    saveGame(value) {
+        console.log("saveGame", value);
+        this.appBarView.updateSaveButton("save_as");
         var saveToFile = {};
         Object.assign(saveToFile, this.model);
         delete saveToFile.fontList;
         delete saveToFile.imageList;
         delete saveToFile.soundList;
-        File.save(gameID, this.model.name, JSON.stringify(saveToFile, (key, value) => { if (key != "id") return value }, '\t'));
+     
+        // var button=document.getElementById("save");
+        // button.innerHTML='save_as';
+        File.save(gameID, this.model.name, JSON.stringify(saveToFile, (key, value) => { if (key != "id") return value }, '\t'))
+            .then(() => {
+                this.appBarView.updateSaveButton("save");
+                if (!value) alert("Game Saved!!!");
+            })
+            .catch((error) => {
+                console.error('Error saving the game:', error);
+            });
     }
 
     takeScreenshot() {

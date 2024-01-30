@@ -23,6 +23,7 @@ export function initGoogleAPI() {
     tokenClient = google.accounts.oauth2.initTokenClient({
       client_id: CLIENT_ID,
       scope: SCOPES,
+      access_type: "offline",
       prompt: ''
     });
     resolve();
@@ -41,6 +42,7 @@ export function logout() {
 export function login() {
   return new Promise((resolve) => {
     tokenClient.callback = (token) => {
+      // console.log(token);
       getUserInfo(token.access_token)
         .then(userInfo => { resolve({ token, userInfo }); })
     };

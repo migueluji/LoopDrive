@@ -1,41 +1,41 @@
 // Editor.js
-
 import React, { useEffect } from 'react';
 import { useAppContext } from '../context';
-import { useNavigate } from 'react-router-dom';
 
 function Editor() {
-  const urlParams = new URLSearchParams(window.location.search);
-  const gameID = urlParams.get('id');
-  const { setSavedGameData } = useAppContext();
-  const navigate = useNavigate();
+  const { gameID, token, API_KEY, DISCOVERY_DOCS } = useAppContext();
 
   useEffect(() => {
-    const handleMessage = (event) => {
-      if (event.origin !== window.location.origin) return;
+    // Función para enviar los datos al iframe
+    const sendMessageToIframe = () => {
+      const iframe = document.getElementById('editorIframe');
+      if (iframe && iframe.contentWindow) {
+        // Espera hasta que el iframe haya cargado completamente
+        iframe.onload = () => {
+          // Objeto con los datos a enviar
+          const messageData = {
+            gameID,
+            token,
+            API_KEY,
+            DISCOVERY_DOCS
+          };
 
-      const eventType = event.data.type;
-
-      if (eventType === 'closeEditor') {
-        navigate('/games');
-      } else if (eventType === 'gameSaved') {
-        const savedGameData = event.data.gameData;
-        setSavedGameData(savedGameData);
+          // Enviar el mensaje al iframe una vez que haya cargado
+          iframe.contentWindow.postMessage(messageData, '*');
+        };
       }
     };
 
-    window.addEventListener('message', handleMessage);
-
-    return () => {
-      window.removeEventListener('message', handleMessage);
-    };
-  }, [setSavedGameData, navigate]);
+    // Llamar a la función al cargar la página
+    sendMessageToIframe();
+  }, [gameID, token]);
 
   return (
     <div style={{ width: '100%', height: '100vh', overflow: 'hidden' }}>
       <iframe
         title="Editor"
-        src={`/editor?id=${gameID}`} 
+        id="editorIframe" // Añade un ID al iframe
+        src="/editor" // URL del iframe (sin query params)
         style={{ width: '100%', height: '100%', border: 'none' }}
       ></iframe>
     </div>
@@ -43,4 +43,5 @@ function Editor() {
 }
 
 export default Editor;
+
 

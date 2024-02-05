@@ -116,7 +116,8 @@ class File {
             }).then(function (response) {
                 if (response.result.files.length > 0) {
                     var fileId = response.result.files[0].id;
-                    // Modificar el nombre del directorio con json.name
+
+                    // Modificar el nombre del directorio con gameName
                     gapi.client.request({
                         path: `/drive/v3/files/${gameID}`,
                         method: 'PATCH',
@@ -124,48 +125,27 @@ class File {
                             name: gameName
                         }
                     }).then(() => {
-                        Command.takeScreenshot();
-                        const gameData = { "name": gameName, "id": gameID };
-                        window.parent.postMessage({ type: 'gameSaved', gameData: gameData }, window.location.origin);
-                        alert('Game saved!!!');
-                    });
-                });
-            }
-        }, function (error) {
-            console.log(error);
+                        // Guardar el archivo json con el nuevo nombre
+                        gapi.client.request({
+                            path: `/upload/drive/v3/files/${fileId}`,
+                            method: 'PATCH',
+                            body: json
+                        }).then(() => {
+                            Command.takeScreenshot();
+                            const gameData = { "name": gameName, "id": gameID };
+                            window.parent.postMessage({ type: 'game_saved', data: gameData }, window.location.origin);
+                            resolve(); // Resuelve la promesa si todo ha ido bien
+                        }).catch(reject); // Rechaza la promesa si hay un error en esta etapa
+                    }).catch(reject); // Rechaza la promesa si hay un error en esta etapa
+                } else {
+                    // Manejar el caso en que no se encuentra el archivo
+                    reject(new Error("No se encontró el archivo game.json"));
+                }
+            }, function (error) {
+                reject(error); // Rechaza la promesa si hay un error en esta etapa
+            });
         });
     }
-    // static save(gameID, gameName, json) {
-    //     gapi.client.drive.files.list({
-    //         'q': `parents in "${gameID}" and name="game.json"`
-    //     }).then(function (response) {
-    //         if (response.result.files.length > 0) {
-    //             var fileId = response.result.files[0].id;
-    //             // Modificar el nombre del directorio con json.name
-    //             gapi.client.request({
-    //                 path: `/drive/v3/files/${gameID}`,
-    //                 method: 'PATCH',
-    //                 body: {
-    //                     name: gameName
-    //                 }
-    //             }).then(() => {
-    //                 // Guardar el archivo json con el nuevo nombre
-    //                 gapi.client.request({
-    //                     path: `/upload/drive/v3/files/${fileId}`,
-    //                     method: 'PATCH',
-    //                     body: json
-    //                 }).then(() => {
-    //                     Command.takeScreenshot();
-    //                     const gameData = { "name": gameName, "id": gameID };
-    //                     window.parent.postMessage({ type: 'game_saved', data: gameData }, window.location.origin);
-    //                    // alert('Game saved!!!');
-    //                 });
-    //             });
-    //         }
-    //     }, function (error) {
-    //         console.log(error);
-    //     });
-    // }
 
     static delete(fileId, assetID, fileName, type) {
         if (type == "Image" || type == "Animation") {
@@ -279,7 +259,7 @@ class File {
                         'headers': { 'Content-Type': 'multipart/related; boundary="' + boundary + '"' },
                         'body': multipartRequestBody
                     }).then(function (response) {
-                       // console.log("Screenshoot updated");
+                        // console.log("Screenshoot updated");
                     });
                 }
             }

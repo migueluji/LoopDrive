@@ -1,59 +1,61 @@
 // /src/api/googleAPI.js
 /* global gapi, google  */
-const CLIENT_ID = process.env.REACT_APP_CLIENT_ID;
-const API_KEY = process.env.REACT_APP_API_KEY;
-const DISCOVERY_DOCS = ["https://www.googleapis.com/discovery/v1/apis/drive/v3/rest"];
-const SCOPES = 'https://www.googleapis.com/auth/drive.file';
+
+const userInfoEndpoint = process.env.REACT_APP_USER_INFO_ENDPOINT;
 
 let tokenClient;
 
-export function initGoogleAPI() {
-  const gapiInitPromise = new Promise((resolve, reject) => {
-    gapi.load('client', () => {
-      gapi.client.init({
-        apiKey: API_KEY,
-        discoveryDocs: DISCOVERY_DOCS
-      })
-        .then(() => { resolve(); })
-        .catch((error) => { reject(error); });
+export async function initGoogleAPI(CLIENT_ID, API_KEY, DISCOVERY_DOCS, SCOPES) {
+  try {
+    await new Promise((resolve, reject) => {
+      gapi.load('client', () => {
+        gapi.client.init({
+          apiKey: API_KEY,
+          discoveryDocs: DISCOVERY_DOCS,
+        }).then(resolve).catch(reject);
+      });
     });
-  });
-
-  const gisInitPromise = new Promise((resolve) => {
     tokenClient = google.accounts.oauth2.initTokenClient({
       client_id: CLIENT_ID,
       scope: SCOPES,
-      access_type: "offline",
-      prompt: ''
+      prompt: '',
     });
-    resolve();
-  });
-
-  return Promise.all([gapiInitPromise, gisInitPromise]);
+  } catch (error) {
+    throw new Error(`Google API initialization failed: ${error.message}`);
+  }
 }
 
-export function logout() {
-  return new Promise((resolve) => {
-    google.accounts.id.disableAutoSelect();
-    resolve({ access_token: '', expires_in: 0 });
-  });
+export async function login() {
+  try {
+    const token = await new Promise((resolve, reject) => {
+      tokenClient.callback = (response) => {
+        if (response.error) {
+          reject(`Login failed: ${response.error}`);
+        } else {
+          resolve(response);
+        }
+      };
+      tokenClient.requestAccessToken({ prompt: 'select_account' });
+    });
+    return token;
+  } catch (error) {
+    throw new Error(`Error during login or user info retrieval: ${error.message}`);
+  }
 }
 
-export function login() {
-  return new Promise((resolve) => {
-    tokenClient.callback = (token) => {
-      // console.log(token);
-      getUserInfo(token.access_token)
-        .then(userInfo => { resolve({ token, userInfo }); })
-    };
-    tokenClient.requestAccessToken({ prompt: '' });
-  });
+export async function logout() {
+  google.accounts.id.disableAutoSelect();
+  // return { access_token: '', expires_in: 0 };
 }
 
-function getUserInfo(accessToken) {
-  const userInfoEndpoint = 'https://www.googleapis.com/oauth2/v1/userinfo';
-  return fetch(userInfoEndpoint, {
-    headers: { Authorization: `Bearer ${accessToken}` }
-  })
-    .then(response => response.json())
+export async function getUserInfo(accessToken) {
+  try {
+    const response = await fetch(userInfoEndpoint, {
+      headers: { Authorization: `Bearer ${accessToken}` }
+    });
+    if (!response.ok) throw new Error('Failed to fetch user info');
+    return await response.json();
+  } catch (error) {
+    throw new Error(`Error during user info retrieval: ${error.message}`);
+  }
 }

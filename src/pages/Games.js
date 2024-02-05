@@ -10,67 +10,60 @@ import { useAppContext } from '../context';
 import { useNavigate } from 'react-router-dom';
 
 const Games = () => {
-  const { savedGameData, setSavedGameData, gamesLoaded, setGamesLoaded, userInfo, token, setGameID, gameList, setGameList, appFolderID } = useAppContext();
+  const { savedGameData, setSavedGameData, token, setGameID, gameList, setGameList, appFolderID } = useAppContext();
   const [loading, setLoading] = useState(false);
+  const [updateGameList, setUpdateGameList] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (!userInfo) {
-      // Si el usuario no está autenticado, redirige a la página de inicio
-      navigate("/");
-    }
-  }, [userInfo, navigate]);
-
-  useEffect(() => {
-    if (!gamesLoaded) {
+    const fetchGames = async () => {
       setLoading(true);
-      listDriveGames(appFolderID)
-        .then(updatedgameList => {
-          setGameList(updatedgameList);
-          setGamesLoaded(true);
-        })
-        .catch(error => {
-          console.error('Error fetching games:', error.message);
-        })
-        .finally(() => {
-          setLoading(false);
-        });
+      try {
+        const updatedGameList = await listDriveGames(appFolderID);
+        setGameList(updatedGameList);
+      } catch (error) {
+        console.error('Error fetching games:', error.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+    if (!gameList || gameList.length === 0 || updateGameList) {
+      fetchGames();
+      setUpdateGameList(false);
     }
-  }, [gamesLoaded, setGameList, setGamesLoaded, appFolderID, token]);
+  }, [gameList, setGameList, appFolderID, updateGameList]);
 
-  useEffect(() => {
-    if (savedGameData) {
-      // Actualiza la lista de juegos utilizando savedGameData
-      setGameList(currentGameList => {
-        return currentGameList.map(game => {
-          if (game.id === savedGameData.id) {
-            return { ...game, ...savedGameData }; // Asegúrate de actualizar todos los campos necesarios
-          }
-          return game;
-        });
-      });
-      setSavedGameData(null); // Resetea savedGameData después de usarlo
-    }
-  }, [savedGameData, setSavedGameData, setGameList]);
+
+  // useEffect(() => {
+  //   if (savedGameData) {
+  //     // Actualiza la lista de juegos utilizando savedGameData
+  //     setGameList(currentGameList => {
+  //       return currentGameList.map(game => {
+  //         if (game.id === savedGameData.id) {
+  //           return { ...game, ...savedGameData }; // Asegúrate de actualizar todos los campos necesarios
+  //         }
+  //         return game;
+  //       });
+  //     });
+  //     setSavedGameData(null); // Resetea savedGameData después de usarlo
+  //   }
+  // }, [savedGameData, setSavedGameData, setGameList]);
 
 
   const handleNewGame = async () => {
     try {
       setLoading(true);
       await newGame(appFolderID, token.access_token);
-      const updatedgameList = await listDriveGames(appFolderID);
-      setGameList(updatedgameList);
+      setUpdateGameList(true);
     } catch (error) {
       console.error('Error creating new game:', error.message);
-    } finally {
-      setLoading(false);
     }
   };
 
   const handleEditGame = async (gameID) => {
     setGameID(gameID);
-    localStorage.setItem("token", JSON.stringify(token));
-    navigate(`/editor/?id=${gameID}`);
+    //localStorage.setItem("token", JSON.stringify(token));
+    navigate(`/editor`);
   };
 
   const handlePlayGame = async (gameID) => {
@@ -83,12 +76,9 @@ const Games = () => {
     try {
       setLoading(true);
       await duplicateGame(gameID);
-      const updatedgameList = await listDriveGames(appFolderID);
-      setGameList(updatedgameList);
+      setUpdateGameList(true);
     } catch (error) {
       console.error('Error duplicating game:', error.message);
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -96,12 +86,9 @@ const Games = () => {
     try {
       setLoading(true);
       await deleteGame(gameID, gameName);
-      const updatedgameList = await listDriveGames(appFolderID);
-      setGameList(updatedgameList);
+      setUpdateGameList(true);
     } catch (error) {
       console.error('Error deleting game:', error.message);
-    } finally {
-      setLoading(false);
     }
   };
 

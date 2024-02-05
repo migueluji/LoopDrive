@@ -121,18 +121,29 @@
 	<script async defer src="https://accounts.google.com/gsi/client"></script>
 
 	<script>
-		window.onload = () => { gapiLoaded() }
-		var API_KEY = 'AIzaSyCfXON-94Onk-fLyihh8buKZcFIjynGRTc';
-		var DISCOVERY_DOCS = ["https://www.googleapis.com/discovery/v1/apis/drive/v3/rest"];
+
 		let app;
+		var gameID;
+		var token;
+		var API_KEY;
+		var DISCOVERY_DOCS;
 
-		const urlParams = new URLSearchParams(window.location.search);
-		const gameID = urlParams.get('id');
-		var token = JSON.parse(localStorage.getItem("token"));
+		window.addEventListener('message', (event) => {
+			if (event.origin !== window.location.origin) return;
+			const messageData = event.data;
+			if (messageData.gameID && messageData.token && messageData.API_KEY && messageData.DISCOVERY_DOCS) {
+				gameID = messageData.gameID;
+				token = messageData.token;
+				API_KEY = messageData.API_KEY;
+				DISCOVERY_DOCS = messageData.DISCOVERY_DOCS;
+				gapiLoaded();
+			}
+		});
 
-		function gapiLoaded() { gapi.load('client', initializeGapiClient); }
+		async function gapiLoaded() { gapi.load('client', initializeGapiClient); }
 
 		async function initializeGapiClient() {
+			console.log("...", API_KEY);
 			await gapi.client.init({
 				apiKey: API_KEY,
 				discoveryDocs: DISCOVERY_DOCS,

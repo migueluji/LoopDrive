@@ -81,9 +81,6 @@ class Editor {
         delete saveToFile.fontList;
         delete saveToFile.imageList;
         delete saveToFile.soundList;
-     
-        // var button=document.getElementById("save");
-        // button.innerHTML='save_as';
         File.save(gameID, this.model.name, JSON.stringify(saveToFile, (key, value) => { if (key != "id") return value }, '\t'))
             .then(() => {
                 this.appBarView.updateSaveButton("save");

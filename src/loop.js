@@ -1,55 +1,78 @@
-// loop.js
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Routes, Route, useLocation, useNavigate } from 'react-router-dom';
-import { initGoogleAPI, login, logout } from './apis/googleAPI';
+import { getUserInfo, initGoogleAPI, login, logout } from './apis/googleAPI';
 import NavBar from './components/NavBar';
 import Home from './pages/Home';
 import Games from './pages/Games';
 import Editor from './pages/Editor';
 import Play from './pages/Play';
+import SessionDialog from './components/SessionDialog';
 import { useAppContext } from './context';
 import { folderExists, createFolder } from './apis/driveAPI';
 
-
 function Loop() {
-  const { setGamesLoaded, setAppFolderID, userInfo, expirationTime, setExpirationTime, setToken, setUserInfo } = useAppContext();
+  const { setToken, setUserInfo, setExpirationTime, setAppFolderID, CLIENT_ID, API_KEY, DISCOVERY_DOCS, SCOPES} = useAppContext();
   const navigate = useNavigate();
   const location = useLocation();
 
-  const handleLogout = async () => {
-    const token = await logout();
-    setToken(token);
-    setUserInfo(null);
-  };
+  // useEffect(() => {
+  //   const checkSessionExpiration = () => {
+  //     const currentTime = new Date().getTime();
+  //     if (expirationTime) {
+  //       const timeUntilExpiration = expirationTime - currentTime;
+  //       const fiveMinutesInMilliseconds = 59.5 * 60 * 1000;
+  //       if (userInfo && timeUntilExpiration <= fiveMinutesInMilliseconds && timeUntilExpiration > 0) {
+  //         setIsDialogOpen(true);
+  //         setLastLocation(location.pathname);
+  //       }
+  //     }
+  //   };
+
+  //   checkSessionExpiration();
+  //   const checkInterval = setInterval(checkSessionExpiration, 1000);
+  //   return () => clearInterval(checkInterval);
+  // }, [expirationTime, setIsDialogOpen, userInfo, location.pathname]);
+
+  // useEffect(() => {
+  //   if (location.pathname.includes('/editor')) {
+  //     const iframe = document.getElementById('gameIframe');
+  //     if (iframe) {
+  //       console.log("game saved!!!");
+  //       iframe.contentWindow.postMessage('GuardarJuego', '*');
+  //     }
+  //   }
+  // }, [location.pathname]);
 
   const handleLogin = async () => {
-    await initGoogleAPI();
-    const { token, userInfo } = await login();
-    // Calculate the exact moment in the future when the token will expire, in milliseconds
-    const expirationTime = new Date().getTime() + token.expires_in * 1000;
-    // Verificar y crear el directorio de juegos
-    var appFolderID = await folderExists("Loop Games", token.access_token);
-    if (!appFolderID) {
-      appFolderID = await createFolder("Loop Games", 'root', token.access_token);
-      setAppFolderID(appFolderID);
-    } else {
-      setAppFolderID(appFolderID);
+    await initGoogleAPI(CLIENT_ID, API_KEY, DISCOVERY_DOCS, SCOPES);
+    const newToken = await login();
+    setToken(newToken);
+    const newExpirationTime = new Date().getTime() + newToken.expires_in * 1000;
+    setExpirationTime(newExpirationTime);
+    var newAppFolderID = await folderExists("Loop Games", newToken.access_token);
+    if (!newAppFolderID) {
+      newAppFolderID = await createFolder("Loop Games", 'root', newToken.access_token);
     }
-    setGamesLoaded(false); // Establece gameList en un array vacío
-    setToken(token);
-    setExpirationTime(expirationTime); // Store the expiration time
-    setUserInfo(userInfo);
+    setAppFolderID(newAppFolderID);
+    const newUserInfo = await getUserInfo(newToken.access_token);
+    setUserInfo(newUserInfo);
     navigate('/games');
   };
 
-  // Verifica si estás en la página del editor para no mostrar la barra global
+  const handleLogout = async () => {
+    await logout();
+    setToken(null);
+    setUserInfo(null);
+    setExpirationTime(null);
+    setAppFolderID(null);
+  };
+
   const isEditorPage = location.pathname.includes('/editor');
 
   return (
     <div style={{ height: '0px' }}>
       {!isEditorPage && (
-        // Renderiza la barra global en todas las páginas excepto en la del editor
-        <NavBar userInfo={userInfo} expirationTime={expirationTime} handleLogin={handleLogin} handleLogout={handleLogout} />
+        <NavBar handleLogin={handleLogin} handleLogout={handleLogout} />
       )}
       <Routes>
         <Route path="/" element={<Home />} />
@@ -57,13 +80,9 @@ function Loop() {
         <Route path="/editor" element={<Editor />} />
         <Route path="/play" element={<Play />} />
       </Routes>
+      <SessionDialog onLogin={handleLogin} onLogout={handleLogout} />
     </div>
   );
 }
 
 export default Loop;
-
-
-
-
-

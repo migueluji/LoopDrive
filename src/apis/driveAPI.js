@@ -2,7 +2,7 @@
 // /apis/driverAPI.js
 /* global gapi */
 
-function folderExists(folderName, token) {
+async function folderExists(folderName, token) {
   return new Promise((resolve, reject) => {
     gapi.client.drive.files.list({
       q: `name='${folderName}' and trashed=false`,
@@ -21,7 +21,7 @@ function folderExists(folderName, token) {
   });
 }
 
-function createFolder(folderName, parent, token) {
+async function createFolder(folderName, parent, token) {
   return new Promise(function (resolve, reject) {
     var request = gapi.client.request({
       path: '/drive/v3/files',
@@ -113,31 +113,51 @@ function getImageDownloadUrl(gameFolderID) {
 }
 
 async function newGame(appFolderID, token) {
-  var gameID;
-  return new Promise((resolve, reject) => {
-    createFolder("Untitled Game", appFolderID, token)
-      .then(function (folderId) {
-        gameID = folderId;
-        return createEmptyJson(gameID, token);
-      })
-      .then(function () {
-        return createEmptyImage(gameID, token);
-      })
-      .then(function () {
-        return createFolder("images", gameID, token);
-      })
-      .then(function () {
-        return createFolder("sounds", gameID, token);
-      })
-      .then(function () {
-        resolve(gameID);
-      })
-      .catch(function (error) {
-        console.error("Failed to create game:", error);
-        reject(error);
-      });
-  });
+  try {
+    const folderId = await createFolder("Untitled Game", appFolderID, token);
+    await createFolder("images", folderId, token);
+    await createFolder("sounds", folderId, token);
+    await createEmptyJson(folderId, token);
+     await createEmptyImage(folderId, token);
+    const gameData = {
+      id: folderId,
+      name: "Untitled Game",
+      imageUrl: ""
+    };
+    return gameData;
+  } catch (error) {
+    console.error("Failed to create game:", error);
+    throw error; 
+  }
 }
+
+
+// async function newGame(appFolderID, token) {
+//   var gameID;
+//   return new Promise((resolve, reject) => {
+//     createFolder("Untitled Game", appFolderID, token)
+//       .then(function (folderId) {
+//         gameID = folderId;
+//         return createEmptyJson(gameID, token);
+//       })
+//       .then(function () {
+//         return createEmptyImage(gameID, token);
+//       })
+//       .then(function () {
+//         return createFolder("images", gameID, token);
+//       })
+//       .then(function () {
+//         return createFolder("sounds", gameID, token);
+//       })
+//       .then(function () {
+//         resolve(gameID);
+//       })
+//       .catch(function (error) {
+//         console.error("Failed to create game:", error);
+//         reject(error);
+//       });
+//   });
+// }
 
 async function duplicateGame(gameID) {
   return new Promise((resolve, reject) => {

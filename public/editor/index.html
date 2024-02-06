@@ -130,12 +130,12 @@
 
 		window.addEventListener('message', (event) => {
 			if (event.origin !== window.location.origin) return;
-			const messageData = event.data;
-			if (messageData.gameID && messageData.token && messageData.API_KEY && messageData.DISCOVERY_DOCS) {
-				gameID = messageData.gameID;
-				token = messageData.token;
-				API_KEY = messageData.API_KEY;
-				DISCOVERY_DOCS = messageData.DISCOVERY_DOCS;
+			const message = event.data;
+			if (message.type === 'initializeEditor' && message.data) {
+				gameID = message.data.gameID;
+				token = message.data.token;
+				API_KEY = message.data.API_KEY;
+				DISCOVERY_DOCS = message.data.DISCOVERY_DOCS;
 				gapiLoaded();
 			}
 		});
@@ -143,7 +143,6 @@
 		async function gapiLoaded() { gapi.load('client', initializeGapiClient); }
 
 		async function initializeGapiClient() {
-			console.log("...", API_KEY);
 			await gapi.client.init({
 				apiKey: API_KEY,
 				discoveryDocs: DISCOVERY_DOCS,

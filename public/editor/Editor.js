@@ -100,6 +100,7 @@ class Editor {
         Object.assign(gameData, this.model);
         gameData = JSON.stringify(gameData, (key, value) => { if (key != "id") return value }, '\t');
         localStorage.setItem("localStorage_GameData", gameData);
+        console.log(gameID,token, API_KEY, DISCOVERY_DOCS);
         var url = "../engine/?id=" + gameID + "&edit=true";
         var width = this.model.displayWidth; // Ancho del juego
         var height = this.model.displayHeight; // Alto del juego
@@ -116,9 +117,7 @@ class Editor {
 
     closeEditor() {
         const userResponse = window.confirm("¿Do you want to close the editor?");
-        if (userResponse) {
-            window.parent.postMessage({ type: 'closeEditor' }, '*');
-        }
+        if (userResponse) window.parent.postMessage({ type: 'closeEditor' }, '*');
     }
 
     //SCENES

@@ -99,21 +99,44 @@ class Editor {
         var gameData = {};
         Object.assign(gameData, this.model);
         gameData = JSON.stringify(gameData, (key, value) => { if (key != "id") return value }, '\t');
-        localStorage.setItem("localStorage_GameData", gameData);
-        console.log(gameID,token, API_KEY, DISCOVERY_DOCS);
-        var url = "../engine/?id=" + gameID + "&edit=true";
-        var width = this.model.displayWidth; // Ancho del juego
-        var height = this.model.displayHeight; // Alto del juego
-        var left = (window.screen.width - width) / 2; // Calcula la posición izquierda para centrarla
-        var top = (window.screen.height - height) / 2; // Calcula la posición superior para centrarla
-
+        console.log(gameID, token, API_KEY, DISCOVERY_DOCS);
+        const url = "../engine";
+        const width = this.model.displayWidth; // Ancho del juego
+        const height = this.model.displayHeight; // Alto del juego
+        const left = (window.screen.width - width) / 2; // Calcula la posición izquierda para centrarla
+        const top = (window.screen.height - height) / 2; // Calcula la posición superior para centrarla
+      
         if (this.openWindows[url] && !this.openWindows[url].closed) {
-            this.openWindows[url].location.reload();
-            this.openWindows[url].focus();
+          const existingWindow = this.openWindows[url];
+          const messageData = {
+            type: 'playEditedGame',
+            data: { gameID, token, API_KEY, DISCOVERY_DOCS, gameData }
+          };
+      
+          // Check if the existing window has received the message
+          if (existingWindow.messageReceived) {
+            // If the message has been received, focus the window and don't reload
+            existingWindow.focus();
+          } else {
+            // If the message hasn't been received, send it and set the flag
+            existingWindow.postMessage(messageData, '*');
+            existingWindow.messageReceived = true;
+          }
         } else {
-            this.openWindows[url] = window.open(url, "_blank", `width=${width}, height=${height}, left=${left}, top=${top}, location=no`);
+          const newWindow = window.open(url, "_blank", `width=${width}, height=${height}, left=${left}, top=${top}, location=no`);
+      
+          newWindow.onload = () => {
+            const messageData = {
+              type: 'playEditedGame',
+              data: { gameID, token, API_KEY, DISCOVERY_DOCS, gameData }
+            };
+            newWindow.postMessage(messageData, '*');
+          };
         }
-    }
+      }
+      
+      
+
 
     closeEditor() {
         const userResponse = window.confirm("¿Do you want to close the editor?");

@@ -52,7 +52,6 @@
 
 	<script>
 
-		window.onload = () => { gapiLoaded() }
 		// requestAnimationFrame Polyfill
 		var lastTime = 0, vendors = ['ms', 'moz', 'webkit', 'o'], x, length, currTime, timeToCall;
 
@@ -72,14 +71,27 @@
 		if (!window.cancelAnimationFrame) window.cancelAnimationFrame = function (id) { clearTimeout(id); };
 
 		// Game info 
-		const urlParams = new URLSearchParams(window.location.search);
-		const gameID = urlParams.get('id');
-		const editor = urlParams.get('edit'); /* to kown if the engine has been launched from the editor */
-		var token = JSON.parse(localStorage.getItem("token"));
 
-		var API_KEY = 'AIzaSyCfXON-94Onk-fLyihh8buKZcFIjynGRTc';
-		var DISCOVERY_DOCS = ["https://www.googleapis.com/discovery/v1/apis/drive/v3/rest"];
+		var gameID;
+		var token;
+		var API_KEY;
+		var DISCOVERY_DOCS;
+		var editor = false;
 		let player;
+
+		window.addEventListener('message', (event) => {
+			if (event.origin !== window.location.origin) return;
+			const message = event.data;
+			if (message.type === 'playEditedGame' && message.data) {
+				editor = true;
+				gameID = message.data.gameID;
+				token = message.data.token;
+				API_KEY = message.data.API_KEY;
+				DISCOVERY_DOCS = message.data.DISCOVERY_DOCS;
+				gameData = message.data.gameData;
+				gapiLoaded();
+			}
+		});
 
 		function gapiLoaded() {
 			gapi.load('client', () => {

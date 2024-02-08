@@ -74,7 +74,6 @@ class Editor {
     }
 
     saveGame(value) {
-        console.log("saveGame", value);
         this.appBarView.updateSaveButton("save_as");
         var saveToFile = {};
         Object.assign(saveToFile, this.model);
@@ -84,6 +83,10 @@ class Editor {
         File.save(gameID, this.model.name, JSON.stringify(saveToFile, (key, value) => { if (key != "id") return value }, '\t'))
             .then(() => {
                 this.appBarView.updateSaveButton("save");
+                window.parent.postMessage({
+                    type: 'savedGame',
+                    data: { id: gameID, name: this.model.name },
+                }, '*');
                 if (!value) alert("Game Saved!!!");
             })
             .catch((error) => {
@@ -91,56 +94,31 @@ class Editor {
             });
     }
 
-    takeScreenshot() {
-        this.canvasView.takeScreenshot(400, 240, 0, this.model.sceneList[0].actorList, true); // 400x240 size of image for server 
-    }
-
     playGame() {
         var gameData = {};
         Object.assign(gameData, this.model);
         gameData = JSON.stringify(gameData, (key, value) => { if (key != "id") return value }, '\t');
-        console.log(gameID, token, API_KEY, DISCOVERY_DOCS);
-        const url = "../engine";
-        const width = this.model.displayWidth; // Ancho del juego
-        const height = this.model.displayHeight; // Alto del juego
-        const left = (window.screen.width - width) / 2; // Calcula la posición izquierda para centrarla
-        const top = (window.screen.height - height) / 2; // Calcula la posición superior para centrarla
-      
-        if (this.openWindows[url] && !this.openWindows[url].closed) {
-          const existingWindow = this.openWindows[url];
-          const messageData = {
+        const url = "../engine"; // Game engine URL
+        const width = this.model.displayWidth; // Game width
+        const height = this.model.displayHeight; // Game height
+        const left = (window.screen.width - width) / 2; // Calculate left position to center
+        const top = (window.screen.height - height) / 2; // Calculate top position to center
+        const messageData = {
             type: 'playEditedGame',
             data: { gameID, token, API_KEY, DISCOVERY_DOCS, gameData }
-          };
-      
-          // Check if the existing window has received the message
-          if (existingWindow.messageReceived) {
-            // If the message has been received, focus the window and don't reload
-            existingWindow.focus();
-          } else {
-            // If the message hasn't been received, send it and set the flag
-            existingWindow.postMessage(messageData, '*');
-            existingWindow.messageReceived = true;
-          }
-        } else {
-          const newWindow = window.open(url, "_blank", `width=${width}, height=${height}, left=${left}, top=${top}, location=no`);
-      
-          newWindow.onload = () => {
-            const messageData = {
-              type: 'playEditedGame',
-              data: { gameID, token, API_KEY, DISCOVERY_DOCS, gameData }
-            };
-            newWindow.postMessage(messageData, '*');
-          };
-        }
-      }
-      
-      
-
+        };
+        if (this.openWindow && !this.openWindow.closed) this.openWindow.close();
+        this.openWindow = window.open(url, "_blank", `width=${width}, height=${height}, left=${left}, top=${top}, location=no`);
+        this.openWindow.onload = () => { this.openWindow.postMessage(messageData, '*'); }
+    }
 
     closeEditor() {
         const userResponse = window.confirm("¿Do you want to close the editor?");
         if (userResponse) window.parent.postMessage({ type: 'closeEditor' }, '*');
+    }
+
+    takeScreenshot() {
+        this.canvasView.takeScreenshot(400, 240, 0, this.model.sceneList[0].actorList, true); // 400x240 size of image for server 
     }
 
     //SCENES

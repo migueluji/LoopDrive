@@ -10,7 +10,7 @@ import { useAppContext } from '../context';
 import { useNavigate } from 'react-router-dom';
 
 const Games = () => {
-  const { savedGameData, setSavedGameData, token, setGameID, gameList, setGameList, appFolderID } = useAppContext();
+  const { savedGame, setSavedGame, token, setGameID, gameList, setGameList, appFolderID } = useAppContext();
   const [loading, setLoading] = useState(false);
   const [updateGameList, setUpdateGameList] = useState(false);
   const navigate = useNavigate();
@@ -34,20 +34,19 @@ const Games = () => {
   }, [gameList, setGameList, appFolderID, updateGameList]);
 
 
-  // useEffect(() => {
-  //   if (savedGameData) {
-  //     // Actualiza la lista de juegos utilizando savedGameData
-  //     setGameList(currentGameList => {
-  //       return currentGameList.map(game => {
-  //         if (game.id === savedGameData.id) {
-  //           return { ...game, ...savedGameData }; // Asegúrate de actualizar todos los campos necesarios
-  //         }
-  //         return game;
-  //       });
-  //     });
-  //     setSavedGameData(null); // Resetea savedGameData después de usarlo
-  //   }
-  // }, [savedGameData, setSavedGameData, setGameList]);
+  useEffect(() => {
+    if (savedGame) {
+      setGameList(currentGameList => {
+        return currentGameList.map(game => {
+          if (game.id === savedGame.id) {
+            return { ...game, ...savedGame };
+          }
+          return game;
+        });
+      });
+      setSavedGame(null);
+    }
+  }, [savedGame, setSavedGame, setGameList]);
 
 
   const handleNewGame = async () => {
@@ -62,14 +61,12 @@ const Games = () => {
 
   const handleEditGame = async (gameID) => {
     setGameID(gameID);
-    //localStorage.setItem("token", JSON.stringify(token));
     navigate(`/editor`);
   };
 
   const handlePlayGame = async (gameID) => {
     setGameID(gameID);
-    localStorage.setItem("token", JSON.stringify(token));
-    navigate(`/play/?id=${gameID}`);
+    navigate(`/play`);
   };
 
   const handleDuplicateGame = async (gameID) => {

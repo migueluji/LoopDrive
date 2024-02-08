@@ -136,11 +136,9 @@
 				token = message.data.token;
 				API_KEY = message.data.API_KEY;
 				DISCOVERY_DOCS = message.data.DISCOVERY_DOCS;
-				gapiLoaded();
+				gapi.load('client', initializeGapiClient);
 			}
 		});
-
-		async function gapiLoaded() { gapi.load('client', initializeGapiClient); }
 
 		async function initializeGapiClient() {
 			await gapi.client.init({

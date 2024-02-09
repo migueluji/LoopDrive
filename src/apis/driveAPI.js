@@ -392,6 +392,7 @@ export {
   folderExists,
   createFolder,
   listDriveGames,
+  getImageDownloadUrl,
   newGame,
   deleteGame,
   duplicateGame

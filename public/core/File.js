@@ -116,14 +116,11 @@ class File {
             }).then(function (response) {
                 if (response.result.files.length > 0) {
                     var fileId = response.result.files[0].id;
-
                     // Modificar el nombre del directorio con gameName
                     gapi.client.request({
                         path: `/drive/v3/files/${gameID}`,
                         method: 'PATCH',
-                        body: {
-                            name: gameName
-                        }
+                        body: {name: gameName }
                     }).then(() => {
                         // Guardar el archivo json con el nuevo nombre
                         gapi.client.request({
@@ -132,8 +129,6 @@ class File {
                             body: json
                         }).then(() => {
                             Command.takeScreenshot();
-                            const gameData = { "name": gameName, "id": gameID };
-                            window.parent.postMessage({ type: 'game_saved', data: gameData }, window.location.origin);
                             resolve(); // Resuelve la promesa si todo ha ido bien
                         }).catch(reject); // Rechaza la promesa si hay un error en esta etapa
                     }).catch(reject); // Rechaza la promesa si hay un error en esta etapa

@@ -73,27 +73,6 @@ class Editor {
         this.view.openCanvas("canvas");
     }
 
-    saveGame(value) {
-        this.appBarView.updateSaveButton("save_as");
-        var saveToFile = {};
-        Object.assign(saveToFile, this.model);
-        delete saveToFile.fontList;
-        delete saveToFile.imageList;
-        delete saveToFile.soundList;
-        File.save(gameID, this.model.name, JSON.stringify(saveToFile, (key, value) => { if (key != "id") return value }, '\t'))
-            .then(() => {
-                this.appBarView.updateSaveButton("save");
-                window.parent.postMessage({
-                    type: 'savedGame',
-                    data: { id: gameID, name: this.model.name },
-                }, '*');
-                if (!value) alert("Game Saved!!!");
-            })
-            .catch((error) => {
-                console.error('Error saving the game:', error);
-            });
-    }
-
     playGame() {
         var gameData = {};
         Object.assign(gameData, this.model);
@@ -112,9 +91,33 @@ class Editor {
         this.openWindow.onload = () => { this.openWindow.postMessage(messageData, '*'); }
     }
 
-    closeEditor() {
+    async saveGame(value) {
+        this.appBarView.updateSaveButton("save_as");
+        var saveToFile = {};
+        Object.assign(saveToFile, this.model);
+        delete saveToFile.fontList;
+        delete saveToFile.imageList;
+        delete saveToFile.soundList;
+        return File.save(gameID, this.model.name, JSON.stringify(saveToFile, (key, value) => { if (key != "id") return value }, '\t'))
+            .then(() => {
+                this.appBarView.updateSaveButton("save");
+                if (value != "automatic") 
+                alert("Game Saved!!!");
+            })
+            .catch((error) => {
+                console.error('Error saving the game:', error);
+            });
+    }
+
+    async closeEditor() {
         const userResponse = window.confirm("¿Do you want to close the editor?");
-        if (userResponse) window.parent.postMessage({ type: 'closeEditor' }, '*');
+        if (userResponse) {
+            await this.saveGame();
+            window.parent.postMessage({
+                type: 'saveGameAndClose',
+                data: { id: gameID, name: this.model.name, imageUrl :"" },
+            }, '*');
+        }
     }
 
     takeScreenshot() {

@@ -8,24 +8,21 @@ function Editor() {
   const navigate = useNavigate();
   const iframeRef = useRef(null);
 
-  // Memoriza handleOpenEditor para que no cambie si sus dependencias no cambian
   const handleOpenEditor = useCallback(() => {
     const messageData = {
       type: 'initializeEditor',
       data: { gameID, token, API_KEY, DISCOVERY_DOCS }
     };
     iframeRef.current.contentWindow.postMessage(messageData, '*');
-  }, [gameID, token, API_KEY, DISCOVERY_DOCS]); // Dependencias de la función
+  }, [gameID, token, API_KEY, DISCOVERY_DOCS]);
 
-  // Memoriza handleCloseEditor por la misma razón
+
   const handleCloseEditor = useCallback((event) => {
-    if (event.data)
-      switch (event.data.type) {
-        case 'closeEditor': navigate('/games'); break;
-        case 'savedGame': setSavedGame(event.data.data); break;
-        default: break;
-      }
-  }, [navigate, setSavedGame]); // Dependencias de la función
+    if (event.data && event.data.type === "saveGameAndClose") {
+      setSavedGame(event.data.data);
+      navigate('/games');
+    }
+  }, [navigate, setSavedGame]);
 
   useEffect(() => {
     if (iframeRef.current) iframeRef.current.onload = handleOpenEditor;

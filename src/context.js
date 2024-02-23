@@ -21,11 +21,11 @@ export const AppContextProvider = ({ children }) => {
     return (
         <AppContext.Provider value={{
             token, setToken,
-            expirationTime, setExpirationTime,
             userInfo, setUserInfo,
-            gameID, setGameID,
-            gameList, setGameList,
+            expirationTime, setExpirationTime,
             appFolderID, setAppFolderID,
+            gameList, setGameList,
+            gameID, setGameID,
             savedGame, setSavedGame,
             isDialogOpen, setIsDialogOpen,
             CLIENT_ID,

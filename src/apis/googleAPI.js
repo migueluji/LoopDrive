@@ -1,7 +1,7 @@
 // /src/api/googleAPI.js
 /* global gapi, google  */
 
-const userInfoEndpoint = process.env.REACT_APP_USER_INFO_ENDPOINT;
+const userInfoEndpoint = 'https://www.googleapis.com/oauth2/v1/userinfo';
 
 let tokenClient;
 
@@ -45,7 +45,6 @@ export async function login() {
 
 export async function logout() {
   google.accounts.id.disableAutoSelect();
-  // return { access_token: '', expires_in: 0 };
 }
 
 export async function getUserInfo(accessToken) {

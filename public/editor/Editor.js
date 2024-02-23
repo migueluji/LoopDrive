@@ -39,7 +39,7 @@ class Editor {
         this.view.addView(this.sideSheetView.html);
 
         // Automatic Save Game
-        setInterval(() => { this.saveGame("automatic"); }, 30000);
+        setInterval(() => { this.saveGame("automatic"); }, 60000); // save game each 60 seconds
     }
 
     // GAME
@@ -77,18 +77,24 @@ class Editor {
         var gameData = {};
         Object.assign(gameData, this.model);
         gameData = JSON.stringify(gameData, (key, value) => { if (key != "id") return value }, '\t');
-        const url = "../engine"; // Game engine URL
-        const width = this.model.displayWidth; // Game width
-        const height = this.model.displayHeight; // Game height
-        const left = (window.screen.width - width) / 2; // Calculate left position to center
-        const top = (window.screen.height - height) / 2; // Calculate top position to center
+        const url = "../engine"; // URL relativa, se asume el mismo dominio
+        const targetOrigin = window.location.origin; // Origen actual para mantenerse en el mismo dominio
+        
+        const width = this.model.displayWidth; 
+        const height = this.model.displayHeight; 
+        const left = (window.screen.width - width) / 2; 
+        const top = (window.screen.height - height) / 2;
+        
         const messageData = {
-            type: 'playEditedGame',
+            type: 'playGame',
             data: { gameID, token, API_KEY, DISCOVERY_DOCS, gameData }
         };
+    
         if (this.openWindow && !this.openWindow.closed) this.openWindow.close();
         this.openWindow = window.open(url, "_blank", `width=${width}, height=${height}, left=${left}, top=${top}, location=no`);
-        this.openWindow.onload = () => { this.openWindow.postMessage(messageData, '*'); }
+        this.openWindow.onload = () => {
+            this.openWindow.postMessage(messageData, targetOrigin);
+        }
     }
 
     async saveGame(value) {
@@ -101,8 +107,8 @@ class Editor {
         return File.save(gameID, this.model.name, JSON.stringify(saveToFile, (key, value) => { if (key != "id") return value }, '\t'))
             .then(() => {
                 this.appBarView.updateSaveButton("save");
-                if (value != "automatic") 
-                alert("Game Saved!!!");
+                if (value != "automatic") alert("Game Saved!!!");
+                else console.log("automatic saved!!!");
             })
             .catch((error) => {
                 console.error('Error saving the game:', error);
@@ -113,9 +119,10 @@ class Editor {
         const userResponse = window.confirm("¿Do you want to close the editor?");
         if (userResponse) {
             await this.saveGame();
+            if (this.openWindow && !this.openWindow.closed) this.openWindow.close();
             window.parent.postMessage({
                 type: 'saveGameAndClose',
-                data: { id: gameID, name: this.model.name, imageUrl :"" },
+                data: { id: gameID, name: this.model.name, imageUrl: "" },
             }, '*');
         }
     }

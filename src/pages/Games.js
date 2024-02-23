@@ -102,7 +102,7 @@ const Games = () => {
 
   return (
     <div style={{ position: 'relative' }}>
-      {loading && ( // Muestra el indicador de carga solo cuando loading es true
+      {loading && (
         <>
           <div
             style={{ position: 'fixed', width: '100%', height: 'calc(100% - 64px)', backgroundColor: `rgba(255,255,255, 0.5)`, zIndex: 9998 }}

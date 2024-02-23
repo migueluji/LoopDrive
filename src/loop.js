@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { Routes, Route, useLocation, useNavigate } from 'react-router-dom';
 import { getUserInfo, initGoogleAPI, login, logout } from './apis/googleAPI';
 import NavBar from './components/NavBar';

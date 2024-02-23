@@ -1,33 +1,60 @@
-import React from 'react';
+// Play.js
+import React, { useEffect, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { IconButton } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
+import { useAppContext } from '../context';
 
 function Play() {
-    const urlParams = new URLSearchParams(window.location.search);
-    const gameID = urlParams.get('id');
+    const { gameID, token, API_KEY, DISCOVERY_DOCS } = useAppContext();
     const navigate = useNavigate();
+    const iframeRef = useRef(null);
 
-    const handleClosePlay = () => {
-        // Redirigir a la página de juegos al cerrar el modo Play
+    const handleCloseEngine = useCallback(() => {
         navigate('/games');
-    };
+    }, [navigate]);
+
+    const handleOpenEngine = useCallback(() => {
+        const messageData = {
+            type: 'playGame',
+            data: { gameID, token, API_KEY, DISCOVERY_DOCS }
+        };
+        iframeRef.current.contentWindow.postMessage(messageData, '*');
+    }, [gameID, token, API_KEY, DISCOVERY_DOCS]);
+
+    // Establecer el manejador de mensajes y otras acciones al montar el componente
+    useEffect(() => {
+        // Este código se ejecutará cuando el componente se monte
+        window.addEventListener('message', (event) => {
+            // Aquí puedes manejar los mensajes recibidos
+            if (event.data && event.data.type === "closeGame") {
+                handleCloseEngine();
+            }
+        });
+
+        // Limpiar el listener cuando el componente se desmonte
+        return () => {
+            window.removeEventListener('message', handleCloseEngine);
+        };
+    }, [handleCloseEngine]);
 
     return (
-        <div style={{ position: 'relative', width: '100%', height: 'calc(100vh - 64px)', overflow: 'hidden' }}>
+        <div style={{ position: 'relative', width: '100%', height: '100vh', overflow: 'hidden' }}>
             <IconButton
                 style={{ position: 'absolute', top: '8px', right: '8px', zIndex: 1, color: 'white' }}
-                onClick={handleClosePlay}
+                onClick={handleCloseEngine}
             >
                 <CloseIcon />
             </IconButton>
             <iframe
                 title="Game Engine"
-                src={`/engine/?id=${gameID}`}
+                ref={iframeRef}
+                onLoad={handleOpenEngine}
+                src={`/engine`}
                 style={{ width: '100%', height: '100%', border: 'none' }}
             ></iframe>
         </div>
     );
-};
+}
 
 export default Play;

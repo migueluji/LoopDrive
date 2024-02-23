@@ -28,7 +28,7 @@ function Editor() {
     if (iframeRef.current) iframeRef.current.onload = handleOpenEditor;
     window.addEventListener('message', handleCloseEditor);
     return () => { window.removeEventListener('message', handleCloseEditor) };
-  }, [handleCloseEditor, handleOpenEditor]); // Ahora incluye las funciones como dependencias
+  }, [handleCloseEditor, handleOpenEditor]); 
 
   return (
     <div style={{ width: '100%', height: '100vh', overflow: 'hidden' }}>

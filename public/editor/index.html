@@ -127,7 +127,7 @@
 		window.addEventListener('message', (event) => {
 			if (event.origin !== window.location.origin) return;
 			const message = event.data;
-			if (message.type === 'initializeEditor' && message.data) {
+			if (message.type === 'initEditor' && message.data) {
 				gameID = message.data.gameID;
 				token = message.data.token;
 				API_KEY = message.data.API_KEY;

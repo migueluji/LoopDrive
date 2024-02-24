@@ -108,7 +108,6 @@ class Editor {
             .then(() => {
                 this.appBarView.updateSaveButton("save");
                 if (value != "automatic") alert("Game Saved!!!");
-                else console.log("automatic saved!!!");
             })
             .catch((error) => {
                 console.error('Error saving the game:', error);
@@ -116,14 +115,15 @@ class Editor {
     }
 
     async closeEditor() {
-        const userResponse = window.confirm("¿Do you want to close the editor?");
+        const userResponse = window.confirm("Do you want to exit the editor? Changes will be saved.");
         if (userResponse) {
-            await this.saveGame();
+            await this.saveGame("automatic");
             if (this.openWindow && !this.openWindow.closed) this.openWindow.close();
             window.parent.postMessage({
-                type: 'saveGameAndClose',
-                data: { id: gameID, name: this.model.name, imageUrl: "" },
-            }, '*');
+                type: 'closeEditor',
+                data: { id: gameID, name: this.model.name },
+                // data: { id: gameID, name: this.model.name, imageUrl: "" },
+            }, window.location.origin);
         }
     }
 

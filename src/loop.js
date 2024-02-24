@@ -11,7 +11,7 @@ import { useAppContext } from './context';
 import { folderExists, createFolder } from './apis/driveAPI';
 
 function Loop() {
-  const { setToken, setUserInfo, setExpirationTime, setAppFolderID, CLIENT_ID, API_KEY, DISCOVERY_DOCS, SCOPES} = useAppContext();
+  const { setToken, setUserInfo,setSessionTime, setAppFolderID, CLIENT_ID, API_KEY, DISCOVERY_DOCS, SCOPES} = useAppContext();
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -48,7 +48,8 @@ function Loop() {
     const newToken = await login();
     setToken(newToken);
     const newExpirationTime = new Date().getTime() + newToken.expires_in * 1000;
-    setExpirationTime(newExpirationTime);
+    console.log(newExpirationTime, newToken.expires_in, newToken);
+    setSessionTime(newExpirationTime);
     var newAppFolderID = await folderExists("Loop Games", newToken.access_token);
     if (!newAppFolderID) {
       newAppFolderID = await createFolder("Loop Games", 'root', newToken.access_token);
@@ -63,7 +64,7 @@ function Loop() {
     await logout();
     setToken(null);
     setUserInfo(null);
-    setExpirationTime(null);
+    setSessionTime(null);
     setAppFolderID(null);
   };
 

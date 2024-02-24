@@ -7,26 +7,26 @@ import { useNavigate } from 'react-router-dom';
 import { useAppContext } from '../context';
 
 const NavBar = ({ handleLogin, handleLogout }) => {
-  const { userInfo, expirationTime } = useAppContext();
+  const { userInfo, sessionTime } = useAppContext();
   const navigate = useNavigate();
   const [menuAnchorEl, setMenuAnchorEl] = useState(null);
-  const [remainingTime, setRemainingTime] = useState('');
+  const [formattedTime, setFormattedTime] = useState('');
 
   useEffect(() => {
     const interval = setInterval(() => {
       const currentTime = new Date().getTime();
-      const difference = expirationTime - currentTime;
+      const difference = sessionTime - currentTime;
       const minutes = Math.floor(difference / 60000);
       const seconds = Math.floor((difference % 60000) / 1000);
       if (difference > 0) {
-        setRemainingTime(`${minutes} : ${seconds < 10 ? '0' : ''}${seconds}`);
+        setFormattedTime(`${minutes} : ${seconds < 10 ? '0' : ''}${seconds}`);
       } else {
-        setRemainingTime('Session has expired');
+        setFormattedTime('Session has expired');
       }
     }, 1000);
 
     return () => clearInterval(interval);
-  }, [expirationTime]);
+  }, [sessionTime]);
 
   const handleMenuOpen = (event) => {
     setMenuAnchorEl(event.currentTarget);
@@ -63,7 +63,7 @@ const NavBar = ({ handleLogin, handleLogout }) => {
             <>
               {/* Texto del tiempo restante */}
               <span style={{ marginRight: '10px', color: 'white', alignSelf: 'center', fontFamily: 'sans-serif', fontWeight: 'bold' }}>
-                {remainingTime}
+                {formattedTime}
               </span>
               {/* Tooltip y Avatar */}
               <Tooltip title={userInfo.name}>

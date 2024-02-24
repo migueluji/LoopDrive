@@ -7,7 +7,7 @@ const AppContext = createContext();
 export const AppContextProvider = ({ children }) => {
     const [token, setToken] = useState(null);
     const [userInfo, setUserInfo] = useState(null);
-    const [expirationTime, setExpirationTime] = useState(null);
+    const [sessionTime, setSessionTime] = useState(null);
     const [appFolderID, setAppFolderID] = useState(null);
     const [gameList, setGameList] = useState([]);
     const [gameID, setGameID] = useState(null);
@@ -22,7 +22,7 @@ export const AppContextProvider = ({ children }) => {
         <AppContext.Provider value={{
             token, setToken,
             userInfo, setUserInfo,
-            expirationTime, setExpirationTime,
+            sessionTime, setSessionTime,
             appFolderID, setAppFolderID,
             gameList, setGameList,
             gameID, setGameID,

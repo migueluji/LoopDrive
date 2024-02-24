@@ -10,7 +10,7 @@ function Editor() {
 
   const handleOpenEditor = useCallback(() => {
     const messageData = {
-      type: 'initializeEditor',
+      type: 'initEditor',
       data: { gameID, token, API_KEY, DISCOVERY_DOCS }
     };
     iframeRef.current.contentWindow.postMessage(messageData, '*');
@@ -18,7 +18,7 @@ function Editor() {
 
 
   const handleCloseEditor = useCallback((event) => {
-    if (event.data && event.data.type === "saveGameAndClose") {
+    if (event.data && event.data.type === "closeEditor") {
       setSavedGame(event.data.data);
       navigate('/games');
     }

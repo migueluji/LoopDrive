@@ -7,10 +7,10 @@ const AppContext = createContext();
 export const AppContextProvider = ({ children }) => {
     const [token, setToken] = useState(null);
     const [userInfo, setUserInfo] = useState(null);
-    const [sessionTime, setSessionTime] = useState(null);
     const [appFolderID, setAppFolderID] = useState(null);
     const [gameList, setGameList] = useState([]);
     const [gameID, setGameID] = useState(null);
+    const [sessionTime, setSessionTime] = useState(null);
     const CLIENT_ID = process.env.REACT_APP_CLIENT_ID;
     const API_KEY = process.env.REACT_APP_API_KEY;
     const DISCOVERY_DOCS = [process.env.REACT_APP_DISCOVERY_DOCS];
@@ -20,10 +20,10 @@ export const AppContextProvider = ({ children }) => {
         <AppContext.Provider value={{
             token, setToken,
             userInfo, setUserInfo,
-            sessionTime, setSessionTime,
             appFolderID, setAppFolderID,
             gameList, setGameList,
             gameID, setGameID,
+            sessionTime, setSessionTime, 
             CLIENT_ID,
             API_KEY,
             DISCOVERY_DOCS,

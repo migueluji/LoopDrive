@@ -13,20 +13,18 @@ const NavBar = ({ handleLogin, handleLogout }) => {
   const [formattedTime, setFormattedTime] = useState('');
 
   useEffect(() => {
-    const interval = setInterval(() => {
-      const currentTime = new Date().getTime();
-      const difference = sessionTime - currentTime;
-      const minutes = Math.floor(difference / 60000);
-      const seconds = Math.floor((difference % 60000) / 1000);
-      if (difference > 0) {
-        setFormattedTime(`${minutes} : ${seconds < 10 ? '0' : ''}${seconds}`);
-      } else {
-        setFormattedTime('Session has expired');
-      }
-    }, 1000);
-
-    return () => clearInterval(interval);
+    const formatTime = (time) => {
+      const minutes = Math.floor(time / 60);
+      const seconds = time % 60;
+      return `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+    };
+    if (sessionTime > 0) {
+      setFormattedTime(formatTime(sessionTime));
+    } else {
+      setFormattedTime('Session has expired');
+    }
   }, [sessionTime]);
+  
 
   const handleMenuOpen = (event) => {
     setMenuAnchorEl(event.currentTarget);

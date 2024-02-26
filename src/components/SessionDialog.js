@@ -2,8 +2,8 @@
 import React from 'react';
 import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Button } from '@mui/material';
 
-const SessionDialog = ({ isOpen, onLogin, onLogout }) => (
-  <Dialog open={isOpen} onClose={onLogout}>
+const SessionDialog = ({ open, onLogin, onLogout }) => (
+  <Dialog open={open} onClose={onLogout}>
     <DialogTitle>Session Expired</DialogTitle>
     <DialogContent>
       <DialogContentText>

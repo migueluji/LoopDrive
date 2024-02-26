@@ -19,7 +19,7 @@ function Edit() {
       setGameList(updatedList);
       navigate('/games');
     }
-  }, [navigate, gameList, setGameList]); // Asegúrate de incluir gameList y setGameList en las dependencias
+  }, [navigate, gameList, setGameList]); 
 
   useEffect(() => {
     window.addEventListener('message', handleCloseEditor);

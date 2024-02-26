@@ -1,7 +1,7 @@
 class Editor {
 
     constructor(editorView, gameModel) {
-        this.openWindows = {};
+       // this.playWindows = {};
         this.view = editorView;
         this.model = gameModel;
         this.selectedSceneIndex = 0;
@@ -77,23 +77,22 @@ class Editor {
         var gameData = {};
         Object.assign(gameData, this.model);
         gameData = JSON.stringify(gameData, (key, value) => { if (key != "id") return value }, '\t');
-        const url = "../engine"; // URL relativa, se asume el mismo dominio
-        const targetOrigin = window.location.origin; // Origen actual para mantenerse en el mismo dominio
-        
-        const width = this.model.displayWidth; 
-        const height = this.model.displayHeight; 
-        const left = (window.screen.width - width) / 2; 
+        const url = "../engine"; 
+     
+        const width = this.model.displayWidth;
+        const height = this.model.displayHeight;
+        const left = (window.screen.width - width) / 2;
         const top = (window.screen.height - height) / 2;
-        
+
         const messageData = {
             type: 'playGame',
             data: { gameID, token, API_KEY, DISCOVERY_DOCS, gameData }
         };
-    
-        if (this.openWindow && !this.openWindow.closed) this.openWindow.close();
-        this.openWindow = window.open(url, "_blank", `width=${width}, height=${height}, left=${left}, top=${top}, location=no`);
-        this.openWindow.onload = () => {
-            this.openWindow.postMessage(messageData, targetOrigin);
+
+        if (this.playWindow && !this.playWindow.closed) this.playWindow.close();
+        this.playWindow = window.open(url, "_blank", `width=${width}, height=${height}, left=${left}, top=${top}, location=no`);
+        this.playWindow.onload = () => {
+            this.playWindow.postMessage(messageData, window.location.origin);
         }
     }
 
@@ -117,12 +116,14 @@ class Editor {
     async closeEditor() {
         const userResponse = window.confirm("Do you want to exit the editor? Changes will be saved.");
         if (userResponse) {
+            this.load = new LoadingView("var(--mdc-theme-primary)");
+            document.body.appendChild(this.load.html);
             await this.saveGame("automatic");
-            if (this.openWindow && !this.openWindow.closed) this.openWindow.close();
+            this.load.closeDialog();
+            if (this.playWindow && !this.playWindow.closed) this.playWindow.close();
             window.parent.postMessage({
                 type: 'closeEditor',
                 data: { id: gameID, name: this.model.name },
-                // data: { id: gameID, name: this.model.name, imageUrl: "" },
             }, window.location.origin);
         }
     }

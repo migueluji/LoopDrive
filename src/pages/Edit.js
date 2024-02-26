@@ -2,11 +2,13 @@
 import React, { useEffect, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAppContext } from '../context';
+import { useTheme } from '@mui/material/styles';
 
 function Edit() {
   const { gameID, token, API_KEY, DISCOVERY_DOCS, gameList, setGameList } = useAppContext();
   const navigate = useNavigate();
   const iframeRef = useRef(null);
+  const theme = useTheme();
 
   const handleCloseEditor = useCallback((event) => {
     if (event.origin === window.location.origin && event.data && event.data.type === "closeEditor") {
@@ -19,7 +21,7 @@ function Edit() {
       setGameList(updatedList);
       navigate('/games');
     }
-  }, [navigate, gameList, setGameList]); 
+  }, [navigate, gameList, setGameList]);
 
   useEffect(() => {
     window.addEventListener('message', handleCloseEditor);
@@ -39,7 +41,7 @@ function Edit() {
   }, [handleOpenEditor]);
 
   return (
-    <div style={{ width: '100%', height: '100vh', overflow: 'hidden' }}>
+    <div style={{ width: '100%', height: '100vh', overflow: 'hidden', backgroundColor: theme.palette.primary.main }}>
       <iframe
         title="Editor"
         id="editorIframe"

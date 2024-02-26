@@ -95,6 +95,8 @@ body{
 }
 .dialog-full-screen{
     z-index:10;
+    top: 0;
+    left: 0;
     position:absolute;
     background-color:rgba(0,0,0,0.2);
     width:100%;

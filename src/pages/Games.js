@@ -72,7 +72,7 @@ const Games = () => {
 
   const handleEditGame = async (gameID) => {
     setGameID(gameID);
-    navigate(`/editor`);
+    navigate(`/edit`);
   };
 
   const handlePlayGame = async (gameID) => {

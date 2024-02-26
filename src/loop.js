@@ -4,7 +4,7 @@ import { getUserInfo, initGoogleAPI, login, logout } from './apis/googleAPI';
 import NavBar from './components/NavBar';
 import Home from './pages/Home';
 import Games from './pages/Games';
-import Editor from './pages/Editor';
+import Edit from './pages/Edit';
 import Play from './pages/Play';
 import SessionDialog from './components/SessionDialog';
 import { useAppContext } from './context';
@@ -14,6 +14,7 @@ function Loop() {
   const { setToken, setUserInfo,setSessionTime, setAppFolderID, CLIENT_ID, API_KEY, DISCOVERY_DOCS, SCOPES} = useAppContext();
   const navigate = useNavigate();
   const location = useLocation();
+  const isEditorPage = location.pathname.includes('/edit');
 
   // useEffect(() => {
   //   const checkSessionExpiration = () => {
@@ -68,8 +69,6 @@ function Loop() {
     setAppFolderID(null);
   };
 
-  const isEditorPage = location.pathname.includes('/editor');
-
   return (
     <div style={{ height: '0px' }}>
       {!isEditorPage && (
@@ -78,7 +77,7 @@ function Loop() {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/games" element={<Games />} />
-        <Route path="/editor" element={<Editor />} />
+        <Route path="/edit" element={<Edit />} />
         <Route path="/play" element={<Play />} />
       </Routes>
       <SessionDialog onLogin={handleLogin} onLogout={handleLogout} />

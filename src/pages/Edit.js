@@ -1,9 +1,9 @@
-// Editor.js
+// Edit.js
 import React, { useEffect, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAppContext } from '../context';
 
-function Editor() {
+function Edit() {
   const { gameID, token, API_KEY, DISCOVERY_DOCS, setSavedGame } = useAppContext();
   const navigate = useNavigate();
   const iframeRef = useRef(null);
@@ -43,7 +43,7 @@ function Editor() {
   );
 }
 
-export default Editor;
+export default Edit;
 
 
 

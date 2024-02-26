@@ -4,31 +4,39 @@ import { useNavigate } from 'react-router-dom';
 import { useAppContext } from '../context';
 
 function Edit() {
-  const { gameID, token, API_KEY, DISCOVERY_DOCS, setSavedGame } = useAppContext();
+  const { gameID, token, API_KEY, DISCOVERY_DOCS, gameList, setGameList } = useAppContext();
   const navigate = useNavigate();
   const iframeRef = useRef(null);
+
+  const handleCloseEditor = useCallback((event) => {
+    if (event.origin === window.location.origin && event.data && event.data.type === "closeEditor") {
+      const updatedList = gameList.map(game => {
+        if (game.id === event.data.data.id) {
+          return { ...game, name: event.data.data.name };
+        }
+        return game;
+      });
+      setGameList(updatedList);
+      navigate('/games');
+    }
+  }, [navigate, gameList, setGameList]); // Asegúrate de incluir gameList y setGameList en las dependencias
+
+  useEffect(() => {
+    window.addEventListener('message', handleCloseEditor);
+    return () => window.removeEventListener('message', handleCloseEditor);
+  }, [handleCloseEditor]);
 
   const handleOpenEditor = useCallback(() => {
     const messageData = {
       type: 'initEditor',
       data: { gameID, token, API_KEY, DISCOVERY_DOCS }
     };
-    iframeRef.current.contentWindow.postMessage(messageData, '*');
+    iframeRef.current.contentWindow.postMessage(messageData, window.location.origin);
   }, [gameID, token, API_KEY, DISCOVERY_DOCS]);
-
-
-  const handleCloseEditor = useCallback((event) => {
-    if (event.data && event.data.type === "closeEditor") {
-      setSavedGame(event.data.data);
-      navigate('/games');
-    }
-  }, [navigate, setSavedGame]);
 
   useEffect(() => {
     if (iframeRef.current) iframeRef.current.onload = handleOpenEditor;
-    window.addEventListener('message', handleCloseEditor);
-    return () => { window.removeEventListener('message', handleCloseEditor) };
-  }, [handleCloseEditor, handleOpenEditor]); 
+  }, [handleOpenEditor]);
 
   return (
     <div style={{ width: '100%', height: '100vh', overflow: 'hidden' }}>
@@ -44,6 +52,8 @@ function Edit() {
 }
 
 export default Edit;
+
+
 
 
 

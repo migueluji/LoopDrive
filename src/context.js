@@ -11,8 +11,6 @@ export const AppContextProvider = ({ children }) => {
     const [appFolderID, setAppFolderID] = useState(null);
     const [gameList, setGameList] = useState([]);
     const [gameID, setGameID] = useState(null);
-    const [savedGame, setSavedGame] = useState(null);
-    const [isDialogOpen, setIsDialogOpen] = useState(false);
     const CLIENT_ID = process.env.REACT_APP_CLIENT_ID;
     const API_KEY = process.env.REACT_APP_API_KEY;
     const DISCOVERY_DOCS = [process.env.REACT_APP_DISCOVERY_DOCS];
@@ -26,8 +24,6 @@ export const AppContextProvider = ({ children }) => {
             appFolderID, setAppFolderID,
             gameList, setGameList,
             gameID, setGameID,
-            savedGame, setSavedGame,
-            isDialogOpen, setIsDialogOpen,
             CLIENT_ID,
             API_KEY,
             DISCOVERY_DOCS,

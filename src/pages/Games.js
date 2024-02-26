@@ -8,10 +8,9 @@ import AddIcon from '@mui/icons-material/Add';
 import GameCard from '../components/GameCard';
 import { useAppContext } from '../context';
 import { useNavigate } from 'react-router-dom';
-import { getImageDownloadUrl } from '../apis/driveAPI';
 
 const Games = () => {
-  const { savedGame, setSavedGame, token, gameID, setGameID, gameList, setGameList, appFolderID } = useAppContext();
+  const { token, setGameID, gameList, setGameList, appFolderID } = useAppContext();
   const [loading, setLoading] = useState(false);
   const [updateGameList, setUpdateGameList] = useState(false);
   const navigate = useNavigate();
@@ -33,32 +32,6 @@ const Games = () => {
       setUpdateGameList(false);
     }
   }, [gameList, setGameList, appFolderID, updateGameList]);
-
-
-  useEffect(() => {
-    const updateGameListWithImageUrl = async () => {
-      if (savedGame) {
-        try {
-          const imageUrl = await getImageDownloadUrl(gameID);
-          const updatedSavedGame = { ...savedGame, imageUrl };
-          setGameList(currentGameList => {
-            return currentGameList.map(game => {
-              if (game.id === updatedSavedGame.id) {
-                return updatedSavedGame;
-              }
-              return game;
-            });
-          });
-          setSavedGame(null);
-        } catch (error) {
-          console.error('Error fetching image URL:', error);
-        }
-      }
-    };
-    updateGameListWithImageUrl();
-  }, [savedGame, setSavedGame, setGameList, gameID]);
-
-
 
   const handleNewGame = async () => {
     try {

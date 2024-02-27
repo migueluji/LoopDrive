@@ -5,7 +5,7 @@ class App {
         this.playList = {};
         this.gameId = gameID;
         this.json = {};
-        this.load = new LoadingView("var(--mdc-theme-primary)");
+        this.load = new LoadingView("white","var(--mdc-theme-primary)");
         document.body.appendChild(this.load.html);
         this.file.loadJson(this.gameId, this.onJsonLoaded.bind(this));
     }

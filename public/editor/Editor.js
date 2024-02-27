@@ -1,7 +1,6 @@
 class Editor {
 
     constructor(editorView, gameModel) {
-       // this.playWindows = {};
         this.view = editorView;
         this.model = gameModel;
         this.selectedSceneIndex = 0;
@@ -77,8 +76,8 @@ class Editor {
         var gameData = {};
         Object.assign(gameData, this.model);
         gameData = JSON.stringify(gameData, (key, value) => { if (key != "id") return value }, '\t');
-        const url = "../engine"; 
-     
+        const url = "../engine";
+
         const width = this.model.displayWidth;
         const height = this.model.displayHeight;
         const left = (window.screen.width - width) / 2;
@@ -114,12 +113,16 @@ class Editor {
     }
 
     async closeEditor() {
-        const userResponse = window.confirm("Do you want to exit the editor? Changes will be saved.");
+        const userResponse = window.confirm("Do you want to exit? Changes will be saved.");
         if (userResponse) {
-            this.load = new LoadingView("var(--mdc-theme-primary)");
+
+            this.load = new LoadingView("#2E64EC", "white");
+            this.load.html.style.opacity = 0.5;
             document.body.appendChild(this.load.html);
+
             await this.saveGame("automatic");
             this.load.closeDialog();
+
             if (this.playWindow && !this.playWindow.closed) this.playWindow.close();
             window.parent.postMessage({
                 type: 'closeEditor',

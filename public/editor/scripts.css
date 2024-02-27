@@ -12,6 +12,7 @@
     position: absolute;
     width: 10000px;
     height: 10000px;
+    background-color: white;
 }
 .init {
     margin: 4064px auto 0px auto; /* margin top, height is 10000*/

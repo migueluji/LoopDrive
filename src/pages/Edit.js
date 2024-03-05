@@ -1,7 +1,7 @@
 // Edit.js
 import React, { useEffect, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAppContext } from '../context';
+import { useAppContext } from '../AppContext';
 import { useTheme } from '@mui/material/styles';
 
 function Edit() {

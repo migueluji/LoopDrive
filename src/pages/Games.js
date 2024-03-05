@@ -1,76 +1,53 @@
 // Games.js
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { newGame, duplicateGame, deleteGame, listDriveGames } from '../apis/driveAPI';
 import Button from '@mui/material/Button';
 import CircularProgress from '@mui/material/CircularProgress';
 import Box from '@mui/material/Box';
 import AddIcon from '@mui/icons-material/Add';
 import GameCard from '../components/GameCard';
-import { useAppContext } from '../context';
+import { useAppContext } from '../AppContext';
 import { useNavigate } from 'react-router-dom';
 
 const Games = () => {
-  const { token, setGameID, gameList, setGameList, appFolderID } = useAppContext();
+  const { token, appFolderID, gameList, setGameList, setGameID, updateGameList, setUpdateGameList } = useAppContext();
   const [loading, setLoading] = useState(false);
-  const [updateGameList, setUpdateGameList] = useState(false);
   const navigate = useNavigate();
 
+  const fetchGames = useCallback(async () => {
+    setLoading(true);
+    try {
+      const updatedGameList = await listDriveGames(appFolderID);
+      setGameList(updatedGameList);
+    } catch (error) {
+      console.error('Error fetching games:', error);
+    } finally {
+      setLoading(false);
+    }
+  }, [appFolderID, setGameList]);
+
   useEffect(() => {
-    const fetchGames = async () => {
-      setLoading(true);
-      try {
-        const updatedGameList = await listDriveGames(appFolderID);
-        setGameList(updatedGameList);
-      } catch (error) {
-        console.error('Error fetching games:', error.message);
-      } finally {
-        setLoading(false);
-      }
-    };
-    if (!gameList || gameList.length === 0 || updateGameList) {
+    if (updateGameList) {
       fetchGames();
       setUpdateGameList(false);
     }
-  }, [gameList, setGameList, appFolderID, updateGameList]);
+  }, [updateGameList, setUpdateGameList, fetchGames]);
 
-  const handleNewGame = async () => {
+  const handleAction = async (action, ...args) => {
+    setLoading(true);
     try {
-      setLoading(true);
-      await newGame(appFolderID, token.access_token);
+      await action(...args);
       setUpdateGameList(true);
     } catch (error) {
-      console.error('Error creating new game:', error.message);
+      console.error('Error performing game operation:', error.message);
+    } finally {
+      setLoading(false);
     }
   };
 
-  const handleEditGame = async (gameID) => {
+  const handleNavigation = (path, gameID) => {
     setGameID(gameID);
-    navigate(`/edit`);
-  };
-
-  const handlePlayGame = async (gameID) => {
-    setGameID(gameID);
-    navigate(`/play`);
-  };
-
-  const handleDuplicateGame = async (gameID) => {
-    try {
-      setLoading(true);
-      await duplicateGame(gameID);
-      setUpdateGameList(true);
-    } catch (error) {
-      console.error('Error duplicating game:', error.message);
-    }
-  };
-
-  const handleDeleteGame = async (gameID, gameName) => {
-    try {
-      setLoading(true);
-      await deleteGame(gameID, gameName);
-      setUpdateGameList(true);
-    } catch (error) {
-      console.error('Error deleting game:', error.message);
-    }
+    navigate(`/${path}`);
   };
 
   return (
@@ -93,7 +70,7 @@ const Games = () => {
             variant="contained"
             color="primary"
             startIcon={<AddIcon />}
-            onClick={handleNewGame}
+            onClick={() => handleAction(newGame, appFolderID, token.access_token)}
             disabled={loading}
           >
             New Game
@@ -102,10 +79,10 @@ const Games = () => {
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '16px' }}>
           {gameList.map((game) => (
             <GameCard key={game.id} game={game}
-              handleEditGame={handleEditGame}
-              handlePlayGame={handlePlayGame}
-              handleDuplicateGame={handleDuplicateGame}
-              handleDeleteGame={handleDeleteGame}
+              handleEditGame={() => handleNavigation('edit', game.id)}
+              handlePlayGame={() => handleNavigation('play', game.id)}
+              handleDuplicateGame={() => handleAction(duplicateGame, game.id)}
+              handleDeleteGame={() => handleAction(deleteGame, game.id)}
             />
           ))}
         </div>
@@ -115,3 +92,5 @@ const Games = () => {
 };
 
 export default Games;
+
+

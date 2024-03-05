@@ -2,8 +2,8 @@
 import { createRoot } from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
 import React from 'react';
-import Loop from './loop';
-import { AppContextProvider } from './context';
+import App from './App';
+import { AppContextProvider } from './AppContext';
 import theme from './theme';
 import { ThemeProvider } from '@mui/material/styles';
 
@@ -12,7 +12,7 @@ root.render(
   <BrowserRouter>
     <AppContextProvider>
       <ThemeProvider theme={theme}>
-        <Loop />
+        <App />
       </ThemeProvider>,
     </AppContextProvider>
   </BrowserRouter>

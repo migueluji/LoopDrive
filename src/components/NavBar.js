@@ -4,7 +4,7 @@ import { AppBar, Toolbar, Button, Avatar, Box, Tooltip } from '@mui/material';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import UserMenu from './UserMenu';
 import { useNavigate } from 'react-router-dom';
-import { useAppContext } from '../context';
+import { useAppContext } from '../AppContext';
 
 const NavBar = ({ handleLogin, handleLogout }) => {
   const { userInfo, sessionTime } = useAppContext();

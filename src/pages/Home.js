@@ -1,10 +1,10 @@
 // Home.js
 import React from 'react';
 import { Box, Container, Typography, Button } from '@mui/material';
-import HeroSection from '../components/HeroSection';
-import FeaturesSection from '../components/FeaturesSection';
-import TutorialSection from '../components/TutorialSection'; // Ensure the path is correct
-import CommunitySection from '../components/CommunitySection'; // Ensure the path is correct
+import HeroSection from './sections/HeroSection';
+import FeaturesSection from './sections/FeaturesSection';
+import TutorialSection from './sections/TutorialSection'; // Ensure the path is correct
+import CommunitySection from './sections/CommunitySection'; // Ensure the path is correct
 
 const Home = () => {
   return (

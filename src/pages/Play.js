@@ -3,7 +3,7 @@ import React, { useEffect, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { IconButton } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
-import { useAppContext } from '../context';
+import { useAppContext } from '../AppContext';
 
 function Play() {
     const { gameID, token, API_KEY, DISCOVERY_DOCS } = useAppContext();
@@ -22,17 +22,13 @@ function Play() {
         iframeRef.current.contentWindow.postMessage(messageData, '*');
     }, [gameID, token, API_KEY, DISCOVERY_DOCS]);
 
-    // Establecer el manejador de mensajes y otras acciones al montar el componente
     useEffect(() => {
-        // Este código se ejecutará cuando el componente se monte
         window.addEventListener('message', (event) => {
-            // Aquí puedes manejar los mensajes recibidos
             if (event.data && event.data.type === "closeGame") {
                 handleCloseEngine();
             }
         });
 
-        // Limpiar el listener cuando el componente se desmonte
         return () => {
             window.removeEventListener('message', handleCloseEngine);
         };

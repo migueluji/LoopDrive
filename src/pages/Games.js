@@ -15,37 +15,30 @@ const Games = () => {
   const navigate = useNavigate();
 
   const fetchGames = useCallback(async () => {
-    setLoading(true);
     try {
-      const updatedGameList = await listDriveGames(appFolderID);
-      setGameList(updatedGameList);
+      setLoading(true);
+      const newUpdatedGameList = await listDriveGames(appFolderID);
+      setGameList(newUpdatedGameList);
+      setLoading(false);
+      setUpdateGameList(false);
     } catch (error) {
       console.error('Error fetching games:', error);
-    } finally {
-      setLoading(false);
-    }
-  }, [appFolderID, setGameList]);
+    } 
+  }, [appFolderID, setGameList, setUpdateGameList]);
 
   useEffect(() => {
-    console.log("useEffects ",updateGameList);
-    if (updateGameList) {
-      fetchGames();
-      setUpdateGameList(false);
-    }
-  }, [updateGameList, setUpdateGameList, fetchGames]);
+    if (updateGameList) fetchGames();
+  }, [updateGameList, fetchGames]);
 
   const handleAction = async (action, ...args) => {
-    setLoading(true);
-    console.log("loading... ", loading);
     try {
+      setLoading(true);
       await action(...args);
+      setLoading(false);
       setUpdateGameList(true);
     } catch (error) {
       console.error('Error performing game operation:', error.message);
-    } finally {
-      setLoading(false);
-      console.log("loading ", loading);
-    }
+    } 
   };
 
   const handleNavigation = (path, gameID) => {

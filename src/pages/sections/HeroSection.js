@@ -1,7 +1,7 @@
 // HeroSection.js
 import React from 'react';
 import { Box, Typography, Button } from '@mui/material';
-import BackgroundImage from '../../images/hero.gif'; // Ensure this path is correct for your image
+import BackgroundImage from '../../images/hero.png'; // Ensure this path is correct for your image
 
 const HeroSection = () => {
   return (

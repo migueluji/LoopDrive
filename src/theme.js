@@ -4,14 +4,13 @@ import { createTheme } from '@mui/material/styles';
 const theme = createTheme({
   palette: {
     primary: {
-      main: '#2E64EC', // Color primario personalizado
+      main: '#2E64EC', 
     },
     secondary: {
-      main: '#FFC107', // Color secundario personalizado
+      main: '#FFC107', 
     },
   },
   typography: {
-    // Aquí puedes personalizar la tipografía global si es necesario
     fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif',
     h1: {
       // Estilo personalizado para variantes h1

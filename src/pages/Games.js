@@ -27,6 +27,7 @@ const Games = () => {
   }, [appFolderID, setGameList]);
 
   useEffect(() => {
+    console.log("useEffects ",updateGameList);
     if (updateGameList) {
       fetchGames();
       setUpdateGameList(false);
@@ -35,6 +36,7 @@ const Games = () => {
 
   const handleAction = async (action, ...args) => {
     setLoading(true);
+    console.log("loading... ", loading);
     try {
       await action(...args);
       setUpdateGameList(true);
@@ -42,6 +44,7 @@ const Games = () => {
       console.error('Error performing game operation:', error.message);
     } finally {
       setLoading(false);
+      console.log("loading ", loading);
     }
   };
 

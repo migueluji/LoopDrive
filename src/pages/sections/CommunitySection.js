@@ -10,7 +10,7 @@ const CommunitySection = () => {
           Join Our Community
         </Typography>
         <Typography variant="body1" paragraph>
-          Connect with other game developers, share your projects, and get inspired by the amazing
+          Connect with other game developers, and get inspired by the amazing
           creations of our community members.
         </Typography>
         <Button variant="contained" color="primary">

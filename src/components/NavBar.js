@@ -5,6 +5,7 @@ import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import UserMenu from './UserMenu';
 import { useNavigate } from 'react-router-dom';
 import { useAppContext } from '../AppContext';
+import loopLogo from '../images/loop.png';
 
 const NavBar = ({ handleLogin, handleLogout }) => {
   const { userInfo, sessionTime } = useAppContext();
@@ -54,7 +55,7 @@ const NavBar = ({ handleLogin, handleLogout }) => {
       <AppBar position="static">
         <Toolbar>
           <Button onClick={onLogoClick} style={{ padding: 0, marginRight: '16px' }}>
-            <img src="/loop.png" alt="Loop Logo" style={{ height: '2rem' }} />
+            <img src={loopLogo} alt="Loop Logo" style={{ height: '2rem' }} />
           </Button>
           <Box sx={{ flexGrow: 1 }} />
           {userInfo ? (

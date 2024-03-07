@@ -20,9 +20,11 @@ const Games = () => {
       const newUpdatedGameList = await listDriveGames(appFolderID);
       setGameList(newUpdatedGameList);
       setUpdateGameList(false);
+    } catch (error) {
+      console.error('Error fetching games:', error);
+    } finally {
       setLoading(false);
     }
-    catch (error) { console.error('Error fetching games:', error); }
   }, [appFolderID, setGameList, setUpdateGameList]);
 
   useEffect(() => {
@@ -32,13 +34,23 @@ const Games = () => {
   const handleAction = async (action, ...args) => {
     try {
       setLoading(true);
+      if (action === deleteGame) {
+        const confirmed = window.confirm('Are you sure you want to delete this game?');
+        if (!confirmed) {
+          setLoading(false);
+          return; 
+        }
+      }
       await action(...args);
       setUpdateGameList(true);
+    } catch (error) {
+      console.error('Error performing game operation:', error.message);
+    } finally {
       setLoading(false);
     }
-    catch (error) { console.error('Error performing game operation:', error.message); }
   };
-
+  
+  
   const handleNavigation = (path, gameID) => {
     setGameID(gameID);
     navigate(`/${path}`);

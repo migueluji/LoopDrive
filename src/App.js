@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { Routes, Route, useLocation, useNavigate, Navigate } from 'react-router-dom';
 import { getUserInfo, initGoogleAPI, login, logout } from './apis/googleAPI';
+import { folderExists, createFolder } from './apis/driveAPI';
 import NavBar from './components/NavBar';
 import Home from './pages/Home';
 import Games from './pages/Games';
@@ -9,7 +10,7 @@ import Edit from './pages/Edit';
 import Play from './pages/Play';
 import SessionDialog from './components/SessionDialog';
 import { useAppContext } from './AppContext';
-import { folderExists, createFolder } from './apis/driveAPI';
+
 
 function App() {
   const { token, setToken, setUserInfo, setAppFolderID, setGameList, sessionTime, setSessionTime, CLIENT_ID, API_KEY, DISCOVERY_DOCS, SCOPES } = useAppContext();

@@ -8,7 +8,7 @@ import powerfulImage from '../../images/powerful.png';
 const featuresData = [
   {
     title: 'Intuitive',
-    description: 'An easy-to-use interface that allows you to quickly create games without complications.',
+    description: 'An easy-to-use interface that allows you to quickly create games with no code.',
     imageUrl: intuitiveImage, // Make sure to replace this with the actual path of your image
   },
   {

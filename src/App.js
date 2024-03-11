@@ -8,6 +8,7 @@ import Home from './pages/Home';
 import Games from './pages/Games';
 import Edit from './pages/Edit';
 import Play from './pages/Play';
+import Footer from './components/Footer';
 import SessionDialog from './components/SessionDialog';
 import { useAppContext } from './AppContext';
 
@@ -65,21 +66,26 @@ function App() {
   };
 
   return (
-    <div style={{ height: '0px' }}>
+    // Ajusta el contenedor principal aquí
+    <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
       {!isEditorPage && <NavBar handleLogin={handleLogin} handleLogout={handleLogout} />}
-      <Routes>
-        <Route path="/" element={<Home />} />
-        {isAuthenticated ? (
-          <>
-            <Route path="/games" element={<Games />} />
-            <Route path="/edit" element={<Edit />} />
-            <Route path="/play" element={<Play />} />
-          </>
-        ) : (
-          <Route path="*" element={<Navigate replace to="/" />} />
-        )}
-      </Routes>
+      {/* Envuelve tus rutas en un div que pueda expandirse para empujar el Footer hacia abajo */}
+      <div style={{ flex: 1 }}>
+        <Routes>
+          <Route path="/" element={<Home handleLogin={handleLogin} />} />
+          {isAuthenticated ? (
+            <>
+              <Route path="/games" element={<Games />} />
+              <Route path="/edit" element={<Edit />} />
+              <Route path="/play" element={<Play />} />
+            </>
+          ) : (
+            <Route path="*" element={<Navigate replace to="/" />} />
+          )}
+        </Routes>
+      </div>
       {isSessionTimeOver && <SessionDialog open={isSessionTimeOver} onLogin={handleLogin} onLogout={handleLogout} />}
+      {!isEditorPage && <Footer />}
     </div>
   );
 }

@@ -37,20 +37,17 @@ const Games = () => {
       if (action === deleteGame) {
         const confirmed = window.confirm('Are you sure you want to delete this game?');
         if (!confirmed) {
-          setLoading(false);
-          return; 
+          return setLoading(false); // Return early if the action is cancelled
         }
       }
       await action(...args);
       setUpdateGameList(true);
     } catch (error) {
       console.error('Error performing game operation:', error.message);
-    } finally {
-      setLoading(false);
     }
   };
-  
-  
+
+
   const handleNavigation = (path, gameID) => {
     setGameID(gameID);
     navigate(`/${path}`);
@@ -59,18 +56,22 @@ const Games = () => {
   return (
     <div style={{ position: 'relative' }}>
       {loading && (
-        <>
-          <div
-            style={{ position: 'fixed', width: '100%', height: 'calc(100% - 64px)', backgroundColor: `rgba(255,255,255, 0.5)`, zIndex: 9998 }}
-          ></div>
-          <Box
-            style={{ position: 'fixed', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', zIndex: 9999 }}
-          >
-            <CircularProgress size={80} />
-          </Box>
-        </>
+        <Box
+          sx={{
+            position: 'fixed',
+            width: '100%',
+            height: '100%',
+            backgroundColor: 'rgba(255, 255, 255, 0.5)',
+            zIndex: 9998,
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+          }}
+        >
+          <CircularProgress size={80} />
+        </Box>
       )}
-      <div style={{ paddingLeft: '64px', paddingTop: '64px' }}>
+      <div style={{ padding: '64px' }}>
         <div style={{ display: 'flex', alignItems: 'center', marginBottom: '48px' }}>
           <Button
             variant="contained"
@@ -98,5 +99,3 @@ const Games = () => {
 };
 
 export default Games;
-
-

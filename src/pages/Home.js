@@ -1,19 +1,28 @@
-// Home.js
 import React from 'react';
-import { Container } from '@mui/material';
+import { Container, Grid, Box } from '@mui/material';
 import HeroSection from './sections/HeroSection';
 import FeaturesSection from './sections/FeaturesSection';
 import TutorialSection from './sections/TutorialSection';
 import CommunitySection from './sections/CommunitySection';
 
-const Home = () => {
+const Home = ({ handleLogin }) => {
   return (
     <div>
-      <HeroSection />
+      <HeroSection handleLogin={handleLogin} />
       <Container maxWidth="lg">
-        <FeaturesSection />
-        <TutorialSection />
-        <CommunitySection />
+        <Box mb={4}>
+          <FeaturesSection />
+        </Box>
+        <Box mb={4}>
+          <Grid container spacing={4}>
+            <Grid item xs={12} md={6}>
+              <TutorialSection />
+            </Grid>
+            <Grid item xs={12} md={6}>
+              <CommunitySection />
+            </Grid>
+          </Grid>
+        </Box>
       </Container>
     </div>
   );

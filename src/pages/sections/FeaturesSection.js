@@ -9,7 +9,7 @@ const featuresData = [
   {
     title: 'Intuitive',
     description: 'An easy-to-use interface that allows you to quickly create games with no code.',
-    imageUrl: intuitiveImage, // Make sure to replace this with the actual path of your image
+    imageUrl: intuitiveImage,
   },
   {
     title: 'Flexible',
@@ -34,10 +34,10 @@ const FeaturesSection = () => {
       <Grid container spacing={2} justifyContent="center">
         {featuresData.map((feature, index) => (
           <Grid item key={index} xs={12} sm={6} md={4}>
-            <Card sx={{ maxWidth: 345, m: 'auto' }}>
+            <Card sx={{ maxWidth: 256, m: 'auto' }}>
               <CardMedia
                 component="img"
-                height="345"
+                height="256"
                 image={feature.imageUrl}
                 alt={feature.title}
               />

@@ -1,42 +1,30 @@
 // HeroSection.js
 import React from 'react';
-import { Box, Typography, Button } from '@mui/material';
+import { Box, Typography, Button, useTheme } from '@mui/material';
 import BackgroundImage from '../../images/hero.gif';
 import GameEngineLogo from '../../images/loop.png';
 
-const HeroSection = () => {
+const HeroSection = ({ handleLogin }) => { // Acepta handleLogin como prop
+  const theme = useTheme();
+  const styles = theme.heroSection;
+
   return (
-    <Box sx={{
-      position: 'relative',
-      backgroundImage: `url(${BackgroundImage})`,
-      backgroundSize: 'cover',
-      backgroundPosition: 'center',
-      height: '100vh',
-      display: 'flex',
-      flexDirection: 'column',
-      justifyContent: 'center',
-      alignItems: 'center',
-      textAlign: 'center',
-      '&::before': {
-        content: '""',
-        position: 'absolute',
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0,
-        backgroundColor: 'rgba(53, 53, 53, 0.5)', // Color con transparencia
-        zIndex: 1,
-      },
-    }}>
-      <Box sx={{ position: 'relative', zIndex: 2 }}>
-        <img src={GameEngineLogo} alt="Game Engine Logo" style={{ width: '400px', marginBottom: '40px' }} />
-        <Typography variant="h2" component="h1" gutterBottom style={{ color: '#fff' }}>
+    <Box sx={{ ...styles.heroContainer, backgroundImage: `url(${BackgroundImage})` }}>
+      <Box sx={styles.overlay}></Box>
+      <Box sx={styles.content}>
+        <img src={GameEngineLogo} alt="Game Engine Logo" style={{ ...styles.logo }} />
+        <Typography variant="h2" component="h1" sx={styles.title}>
           Build Your Own 2D Games Easily
         </Typography>
-        <Typography variant="h5" component="p" gutterBottom style={{ color: '#fff', marginBottom: '20px' }}>
+        <Typography variant="h5" component="p" sx={styles.subtitle}>
           The simplest game engine in the world, completely free and open source.
         </Typography>
-        <Button variant="contained" color="secondary" href="#register" style={{ marginTop: '24px' }}>
+        <Button
+          variant="contained"
+          color="secondary"
+          sx={styles.startButton}
+          onClick={handleLogin} // Usa handleLogin aquí en vez de href
+        >
           Start Now
         </Button>
       </Box>
@@ -45,7 +33,3 @@ const HeroSection = () => {
 };
 
 export default HeroSection;
-
-
-
-

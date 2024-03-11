@@ -13,7 +13,7 @@ root.render(
     <AppContextProvider>
       <ThemeProvider theme={theme}>
         <App />
-      </ThemeProvider>,
+      </ThemeProvider>
     </AppContextProvider>
   </BrowserRouter>
 );

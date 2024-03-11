@@ -26,7 +26,6 @@ const NavBar = ({ handleLogin, handleLogout }) => {
     }
   }, [sessionTime]);
   
-
   const handleMenuOpen = (event) => {
     setMenuAnchorEl(event.currentTarget);
   };

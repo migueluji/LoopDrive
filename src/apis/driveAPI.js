@@ -167,7 +167,7 @@ async function copyContents(sourceDirectoryID, newDirectoryID, newDirName) {
       q: `'${sourceDirectoryID}' in parents`,
       fields: 'files(id, name, mimeType)'
     });
-    const blockSize = 50;
+    const blockSize = 10;
     const fileGroups = [];
     for (let i = 0; i < files.result.files.length; i += blockSize) {
       fileGroups.push(files.result.files.slice(i, i + blockSize));

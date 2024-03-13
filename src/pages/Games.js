@@ -60,7 +60,7 @@ const Games = () => {
           sx={{
             position: 'fixed',
             width: '100%',
-            height: '100%',
+            height: 'calc(100vh - 64px - 106.5px)',
             backgroundColor: 'rgba(255, 255, 255, 0.5)',
             zIndex: 9998,
             display: 'flex',
@@ -71,7 +71,7 @@ const Games = () => {
           <CircularProgress size={80} />
         </Box>
       )}
-      <div style={{ padding: '64px' }}>
+      <div style={{ padding: '64px 96px' }}>
         <div style={{ display: 'flex', alignItems: 'center', marginBottom: '48px' }}>
           <Button
             variant="contained"

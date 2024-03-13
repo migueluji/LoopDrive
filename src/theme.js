@@ -1,4 +1,3 @@
-// theme.js
 import { createTheme } from '@mui/material/styles';
 
 const theme = createTheme({
@@ -13,13 +12,14 @@ const theme = createTheme({
   typography: {
     fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif',
   },
-  components: {
-    MuiButton: {
-      styleOverrides: {
-        root: {
-          // Estilos para botones si es necesario
-        },
-      },
+  // Definiciones de estilos personalizados
+  customStyles: {
+    footer: {
+      py: 3,
+      px: 2,
+      mt: 'auto',
+      backgroundColor: '#2E64EC', 
+      color: '#FFFFFF', 
     },
   },
   heroSection: {

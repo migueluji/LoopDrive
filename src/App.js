@@ -4,7 +4,7 @@ import { Routes, Route, useLocation, useNavigate, Navigate } from 'react-router-
 import { getUserInfo, initGoogleAPI, login, logout } from './apis/googleAPI';
 import { folderExists, createFolder } from './apis/driveAPI';
 import NavBar from './components/NavBar';
-import Home from './pages/Home';
+import LandingPage from './pages/LandingPage';
 import Games from './pages/Games';
 import Edit from './pages/Edit';
 import Play from './pages/Play';
@@ -72,7 +72,7 @@ function App() {
       {/* Envuelve tus rutas en un div que pueda expandirse para empujar el Footer hacia abajo */}
       <div style={{ flex: 1 }}>
         <Routes>
-          <Route path="/" element={<Home handleLogin={handleLogin} />} />
+          <Route path="/" element={<LandingPage handleLogin={handleLogin} />} />
           {isAuthenticated ? (
             <>
               <Route path="/games" element={<Games />} />

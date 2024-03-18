@@ -7,12 +7,11 @@ import CardMedia from '@mui/material/CardMedia';
 import IconButton from '@mui/material/IconButton';
 import EditIcon from '@mui/icons-material/Edit';
 import PlayCircleFilledIcon from '@mui/icons-material/PlayCircleFilled';
-import FileCopyIcon from '@mui/icons-material/FileCopy';
 import DeleteIcon from '@mui/icons-material/Delete';
 import Typography from '@mui/material/Typography';
 import Tooltip from '@mui/material/Tooltip';
 
-const GameCard = ({ game, handleEditGame, handlePlayGame, handleDuplicateGame, handleDeleteGame }) => (
+const GameCard = ({ game, handleEditGame, handlePlayGame, handleDeleteGame }) => (
     <Card style={{ maxWidth: '240px', minWidth: '240px' }}>
         <CardMedia
             component="img"
@@ -36,11 +35,6 @@ const GameCard = ({ game, handleEditGame, handlePlayGame, handleDuplicateGame, h
             <Tooltip title="Play game">
                 <IconButton onClick={() => handlePlayGame(game.id)}>
                     <PlayCircleFilledIcon />
-                </IconButton>
-            </Tooltip>
-            <Tooltip title="Duplicate game">
-                <IconButton onClick={() => handleDuplicateGame(game.id)}>
-                    <FileCopyIcon />
                 </IconButton>
             </Tooltip>
             <Tooltip title="Delete game">

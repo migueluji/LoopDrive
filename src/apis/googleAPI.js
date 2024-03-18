@@ -20,8 +20,10 @@ export async function initGoogleAPI(CLIENT_ID, API_KEY, DISCOVERY_DOCS, SCOPES) 
       scope: SCOPES,
       prompt: '',
     });
+    return { error: null };
   } catch (error) {
-    throw new Error(`Google API initialization failed: ${error.message}`);
+    console.error(`Google API initialization failed: ${error.message}`);
+    return { error };
   }
 }
 
@@ -37,24 +39,42 @@ export async function login() {
       };
       tokenClient.requestAccessToken({ prompt: 'select_account' });
     });
-    return token;
+    return { data: token, error: null };
   } catch (error) {
-    throw new Error(`Error during login or user info retrieval: ${error.message}`);
+    console.error(`Error during login or user info retrieval: ${error.message}`);
+    return { error };
   }
 }
 
 export async function logout() {
-  google.accounts.id.disableAutoSelect();
-}
-
-export async function getUserInfo(accessToken) {
   try {
-    const response = await fetch(userInfoEndpoint, {
-      headers: { Authorization: `Bearer ${accessToken}` }
-    });
-    if (!response.ok) throw new Error('Failed to fetch user info');
-    return await response.json();
+    google.accounts.id.disableAutoSelect();
+    return { data: true, error: null };
   } catch (error) {
-    throw new Error(`Error during user info retrieval: ${error.message}`);
+    console.error(`Error during logout: ${error.message}`);
+    return { data: null, error };
   }
 }
+
+
+export async function getUserInfo() {
+  console.log(gapi.client);
+  try {
+    // Asegúrate de que el endpoint de userinfo está incluido en tus documentos de descubrimiento.
+    const response = await gapi.client.people.people.connections.list({
+      resourceName: 'people/me',
+      personFields: 'emailAddresses,names',
+    });
+    if (response.error) {
+      // Esto manejará específicamente errores relacionados con la API, incluidos los de autenticación.
+      console.error('Error during user info retrieval:', response.error.message);
+      return { data: null, error: response.error };
+    }
+    // Retorna los datos de usuario directamente obtenidos de la respuesta de `gapi.client`.
+    return { data: response.result, error: null };
+  } catch (error) {
+    console.error(`Error during user info retrieval: ${error.message}`);
+    return { data: null, error };
+  }
+}
+

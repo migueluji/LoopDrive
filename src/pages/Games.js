@@ -1,6 +1,6 @@
 // Games.js
 import React, { useEffect, useState, useCallback } from 'react';
-import { newGame, duplicateGame, deleteGame, listDriveGames } from '../apis/driveAPI';
+import { newGame, deleteGame, listDriveGames } from '../apis/driveAPI';
 import Button from '@mui/material/Button';
 import CircularProgress from '@mui/material/CircularProgress';
 import Box from '@mui/material/Box';
@@ -37,7 +37,7 @@ const Games = () => {
       if (action === deleteGame) {
         const confirmed = window.confirm('Are you sure you want to delete this game?');
         if (!confirmed) {
-          return setLoading(false); // Return early if the action is cancelled
+          return setLoading(false); 
         }
       }
       await action(...args);
@@ -46,7 +46,6 @@ const Games = () => {
       console.error('Error performing game operation:', error.message);
     }
   };
-
 
   const handleNavigation = (path, gameID) => {
     setGameID(gameID);
@@ -88,7 +87,7 @@ const Games = () => {
             <GameCard key={game.id} game={game}
               handleEditGame={() => handleNavigation('edit', game.id)}
               handlePlayGame={() => handleNavigation('play', game.id)}
-              handleDuplicateGame={() => handleAction(duplicateGame, game.id)}
+             // handleDuplicateGame={() => handleAction(duplicateGame, game.id)}
               handleDeleteGame={() => handleAction(deleteGame, game.id)}
             />
           ))}

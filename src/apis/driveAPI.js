@@ -1,12 +1,11 @@
 // /apis/driverAPI.js
 /* global gapi */
 
-async function folderExists(folderName, token) {
+async function folderExists(folderName) {
   try {
     const response = await gapi.client.drive.files.list({
       q: `name='${folderName}' and trashed=false`,
       fields: 'files(id)',
-      headers: token ? { Authorization: `Bearer ${token}` } : {}
     });
     if (response.result.files && response.result.files.length > 0) {
       return response.result.files[0].id;
@@ -19,7 +18,7 @@ async function folderExists(folderName, token) {
   }
 }
 
-async function createFolder(folderName, parent, token) {
+async function createFolder(folderName, parent) {
   try {
     const requestBody = {
       'name': folderName,
@@ -29,11 +28,7 @@ async function createFolder(folderName, parent, token) {
     const response = await gapi.client.request({
       path: '/drive/v3/files',
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': token ? `Bearer ${token}` : '',
-      },
-      body: JSON.stringify(requestBody)
+      body: JSON.stringify(requestBody),
     });
     const createdFolderId = response.result?.id;
     if (createdFolderId) {
@@ -47,7 +42,7 @@ async function createFolder(folderName, parent, token) {
   }
 }
 
-async function listDriveGames(appFolderID, token) {
+async function listDriveGames(appFolderID) {
   if (!appFolderID) return [];
   const files = [];
   let nextPageToken = null;
@@ -56,7 +51,6 @@ async function listDriveGames(appFolderID, token) {
       const response = await gapi.client.drive.files.list({
         q: `parents in "${appFolderID}"`,
         fields: 'nextPageToken, files(id, name)',
-        headers: token ? { Authorization: `Bearer ${token}` } : {},
         pageToken: nextPageToken,
       });
       const gameFiles = response.result.files;
@@ -64,7 +58,6 @@ async function listDriveGames(appFolderID, token) {
         const imagePromises = gameFiles.map(async (file) => {
           file.imageUrl = await getImageDownloadUrl(file.id);
         });
-
         await Promise.all(imagePromises);
         files.push(...gameFiles);
       }
@@ -102,14 +95,14 @@ async function getImageDownloadUrl(gameFolderID) {
   }
 }
 
-async function newGame(appFolderID, token) {
+async function newGame(appFolderID) {
   try {
-    const folderId = await createFolder("Untitled Game", appFolderID, token);
+    const folderId = await createFolder("Untitled Game", appFolderID);
     await Promise.all([
-      createFolder("images", folderId, token),
-      createFolder("sounds", folderId, token),
-      createEmptyJson(folderId, token),
-      createEmptyImage(folderId, token)
+      createFolder("images", folderId),
+      createFolder("sounds", folderId),
+      createEmptyJson(folderId),
+      createEmptyImage(folderId)
     ]);
     return { id: folderId, name: "Untitled Game", imageUrl: "" };
   } catch (error) {
@@ -118,86 +111,13 @@ async function newGame(appFolderID, token) {
   }
 }
 
-async function duplicateGame(gameID) {
-  try {
-    await copyDirectory(gameID);
-    console.log('Game duplication completed. New Game ID:');
-  } catch (error) {
-    console.error('Error during game duplication:', error.message);
-    throw error;
-  }
-}
-
-async function deleteGame(gameID, gameName) {
+async function deleteGame(gameID) {
   try {
     await gapi.client.drive.files.delete({
       'fileId': gameID
     });
   } catch (error) {
     console.error('Error deleting game:', error.message);
-  }
-}
-
-async function copyDirectory(sourceDirectoryID, parentDirectoryID = null) {
-  try {
-    const sourceDirInfo = await gapi.client.drive.files.get({
-      fileId: sourceDirectoryID,
-      fields: 'name, parents'
-    });
-    let newDirName = !parentDirectoryID ? `${sourceDirInfo.result.name} - Copy` : sourceDirInfo.result.name;
-    const newDirRes = await gapi.client.drive.files.create({
-      resource: {
-        name: newDirName,
-        mimeType: 'application/vnd.google-apps.folder',
-        parents: [parentDirectoryID || sourceDirInfo.result.parents[0]]
-      }
-    });
-    const newDirectoryID = newDirRes.result.id;
-    console.log(`Directory created: ${newDirName}`);
-    await copyContents(sourceDirectoryID, newDirectoryID, newDirName);
-  } catch (error) {
-    console.error('Error during directory copy:', error.message);
-    throw error;
-  }
-}
-
-async function copyContents(sourceDirectoryID, newDirectoryID, newDirName) {
-  try {
-    const files = await gapi.client.drive.files.list({
-      q: `'${sourceDirectoryID}' in parents`,
-      fields: 'files(id, name, mimeType)'
-    });
-    const blockSize = 10;
-    const fileGroups = [];
-    for (let i = 0; i < files.result.files.length; i += blockSize) {
-      fileGroups.push(files.result.files.slice(i, i + blockSize));
-    }
-    for (const group of fileGroups) {
-      const copyPromises = [];
-    for (const file of group) {
-        if (file.mimeType === 'application/vnd.google-apps.folder') {
-          await copyDirectory(file.id, newDirectoryID);
-        } else {
-          const copyPromise = gapi.client.drive.files.copy({
-            fileId: file.id,
-            parents: [newDirectoryID]
-          }).then(copyRes => {
-            console.log(`File copied: ${file.name}`);
-            if (file.name === "game.json") {
-              return changeNameInJson(copyRes.result.id, newDirName);
-            }
-          }).catch(error => {
-            console.error(`Error copying file ${file.name}:`, error);
-            throw new Error(`Error copying file ${file.name}: ${error.message || error}`);
-          });
-          copyPromises.push(copyPromise);
-        }
-      }
-      await Promise.all(copyPromises);
-    }
-  } catch (error) {
-    console.error('Error copying directory contents:', error.message);
-    throw error;
   }
 }
 
@@ -226,7 +146,7 @@ async function changeNameInJson(fileId, newName) {
   }
 }
 
-async function createEmptyJson(gameID, token) {
+async function createEmptyJson(gameID) {
   try {
     const response = await gapi.client.drive.files.create({
       resource: {
@@ -247,7 +167,7 @@ async function createEmptyJson(gameID, token) {
   }
 }
 
-async function createEmptyImage(gameID, token) {
+async function createEmptyImage(gameID) {
   try {
     const canvas = document.createElement('canvas');
     canvas.width = 1;
@@ -279,7 +199,6 @@ async function createEmptyImage(gameID, token) {
       params: { uploadType: 'multipart' },
       headers: {
         'Content-Type': `multipart/related; boundary="${boundary}"`,
-        'Authorization': `Bearer ${token}`,
       },
       body: multipartRequestBody,
     });
@@ -300,6 +219,5 @@ export {
   listDriveGames,
   newGame,
   deleteGame,
-  duplicateGame
+  changeNameInJson
 };
-

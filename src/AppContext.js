@@ -3,7 +3,6 @@ import React, { createContext, useContext, useState } from 'react';
 
 const AppContext = createContext();
 
-
 export const AppContextProvider = ({ children }) => {
     const [token, setToken] = useState(null);
     const [userInfo, setUserInfo] = useState(null);
@@ -14,7 +13,7 @@ export const AppContextProvider = ({ children }) => {
     const [sessionTime, setSessionTime] = useState(null);
     const CLIENT_ID = process.env.REACT_APP_CLIENT_ID;
     const API_KEY = process.env.REACT_APP_API_KEY;
-    const DISCOVERY_DOCS = [process.env.REACT_APP_DISCOVERY_DOCS];
+    const DISCOVERY_DOCS = process.env.REACT_APP_DISCOVERY_DOCS.split(' ');
     const SCOPES = process.env.REACT_APP_SCOPES;
 
     return (

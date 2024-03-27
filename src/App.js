@@ -41,7 +41,7 @@ function App() {
     await initGoogleAPI(CLIENT_ID, API_KEY, DISCOVERY_DOCS, SCOPES);
     const newToken = await login();
     setToken(newToken);
-    newToken.expires_in = 30;
+    //newToken.expires_in = 30;
     setSessionTime(newToken.expires_in);
     let newAppFolderID = await folderExists("Loop Games", newToken.access_token);
     if (!newAppFolderID) {
@@ -83,7 +83,6 @@ function App() {
           {/* Estas rutas deben ser accesibles sin importar el estado de autenticación */}
           <Route path="/legal" element={<Legal />} />
           <Route path="/privacy-policy" element={<PrivacyPolicy />} />
-          {/* Redirigir a la página de inicio si la ruta no coincide y el usuario no está autenticado */}
           {!isAuthenticated && <Route path="*" element={<Navigate replace to="/" />} />}
         </Routes>
       </div>

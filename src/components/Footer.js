@@ -62,7 +62,7 @@ const Footer = () => {
           </Typography>
           <Typography variant="body2" sx={{ display: 'flex', gap: 1 }}>
             <RouterLink to="/legal" style={{ color: 'inherit', textDecoration: 'none' }}>
-              Legal
+              Terms of Use
             </RouterLink>
             |
             <RouterLink to="/privacy-policy" style={{ color: 'inherit', textDecoration: 'none' }}>

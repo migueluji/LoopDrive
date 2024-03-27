@@ -1,10 +1,11 @@
-import tikTokImage from '../images/tic-toc.png';
 import React from 'react';
-import { Box, Grid, Link, IconButton, Tooltip, Typography, useTheme } from '@mui/material';
+import { Box, Grid, IconButton, Tooltip, Typography, useTheme } from '@mui/material';
+import { Link as RouterLink } from 'react-router-dom'; // Importa Link como RouterLink para evitar conflictos
 import YouTubeIcon from '@mui/icons-material/YouTube';
 import FacebookIcon from '@mui/icons-material/Facebook';
 import InstagramIcon from '@mui/icons-material/Instagram';
 import DiscordIcon from './DiscordIcon'; // Asegúrate de ajustar la ruta de importación según sea necesario
+import tikTokImage from '../images/tic-toc.png';
 
 const Footer = () => {
   const theme = useTheme();
@@ -60,9 +61,13 @@ const Footer = () => {
             Copyright © {currentYear} Loop Game Engine
           </Typography>
           <Typography variant="body2" sx={{ display: 'flex', gap: 1 }}>
-            <Link href="#" color="inherit" sx={{ textDecoration: 'none' }}>Legal</Link>
+            <RouterLink to="/legal" style={{ color: 'inherit', textDecoration: 'none' }}>
+              Legal
+            </RouterLink>
             |
-            <Link href="#" color="inherit" sx={{ textDecoration: 'none' }}>Privacy Policy</Link>
+            <RouterLink to="/privacy-policy" style={{ color: 'inherit', textDecoration: 'none' }}>
+              Privacy Policy
+            </RouterLink>
           </Typography>
         </Grid>
       </Grid>
@@ -71,6 +76,8 @@ const Footer = () => {
 };
 
 export default Footer;
+
+
 
 
 

@@ -18,6 +18,7 @@ class AppBarView {
 				'<button id="redo" class="material-icons mdc-top-app-bar__action-item mdc-icon-button">redo</button>'+
 				'<button id="cast" class="material-icons mdc-top-app-bar__action-item mdc-icon-button">list</button>'+
 				'<button id="settings" class="material-icons mdc-top-app-bar__action-item  mdc-icon-button">settings</button>'+
+				'<span id="span" style="font-size: 36px; margin: 0px 5px auto 5px;"> | </span>' +
 				'<button id="close" class="material-icons mdc-top-app-bar__action-item  mdc-icon-button">close</button>'+
 			'</section>'+
 		'</div>';

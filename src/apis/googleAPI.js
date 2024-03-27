@@ -1,14 +1,14 @@
 // /src/api/googleAPI.js
 /* global gapi, google  */
 
-//const userInfoEndpoint = 'https://www.googleapis.com/oauth2/v1/userinfo';
+const userInfoEndpoint = 'https://www.googleapis.com/oauth2/v1/userinfo';
 
 let tokenClient;
 
 export async function initGoogleAPI(CLIENT_ID, API_KEY, DISCOVERY_DOCS, SCOPES) {
   try {
     await new Promise((resolve, reject) => {
-      gapi.load('client', () => {
+      gapi.load('client:auth2', () => {
         gapi.client.init({
           apiKey: API_KEY,
           discoveryDocs: DISCOVERY_DOCS,
@@ -35,7 +35,8 @@ export async function login() {
           resolve(response);
         }
       };
-      tokenClient.requestAccessToken({ prompt: 'select_account' });
+        tokenClient.requestAccessToken();
+
     });
     return token;
   } catch (error) {
@@ -45,23 +46,21 @@ export async function login() {
 
 export async function logout() {
   try {
-    google.accounts.id.disableAutoSelect();
+    //google.accounts.id.disableAutoSelect();
   } catch (error) {
     console.error(`Error during logout: ${error.message}`);
   }
 }
 
-export async function getUserInfo() {
+export async function getUserInfo(accessToken) {
   try {
-    const response = await gapi.client.people.people.get({
-      resourceName: 'people/me',
-      personFields: 'emailAddresses,names',
+    const response = await fetch(userInfoEndpoint, {
+      headers: { Authorization: `Bearer ${accessToken}` }
     });
-    console.log(response); // Verifica la estructura de la respuesta completa
-    return { data: response.result, error: null };
+    if (!response.ok) throw new Error('Failed to fetch user info');
+    return await response.json();
   } catch (error) {
-    console.error(`Error during user info retrieval: ${error.message}`);
-    return { data: null, error };
+    throw new Error(`Error during user info retrieval: ${error.message}`);
   }
 }
 

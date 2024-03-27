@@ -8,13 +8,14 @@ import LandingPage from './pages/LandingPage';
 import Games from './pages/Games';
 import Edit from './pages/Edit';
 import Play from './pages/Play';
+import Legal from './pages/Legal';
+import PrivacyPolicy from './pages/PrivacyPolicy';
 import Footer from './components/Footer';
 import SessionDialog from './components/SessionDialog';
 import { useAppContext } from './AppContext';
 
-
 function App() {
-  const { token, setToken, setUserInfo, setAppFolderID, setGameList, sessionTime, setSessionTime, CLIENT_ID, API_KEY, DISCOVERY_DOCS, SCOPES } = useAppContext();
+  const { token, setToken, setUserInfo, setAppFolderID, setGameList, setUpdateGameList, sessionTime, setSessionTime, CLIENT_ID, API_KEY, DISCOVERY_DOCS, SCOPES } = useAppContext();
   const navigate = useNavigate();
   const location = useLocation();
   const isEditorPage = location.pathname.includes('/edit');
@@ -35,13 +36,12 @@ function App() {
     return () => clearInterval(interval);
   }, [sessionTime, setSessionTime]);
 
-
   const handleLogin = async () => {
     setIsSessionTimeOver(false);
     await initGoogleAPI(CLIENT_ID, API_KEY, DISCOVERY_DOCS, SCOPES);
     const newToken = await login();
     setToken(newToken);
-    //newToken.expires_in = 30;
+    newToken.expires_in = 30;
     setSessionTime(newToken.expires_in);
     let newAppFolderID = await folderExists("Loop Games", newToken.access_token);
     if (!newAppFolderID) {
@@ -50,6 +50,7 @@ function App() {
     setAppFolderID(newAppFolderID);
     const newUserInfo = await getUserInfo(newToken.access_token);
     setUserInfo(newUserInfo);
+    setUpdateGameList(true);
     if (location.pathname === '/') navigate('/games');
   };
 
@@ -58,7 +59,6 @@ function App() {
     setToken(null);
     setUserInfo(null);
     setAppFolderID(null);
-    setGameList(null);
     setGameList([]);
     setSessionTime(null);
     setIsSessionTimeOver(false);
@@ -73,15 +73,18 @@ function App() {
       <div style={{ flex: 1 }}>
         <Routes>
           <Route path="/" element={<LandingPage handleLogin={handleLogin} />} />
-          {isAuthenticated ? (
+          {isAuthenticated && (
             <>
               <Route path="/games" element={<Games />} />
               <Route path="/edit" element={<Edit />} />
               <Route path="/play" element={<Play />} />
             </>
-          ) : (
-            <Route path="*" element={<Navigate replace to="/" />} />
           )}
+          {/* Estas rutas deben ser accesibles sin importar el estado de autenticación */}
+          <Route path="/legal" element={<Legal />} />
+          <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+          {/* Redirigir a la página de inicio si la ruta no coincide y el usuario no está autenticado */}
+          {!isAuthenticated && <Route path="*" element={<Navigate replace to="/" />} />}
         </Routes>
       </div>
       {isSessionTimeOver && <SessionDialog open={isSessionTimeOver} onLogin={handleLogin} onLogout={handleLogout} />}

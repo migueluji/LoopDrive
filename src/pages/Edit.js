@@ -46,7 +46,7 @@ function Edit() {
         title="Editor"
         id="editorIframe"
         ref={iframeRef}
-        src="/LoopDrive/editor/index.html"
+        src="/loopsite/editor/index.html"
         style={{ width: '100%', height: '100%', border: 'none' }}
       ></iframe>
     </div>

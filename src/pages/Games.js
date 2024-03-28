@@ -1,6 +1,6 @@
 // Games.js
 import React, { useEffect, useState, useCallback } from 'react';
-import { newGame, deleteGame, listDriveGames } from '../apis/driveAPI';
+import { newGame, deleteGame, duplicateGame,listDriveGames } from '../apis/driveAPI';
 import Button from '@mui/material/Button';
 import CircularProgress from '@mui/material/CircularProgress';
 import Box from '@mui/material/Box';
@@ -87,7 +87,7 @@ const Games = () => {
             <GameCard key={game.id} game={game}
               handleEditGame={() => handleNavigation('edit', game.id)}
               handlePlayGame={() => handleNavigation('play', game.id)}
-             // handleDuplicateGame={() => handleAction(duplicateGame, game.id)}
+              handleDuplicateGame={() => handleAction(duplicateGame, game.id)}
               handleDeleteGame={() => handleAction(deleteGame, game.id)}
             />
           ))}

@@ -1,6 +1,6 @@
 {
   "files": {
-    "main.js": "./static/js/main.0ca07032.js",
+    "main.js": "./static/js/main.5eb6239c.js",
     "static/media/hero.gif": "./static/media/hero.65fe9d558c7c21f9f23b.gif",
     "static/media/powerful.png": "./static/media/powerful.6e36af265979cc13c9b5.png",
     "static/media/intuitive.png": "./static/media/intuitive.30c77c8c98321403bb84.png",
@@ -10,9 +10,9 @@
     "static/media/flexible.png": "./static/media/flexible.3107ce8a7568059a8154.png",
     "static/media/discord-mark-white.svg": "./static/media/discord-mark-white.78e7bdfb55259fd6ad708ce2663a0c0b.svg",
     "index.html": "./index.html",
-    "main.0ca07032.js.map": "./static/js/main.0ca07032.js.map"
+    "main.5eb6239c.js.map": "./static/js/main.5eb6239c.js.map"
   },
   "entrypoints": [
-    "static/js/main.0ca07032.js"
+    "static/js/main.5eb6239c.js"
   ]
 }

@@ -46,7 +46,7 @@ function Play() {
                 title="Game Engine"
                 ref={iframeRef}
                 onLoad={handleOpenEngine}
-                src={`/loopsite/engine/index.html`}
+                src={`/engine/index.html`}
                 style={{ width: '100%', height: '100%', border: 'none' }}
             ></iframe>
         </div>

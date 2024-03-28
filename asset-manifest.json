@@ -1,18 +1,18 @@
 {
   "files": {
-    "main.js": "/loop2d.com/static/js/main.f417443d.js",
-    "static/media/hero.gif": "/loop2d.com/static/media/hero.65fe9d558c7c21f9f23b.gif",
-    "static/media/powerful.png": "/loop2d.com/static/media/powerful.6e36af265979cc13c9b5.png",
-    "static/media/intuitive.png": "/loop2d.com/static/media/intuitive.30c77c8c98321403bb84.png",
-    "static/media/loop.png": "/loop2d.com/static/media/loop.3ad886a5ccbf2e8a4619.png",
-    "static/media/chat.png": "/loop2d.com/static/media/chat.ebd48d71b0cfe6bd5b1f.png",
-    "static/media/tic-toc.png": "/loop2d.com/static/media/tic-toc.b18bb7bb5044c5d84069.png",
-    "static/media/flexible.png": "/loop2d.com/static/media/flexible.3107ce8a7568059a8154.png",
-    "static/media/discord-mark-white.svg": "/loop2d.com/static/media/discord-mark-white.78e7bdfb55259fd6ad708ce2663a0c0b.svg",
-    "index.html": "/loop2d.com/index.html",
-    "main.f417443d.js.map": "/loop2d.com/static/js/main.f417443d.js.map"
+    "main.js": "./static/js/main.0ca07032.js",
+    "static/media/hero.gif": "./static/media/hero.65fe9d558c7c21f9f23b.gif",
+    "static/media/powerful.png": "./static/media/powerful.6e36af265979cc13c9b5.png",
+    "static/media/intuitive.png": "./static/media/intuitive.30c77c8c98321403bb84.png",
+    "static/media/loop.png": "./static/media/loop.3ad886a5ccbf2e8a4619.png",
+    "static/media/chat.png": "./static/media/chat.ebd48d71b0cfe6bd5b1f.png",
+    "static/media/tic-toc.png": "./static/media/tic-toc.b18bb7bb5044c5d84069.png",
+    "static/media/flexible.png": "./static/media/flexible.3107ce8a7568059a8154.png",
+    "static/media/discord-mark-white.svg": "./static/media/discord-mark-white.78e7bdfb55259fd6ad708ce2663a0c0b.svg",
+    "index.html": "./index.html",
+    "main.0ca07032.js.map": "./static/js/main.0ca07032.js.map"
   },
   "entrypoints": [
-    "static/js/main.f417443d.js"
+    "static/js/main.0ca07032.js"
   ]
 }
